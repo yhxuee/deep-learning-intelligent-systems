@@ -1,15 +1,32 @@
 ---
 title: Unit prompts
-description: Unit-specific Tutor and Critic prompts with learning objectives and known values for Units 03–05.
+description: Unit-specific Tutor and Critic prompts with learning objectives and known values for all twelve units.
 sidebar: { order: 2 }
 ---
 
 import { Code } from '@astrojs/starlight/components';
+import u01 from '../../../../prompts/units/unit-01-tutor.md?raw';
+import u02 from '../../../../prompts/units/unit-02-tutor.md?raw';
 import u03 from '../../../../prompts/units/unit-03-tutor.md?raw';
 import u04 from '../../../../prompts/units/unit-04-critic.md?raw';
 import u05 from '../../../../prompts/units/unit-05-tutor.md?raw';
+import u06 from '../../../../prompts/units/unit-06-tutor.md?raw';
+import u07 from '../../../../prompts/units/unit-07-tutor.md?raw';
+import u08 from '../../../../prompts/units/unit-08-tutor.md?raw';
+import u09 from '../../../../prompts/units/unit-09-tutor.md?raw';
+import u10 from '../../../../prompts/units/unit-10-critic.md?raw';
+import u11 from '../../../../prompts/units/unit-11-tutor.md?raw';
+import u12 from '../../../../prompts/units/unit-12-critic.md?raw';
 
 Unit prompts specialize a mode with the unit's objectives, AI-off boundaries and — where useful — the known values the Mentor should check against without revealing them. Paste the [base policy](/mentor/modes/) first.
+
+## Unit 01 · Tutor
+
+<Code code={u01} lang="text" title="prompts/units/unit-01-tutor.md" />
+
+## Unit 02 · Tutor
+
+<Code code={u02} lang="text" title="prompts/units/unit-02-tutor.md" />
 
 ## Unit 03 · Tutor
 
@@ -24,3 +41,35 @@ Use with the bug-hunt file in `labs/unit-04-attention/buggy_variants.py`, or wit
 ## Unit 05 · Tutor
 
 <Code code={u05} lang="text" title="prompts/units/unit-05-tutor.md" />
+
+## Unit 06 · Tutor
+
+<Code code={u06} lang="text" title="prompts/units/unit-06-tutor.md" />
+
+## Unit 07 · Tutor
+
+<Code code={u07} lang="text" title="prompts/units/unit-07-tutor.md" />
+
+## Unit 08 · Tutor
+
+<Code code={u08} lang="text" title="prompts/units/unit-08-tutor.md" />
+
+## Unit 09 · Tutor
+
+<Code code={u09} lang="text" title="prompts/units/unit-09-tutor.md" />
+
+## Unit 10 · Critic
+
+Use with any evaluation table or plan — your own, a paper's, or one an AI wrote for you.
+
+<Code code={u10} lang="text" title="prompts/units/unit-10-critic.md" />
+
+## Unit 11 · Tutor
+
+<Code code={u11} lang="text" title="prompts/units/unit-11-tutor.md" />
+
+## Unit 12 · Critic
+
+Use on your capstone registration before you run anything, and again on the results section before you write the conclusion.
+
+<Code code={u12} lang="text" title="prompts/units/unit-12-critic.md" />

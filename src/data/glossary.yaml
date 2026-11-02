@@ -213,3 +213,47 @@ linear-attention: { en: "linear attention", zh: "線性注意力", area: memory 
 capacity: { en: "(memory) capacity", zh: "（記憶）容量", area: memory }
 cross-talk: { en: "cross-talk (interference)", zh: "串擾（干擾）", area: memory }
 delta-rule: { en: "delta rule", zh: "delta 規則", area: memory }
+
+# --- Units 01-02 and 06-12
+held-out-data: { en: "held-out data", zh: "留出資料", area: statistics, cn: "留出數據 / 保留集" }
+standard-error: { en: "standard error", zh: "標準誤", area: statistics, cn: "標準誤差" }
+perplexity: { en: "perplexity", zh: "困惑度", area: statistics }
+smoothing: { en: "(add-α) smoothing", zh: "（加 α）平滑", area: statistics }
+linear-separability: { en: "linear separability", zh: "線性可分性", area: general }
+one-hot: { en: "one-hot encoding", zh: "獨熱編碼", area: general }
+embedding-lookup: { en: "embedding lookup", zh: "嵌入查找", area: general }
+scaling-law: { en: "scaling law", zh: "規模定律", area: systems, cn: "縮放定律" }
+compute-optimal: { en: "compute-optimal", zh: "計算最佳", area: systems }
+arithmetic-intensity: { en: "arithmetic intensity", zh: "算術強度", area: systems }
+memory-bound: { en: "memory-bound", zh: "受記憶體限制", area: systems, cn: "訪存受限" }
+deduplication: { en: "deduplication", zh: "去重", area: general }
+contamination: { en: "(test-set) contamination", zh: "（測試集）污染", area: statistics }
+self-supervised: { en: "self-supervised learning", zh: "自我監督學習", area: general, cn: "自監督學習" }
+pretraining: { en: "pretraining", zh: "預訓練", area: general }
+ancestral-sampling: { en: "ancestral sampling", zh: "祖先抽樣", area: statistics, cn: "祖先採樣" }
+nucleus-sampling: { en: "nucleus (top-p) sampling", zh: "核心（top-p）抽樣", area: statistics, cn: "核採樣" }
+flow-matching: { en: "flow matching", zh: "流匹配", area: general }
+elbo: { en: "evidence lower bound (ELBO)", zh: "證據下界", area: statistics }
+policy: { en: "policy", zh: "策略", area: general }
+reward: { en: "reward", zh: "獎勵", area: general, cn: "獎勵 / 回報" }
+baseline-rl: { en: "baseline (variance reduction)", zh: "基準（降低變異數）", area: statistics, cn: "基線" }
+advantage: { en: "advantage", zh: "優勢", area: general }
+post-training: { en: "post-training", zh: "後訓練", area: general }
+reward-hacking: { en: "reward hacking", zh: "獎勵駭取", area: general, cn: "獎勵破解 / 獎勵黑客" }
+dpo: { en: "direct preference optimization (DPO)", zh: "直接偏好最佳化", area: optimization, cn: "直接偏好優化" }
+distribution-shift: { en: "distribution shift", zh: "分布偏移", area: statistics, cn: "分佈偏移" }
+leakage: { en: "(data) leakage", zh: "（資料）洩漏", area: statistics, cn: "數據洩露" }
+calibration: { en: "calibration", zh: "校準", area: statistics }
+ece: { en: "expected calibration error (ECE)", zh: "期望校準誤差", area: statistics }
+bootstrap: { en: "bootstrap", zh: "拔靴法", area: statistics, cn: "自助法" }
+conformal-prediction: { en: "conformal prediction", zh: "保形預測", area: statistics, cn: "共形預測" }
+false-discovery-rate: { en: "false discovery rate", zh: "錯誤發現率", area: statistics }
+induction-head: { en: "induction head", zh: "歸納頭", area: attention }
+ablation: { en: "ablation", zh: "消融", area: general }
+activation-patching: { en: "activation patching", zh: "激活修補", area: general, cn: "激活修補 / 激活替換" }
+probe: { en: "(linear) probe", zh: "（線性）探針", area: general }
+causal-abstraction: { en: "causal abstraction", zh: "因果抽象", area: general }
+pre-registration: { en: "pre-registration", zh: "預先登記", area: book, cn: "預註冊" }
+replication: { en: "replication", zh: "重現", area: book, cn: "復現" }
+statistical-power: { en: "statistical power", zh: "檢定力", area: statistics, cn: "統計功效" }
+forking-paths: { en: "garden of forking paths", zh: "分岔小徑花園", area: statistics }

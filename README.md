@@ -16,16 +16,15 @@ This book covers fewer topics than a survey and treats each one completely — d
 | **Mentor** | model-agnostic prompt packs + `llms.txt`, `atlas.json` and a zero-dependency **MCP server** | `prompts/`, `mcp/` |
 | **Labs** | laptop-scale AI-off construction tasks with invariant tests | `labs/` |
 
-## Status (v1.3 — interactive figures and Traditional Chinese edition)
+## Status (v2.0 — all twelve units, one argument)
 
-- **Units 03, 04, 05** — optimization, interaction (attention/Transformer), memory — are **full drafts**: self-contained chapters in a ten-part structure (problem → first principles → construction → worked examples → theory → connections → limitations → modern developments → experiments → problems), about 41 000 words with 27 worked examples, 14 code-generated figures and 60 graded problems. They await subject and pedagogical review.
-- The other nine units are **planning outlines**, not yet textbook text.
-- Target scale: 600–750 pages plus 100–200 pages of appendices. See the [writing standard](https://yhxuee.github.io/deep-learning-intelligent-systems/project/writing-standard/).
-- **The textbook educates; the AI augments.** Every derivation is in the text; the Mentor prompts explain first, then question.
-- 15 Atlas nodes; labs for Units 03–05 (incl. a five-bug attention bug hunt); spine stages 01 and 03. Tests run in CI against reference implementations; the build fails on dangling Atlas links or unknown citations; a link checker verifies every internal link and anchor.
-- **Ten interactive figures** (vanilla JS, no external services) embedded in Units 03–05 and collected at [/labs/interactive/](https://yhxuee.github.io/deep-learning-intelligent-systems/labs/interactive/).
-- **Traditional Chinese (Taiwan) edition** of every page, with English terms at first use and a [bilingual glossary](https://yhxuee.github.io/deep-learning-intelligent-systems/zh-tw/start/glossary/) (Taiwan / English / mainland variant). Chinese Mentor prompts in `prompts/zh-tw/`. Machine-readable endpoints (`llms.txt`, `atlas.json`) remain English.
-- **Feature freeze** on agent tooling until the Core meets the writing standard.
+- **All twelve units are full drafts** in a ten-part structure (problem → first principles → construction → worked examples → theory → connections → limitations → modern developments → experiments → problems): about 100 000 words in English, 99 worked examples, 78 experiments and 240 graded problems. They await subject and pedagogical review.
+- **One argument.** Each unit records its answer, the limitation it leaves open and what it builds on; the build checks the chain, and [the argument of the book](https://yhxuee.github.io/deep-learning-intelligent-systems/core/) shows it — Unit 12's limitation returns to Unit 01's question.
+- **Spine project, stages 01–12** (`spine/`): a NumPy decoder-only Transformer with hand-derived gradients, an exact FLOP counter and a KV cache, trained on an instrumented synthetic corpus, through scaling fits, deduplication, sampling and flow matching, REINFORCE/DPO with a deliberately buggy reward, an evaluation harness, induction-circuit interventions and a pre-registered capstone. Results are reported as measured, including the ones that failed.
+- **Reproducible numbers.** Every worked-example number is recomputed by `labs/test_worked_examples*.py` or asserted by `spine/test_*.py`; the full suite runs in CI in about a minute.
+- 24 Atlas verification kits; labs for Units 03–05; ten interactive figures; a link checker and a CJK-in-math checker in CI.
+- **Traditional Chinese (Taiwan) edition** of every page, with English terms at first use and a [bilingual glossary](https://yhxuee.github.io/deep-learning-intelligent-systems/zh-tw/start/glossary/). Chinese Mentor prompts in `prompts/zh-tw/`.
+- Target scale: 600–750 pages plus 100–200 pages of appendices (appendices not yet written). **Feature freeze** on agent tooling until the Core has been reviewed.
 
 ## Quick start
 
@@ -37,6 +36,9 @@ npm run dev            # http://localhost:4321/deep-learning-intelligent-systems
 # Do a lab (AI-off): implement labs/unit-04-attention/attention.py, then
 pip install -r labs/requirements.txt
 cd labs/unit-04-attention && python -m pytest
+
+# Run the spine project and every reproducibility check
+cd ../.. && LAB_IMPL=reference python -m pytest
 
 # Give your AI agent the book (MCP, stdio, standard library only)
 python3 mcp/atlas_server.py --self-test
@@ -54,7 +56,7 @@ src/data/           bibliography.yaml — citation keys validated at build time
 src/pages/          atlas.json, llms.txt, llms-full.txt endpoints; references page
 prompts/            Mentor prompt packs (source of truth; rendered on the site); prompts/zh-tw/ in Chinese
 labs/               unit labs: learner stub, reference, invariant tests
-spine/              the spine-project language model
+spine/              the spine-project language model (NumPy, stages 01–12, tests, checkpoints)
 mcp/                Atlas MCP server + tests
 scripts/            link checker; CJK-in-math checker
 ```

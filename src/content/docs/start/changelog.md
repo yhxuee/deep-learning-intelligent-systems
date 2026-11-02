@@ -4,6 +4,14 @@ description: What changed between blueprint v1.0 and each edition published here
 sidebar: { order: 3 }
 ---
 
+## v2.0 — 2 November 2026: all twelve units, one argument
+
+1. **Every unit is a full draft.** Units 01, 02 and 06–12 were written from scratch to the [writing standard](/project/writing-standard/), joining Units 03–05: twelve ten-part chapters, about 100 000 words in English, 99 worked examples, 78 experiments and 240 graded problems with selected answers. Every worked-example number is recomputed by `labs/test_worked_examples*.py` or asserted by the spine tests.
+2. **The units are one argument.** Each unit's front matter now records its *answer*, the limitation it *leaves open*, and which earlier results it *builds on*. The build checks that the chain is complete and that every dependency points backward. Each unit page shows where it arrives from and where it leads; [the argument of the book](/core/) shows the whole chain, and Unit 12's limitation returns to Unit 01's question.
+3. **The spine project runs end to end** (`spine/`): a NumPy decoder-only Transformer with hand-derived gradients (finite-difference checked), an exact FLOP counter and a KV cache, trained on a synthetic corpus with planted duplicates, contamination, wrong arithmetic and made-up names — through deduplication, scaling fits, pretraining, sampling and flow matching, REINFORCE and DPO with a deliberately buggy reward, an evaluation harness, induction-circuit interventions, and a pre-registered capstone ablation. Results are reported as measured, including a scaling prediction that failed, a trained model that copies without the textbook mechanism, and a capstone that was inconclusive with a pairing flaw it exposed.
+4. **Traditional Chinese edition complete**: all 120 unit pages, with English terms at first use; new Atlas method nodes in both languages.
+5. **Atlas**: 24 verification kits, including MinHash deduplication, flow matching, policy gradients, DPO, calibration, bootstrap intervals, activation patching and pre-registration.
+
 ## v1.3 — 2 November 2026: interactive figures and Traditional Chinese edition
 
 1. **Ten interactive figures**, embedded in the relevant sections of Units 03–05 and collected on the [interactive figures](/labs/interactive/) page: step size and divergence, ill-conditioning and momentum, forward and backward pass through one neuron, softmax temperature, soft lookup, attention-score scaling, an EMA smoothing filter, discretization stability, 2×2 eigenmodes and transient growth, and linear-attention memory capacity. They run entirely in the browser with no external services, and their labels follow the page language.
