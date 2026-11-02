@@ -1,0 +1,23 @@
+{
+  "name": "deep-learning-intelligent-systems",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "LAB_IMPL=reference python -m pytest",
+    "check:links": "node scripts/check-links.mjs dist"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "7.3.5",
+    "@astrojs/starlight": "0.42.8",
+    "astro": "7.4.4",
+    "katex": "0.16.47",
+    "rehype-katex": "7.0.1",
+    "remark-math": "6.0.0",
+    "sharp": "0.35.5",
+    "unist-util-visit": "5.1.0"
+  }
+}

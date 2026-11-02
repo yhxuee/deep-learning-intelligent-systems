@@ -1,0 +1,39 @@
+---
+title: The Atlas
+description: A capped, versioned set of verification kits — reference implementations, invariants, known values and common bugs — linked by typed relationships.
+sidebar: { label: Overview, order: 0 }
+---
+
+import AtlasTable from '../../../components/AtlasTable.astro';
+
+The Atlas is **not an encyclopedia**. AI systems already explain well; what they cannot reliably supply is *ground truth to check them against*. Each node is therefore a short **verification kit**:
+
+- a one-paragraph definition with the essential equation;
+- **invariants** any correct implementation must satisfy;
+- **known values** you can reproduce by hand;
+- a **reference implementation** with tests (where a lab exists);
+- **common bugs** and which invariant catches each;
+- primary sources by stable bibliography key.
+
+Nodes are connected by typed links — *prerequisite*, *related*, *historical predecessor*, *alternative mechanism* — and the site build **fails** if any link, unit number or citation key is dangling. The Atlas is capped at about 150 nodes; adding one should usually mean merging or retiring another.
+
+<AtlasTable />
+
+## Node schema
+
+```yaml
+atlas:
+  id: mech-attention            # (math|mech|arch|method|opt|para)-slug
+  type: mechanism
+  mastery: internalize          # internalize | understand-and-verify | access-on-demand
+  core_units: [4, 5, 11]
+  prerequisites: [math-softmax]
+  related: [arch-transformer-block]
+  predecessors: []
+  alternatives: [mech-linear-recurrence]
+  lab: labs/unit-04-attention   # optional verification kit in the repo
+  references: [vaswani-2017]    # keys in src/data/bibliography.yaml
+  last_reviewed: 2026-11-02
+```
+
+The same data is published as [`atlas.json`](/atlas.json) for AI agents and tools — see [machine-readable book](/mentor/machine-readable/).

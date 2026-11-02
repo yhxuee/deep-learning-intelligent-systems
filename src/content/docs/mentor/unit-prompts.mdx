@@ -1,0 +1,26 @@
+---
+title: Unit prompts
+description: Unit-specific Tutor and Critic prompts with learning objectives and known values for Units 03–05.
+sidebar: { order: 2 }
+---
+
+import { Code } from '@astrojs/starlight/components';
+import u03 from '../../../../prompts/units/unit-03-tutor.md?raw';
+import u04 from '../../../../prompts/units/unit-04-critic.md?raw';
+import u05 from '../../../../prompts/units/unit-05-tutor.md?raw';
+
+Unit prompts specialize a mode with the unit's objectives, AI-off boundaries and — where useful — the known values the Mentor should check against without revealing them. Paste the [base policy](/mentor/modes/) first.
+
+## Unit 03 · Tutor
+
+<Code code={u03} lang="text" title="prompts/units/unit-03-tutor.md" />
+
+## Unit 04 · Critic
+
+Use with the bug-hunt file in `labs/unit-04-attention/buggy_variants.py`, or with any attention code an AI wrote for you.
+
+<Code code={u04} lang="text" title="prompts/units/unit-04-critic.md" />
+
+## Unit 05 · Tutor
+
+<Code code={u05} lang="text" title="prompts/units/unit-05-tutor.md" />

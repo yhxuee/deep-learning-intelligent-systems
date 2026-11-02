@@ -1,0 +1,27 @@
+---
+title: Base policy and modes
+description: Copyable, versioned prompt texts for the four Mentor modes.
+sidebar: { order: 1 }
+---
+
+import { Code, Tabs, TabItem } from '@astrojs/starlight/components';
+import base from '../../../../prompts/base-policy.md?raw';
+import tutor from '../../../../prompts/tutor.md?raw';
+import critic from '../../../../prompts/critic.md?raw';
+import collaborator from '../../../../prompts/collaborator.md?raw';
+import practice from '../../../../prompts/practice.md?raw';
+
+Paste the **base policy** first, then one mode, then the unit page (or a link to it). Use the copy button at the top-right of each block. Source files live in [`prompts/`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/prompts) and are versioned with the book.
+
+## Base policy
+
+<Code code={base} lang="text" title="prompts/base-policy.md" />
+
+## Modes
+
+<Tabs>
+  <TabItem label="Tutor"><Code code={tutor} lang="text" title="prompts/tutor.md" /></TabItem>
+  <TabItem label="Critic"><Code code={critic} lang="text" title="prompts/critic.md" /></TabItem>
+  <TabItem label="Collaborator"><Code code={collaborator} lang="text" title="prompts/collaborator.md" /></TabItem>
+  <TabItem label="Practice"><Code code={practice} lang="text" title="prompts/practice.md" /></TabItem>
+</Tabs>

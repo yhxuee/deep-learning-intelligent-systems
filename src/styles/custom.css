@@ -1,0 +1,7 @@
+/* Small, theme-aware additions on top of Starlight's defaults. */
+.katex-display { overflow-x: auto; overflow-y: hidden; padding-block: 0.25rem; }
+.sl-markdown-content table { display: block; overflow-x: auto; }
+.tier { font-size: var(--sl-text-xs); font-weight: 600; padding: 0.1rem 0.45rem; border-radius: 0.25rem; white-space: nowrap; }
+.tier-internalize { background: var(--sl-color-red-low); color: var(--sl-color-red-high); }
+.tier-verify { background: var(--sl-color-orange-low); color: var(--sl-color-orange-high); }
+.tier-access { background: var(--sl-color-green-low); color: var(--sl-color-green-high); }

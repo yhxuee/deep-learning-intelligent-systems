@@ -1,0 +1,103 @@
+---
+import { loadGraph, url, repoUrl, shortCite, MASTERY_CLASS, MASTERY_LABEL } from '../lib/atlas';
+const { node } = Astro.props;
+const { nodes, units, refs } = await loadGraph();
+const link = (id: string) => ({ href: url(nodes.get(id)!.id + '/'), title: nodes.get(id)!.data.title });
+const groups = [
+  ['Prerequisites', node.prerequisites],
+  ['Related', node.related],
+  ['Historical predecessors', node.predecessors],
+  ['Alternative mechanisms', node.alternatives],
+].filter(([, ids]) => (ids as string[]).length > 0) as [string, string[]][];
+const usedBy = [...nodes.values()].filter((n) => n.data.atlas!.prerequisites.includes(node.id));
+---
+
+<aside class="atlas-card" aria-label="Atlas node metadata">
+  <p class="row">
+    <code>{node.id}</code>
+    <span class="type">{node.type}</span>
+    <span class={MASTERY_CLASS[node.mastery]}>{MASTERY_LABEL[node.mastery]}</span>
+  </p>
+  <dl>
+    {
+      node.core_units.length > 0 && (
+        <>
+          <dt>Core units</dt>
+          <dd>
+            {node.core_units.map((u: number, i: number) => (
+              <>
+                {i > 0 && ' · '}
+                <a href={url(units.get(u)!.id + '/')}>{units.get(u)!.data.title}</a>
+              </>
+            ))}
+          </dd>
+        </>
+      )
+    }
+    {
+      groups.map(([label, ids]) => (
+        <>
+          <dt>{label}</dt>
+          <dd>
+            {ids.map((id, i) => (
+              <>
+                {i > 0 && ' · '}
+                <a href={link(id).href}>{link(id).title}</a>
+              </>
+            ))}
+          </dd>
+        </>
+      ))
+    }
+    {
+      usedBy.length > 0 && (
+        <>
+          <dt>Required by</dt>
+          <dd>
+            {usedBy.map((n, i) => (
+              <>
+                {i > 0 && ' · '}
+                <a href={url(n.id + '/')}>{n.data.title}</a>
+              </>
+            ))}
+          </dd>
+        </>
+      )
+    }
+    {
+      node.lab && (
+        <>
+          <dt>Verification kit</dt>
+          <dd>
+            <a href={repoUrl(node.lab)}>
+              <code>{node.lab}</code>
+            </a>
+          </dd>
+        </>
+      )
+    }
+    <dt>Primary sources</dt>
+    <dd>
+      {node.references.map((k: string, i: number) => {
+        const r = refs.get(k)!;
+        return (
+          <>
+            {i > 0 && ' · '}
+            {r.data.url ? <a href={r.data.url}>{shortCite(r)}</a> : shortCite(r)}
+          </>
+        );
+      })}
+    </dd>
+  </dl>
+  <p class="reviewed">Last reviewed {node.last_reviewed.toISOString().slice(0, 10)}</p>
+</aside>
+
+<style>
+  .atlas-card { border: 1px solid var(--sl-color-gray-5); border-radius: 0.5rem; padding: 0.9rem 1.2rem; margin-bottom: 2rem; font-size: var(--sl-text-sm); }
+  .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 0 0 0.5rem; }
+  .type { text-transform: uppercase; font-size: var(--sl-text-xs); letter-spacing: 0.06em; color: var(--sl-color-gray-3); font-weight: 600; }
+  dl { margin: 0; }
+  dt { font-weight: 600; color: var(--sl-color-gray-2); margin-top: 0.5rem; }
+  dd { margin: 0; }
+  .reviewed { margin: 0.75rem 0 0; font-size: var(--sl-text-xs); color: var(--sl-color-gray-3); }
+</style>

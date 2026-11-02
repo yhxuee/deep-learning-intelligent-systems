@@ -1,0 +1,28 @@
+---
+import { loadGraph, url, MASTERY_CLASS, MASTERY_LABEL } from '../lib/atlas';
+const { nodes } = await loadGraph();
+const rows = [...nodes.values()].sort((a, b) => a.data.atlas!.id.localeCompare(b.data.atlas!.id));
+---
+
+<table>
+  <thead>
+    <tr><th>Node</th><th>Type</th><th>Tier</th><th>Units</th><th>Prerequisites</th><th>Kit</th></tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((n) => {
+        const a = n.data.atlas!;
+        return (
+          <tr>
+            <td><a href={url(n.id + '/')}>{n.data.title}</a><br /><code>{a.id}</code></td>
+            <td>{a.type}</td>
+            <td><span class={MASTERY_CLASS[a.mastery]}>{MASTERY_LABEL[a.mastery]}</span></td>
+            <td>{a.core_units.map((u) => String(u).padStart(2, '0')).join(', ')}</td>
+            <td>{a.prerequisites.map((p) => <code>{p}</code>)}</td>
+            <td>{a.lab ? 'lab + tests' : '—'}</td>
+          </tr>
+        );
+      })
+    }
+  </tbody>
+</table>

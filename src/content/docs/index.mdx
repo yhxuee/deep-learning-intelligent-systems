@@ -1,0 +1,59 @@
+---
+title: Deep Learning and Intelligent Systems
+description: An AI-native deep learning textbook for 2027–2037 — principles, experiments, and discovery.
+template: splash
+hero:
+  tagline: An AI-native textbook for 2027–2037. A finite Core of twelve scientific questions, one small language model you build across all of them, and a verification layer that lets you check what AI tells you.
+  actions:
+    - text: Start with the Core
+      link: core/
+      icon: right-arrow
+    - text: How to study with AI
+      link: start/how-to-study/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+> **Central proposition.** A textbook should no longer try to be a compressed copy of everything a student could know.
+> It should build durable mental models, independent judgment, and the ability to create and verify knowledge with AI.
+> **You can delegate only what you can verify — and you can verify only what you have internalized.**
+
+<CardGrid>
+  <Card title="The Core" icon="open-book">
+    Twelve units, each built around one enduring question and **one concrete exemplar** you internalize completely —
+    the Transformer block, reverse-mode autodiff, a linear recurrence, a scaling-law fit.
+  </Card>
+  <Card title="The Spine project" icon="rocket">
+    One small language model grows across all twelve units: bigram baseline → your own autodiff → attention → KV cache →
+    scaling-law fit → post-training → finding an induction head in your own model.
+  </Card>
+  <Card title="The Atlas" icon="puzzle">
+    Not an encyclopedia. A capped set of **verification kits**: reference implementations, invariant tests, known values,
+    and common bugs — the ground truth AI cannot reliably supply.
+  </Card>
+  <Card title="The Mentor" icon="comment-alt">
+    Model-agnostic tutor prompts (Tutor · Critic · Collaborator · Practice), plus `llms.txt`, `atlas.json` and an MCP server
+    so your own AI agent can read the book directly.
+  </Card>
+</CardGrid>
+
+## Three levels of knowledge ownership
+
+| Level | What you achieve | Examples | How mastery is shown |
+|---|---|---|---|
+| <span class="tier tier-internalize">Internalize</span> | Reconstruct and reason without AI | chain rule, likelihood, attention, gradient descent, generalization | derive, transfer, find counterexamples unaided |
+| <span class="tier tier-verify">Understand & verify</span> | Explain mechanism and failure modes; check external answers | optimizer variants, diffusion objectives, parallelism strategies | critique a generated solution; design the check |
+| <span class="tier tier-access">Access on demand</span> | Find, contextualize and apply correctly | APIs, model configs, benchmark releases | locate authoritative sources; apply safeguards |
+
+## Where to go next
+
+<CardGrid>
+  <LinkCard title="Philosophy" href="start/philosophy/" description="Why coverage is the wrong goal — and why depth on exemplars is the right one." />
+  <LinkCard title="Unit 03 · Optimization (complete)" href="core/unit-03/" description="Reverse-mode autodiff, built and verified by hand." />
+  <LinkCard title="Unit 04 · Interaction (complete)" href="core/unit-04/" description="The Transformer block as the anchor exemplar." />
+  <LinkCard title="Machine-readable book" href="mentor/machine-readable/" description="llms.txt, atlas.json and an MCP server for your AI agent." />
+</CardGrid>
+
+<small>Status: Phase 1 (static MVP with prompt packs). Units 03 and 04 are complete; Unit 05 is a full draft; the rest are reviewed outlines. Content © contributors, CC BY 4.0; code MIT.</small>

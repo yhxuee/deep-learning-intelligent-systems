@@ -1,0 +1,114 @@
+# Bibliography. Keys are cited from Atlas front matter (`references:`) and validated at build time.
+# kind: paper | book | course | software | standard | essay
+
+# --- Textbooks and courses ---------------------------------------------------
+goodfellow-2016: { authors: "Goodfellow, I., Bengio, Y., and Courville, A.", year: 2016, title: "Deep Learning", venue: "MIT Press", url: "https://www.deeplearningbook.org/", kind: book }
+prince-2023: { authors: "Prince, S. J. D.", year: 2023, title: "Understanding Deep Learning", venue: "MIT Press", url: "https://udlbook.github.io/udlbook/", kind: book }
+bishop-2024: { authors: "Bishop, C. M., and Bishop, H.", year: 2024, title: "Deep Learning: Foundations and Concepts", venue: "Springer", url: "https://www.bishopbook.com/", kind: book }
+zhang-2023: { authors: "Zhang, A., Lipton, Z. C., Li, M., and Smola, A. J.", year: 2023, title: "Dive into Deep Learning", venue: "Cambridge University Press", url: "https://d2l.ai/", kind: book }
+sutton-2018: { authors: "Sutton, R. S., and Barto, A. G.", year: 2018, title: "Reinforcement Learning: An Introduction (2nd ed.)", venue: "MIT Press", url: "http://incompleteideas.net/book/the-book-2nd.html", kind: book }
+griewank-2008: { authors: "Griewank, A., and Walther, A.", year: 2008, title: "Evaluating Derivatives: Principles and Techniques of Algorithmic Differentiation (2nd ed.)", venue: "SIAM", url: "https://doi.org/10.1137/1.9780898717761", kind: book }
+cs336-2026: { authors: "Stanford University", year: 2026, title: "CS336: Language Modeling from Scratch", venue: "Course website", url: "https://cs336.stanford.edu/", kind: course }
+karpathy-micrograd: { authors: "Karpathy, A.", year: 2020, title: "micrograd: a tiny scalar-valued autograd engine", venue: "GitHub repository", url: "https://github.com/karpathy/micrograd", kind: software }
+karpathy-nanogpt: { authors: "Karpathy, A.", year: 2023, title: "nanoGPT", venue: "GitHub repository", url: "https://github.com/karpathy/nanoGPT", kind: software }
+karpathy-2019: { authors: "Karpathy, A.", year: 2019, title: "A Recipe for Training Neural Networks", venue: "Blog post", url: "http://karpathy.github.io/2019/04/25/recipe/", kind: essay }
+
+# --- Learning, optimization, generalization ----------------------------------
+rumelhart-1986: { authors: "Rumelhart, D. E., Hinton, G. E., and Williams, R. J.", year: 1986, title: "Learning representations by back-propagating errors", venue: "Nature 323, 533–536", url: "https://doi.org/10.1038/323533a0" }
+baydin-2018: { authors: "Baydin, A. G., Pearlmutter, B. A., Radul, A. A., and Siskind, J. M.", year: 2018, title: "Automatic differentiation in machine learning: a survey", venue: "Journal of Machine Learning Research 18(153)", url: "https://jmlr.org/papers/v18/17-468.html" }
+kingma-2015: { authors: "Kingma, D. P., and Ba, J.", year: 2015, title: "Adam: A Method for Stochastic Optimization", venue: "ICLR", url: "https://arxiv.org/abs/1412.6980" }
+loshchilov-2019: { authors: "Loshchilov, I., and Hutter, F.", year: 2019, title: "Decoupled Weight Decay Regularization", venue: "ICLR", url: "https://arxiv.org/abs/1711.05101" }
+glorot-2010: { authors: "Glorot, X., and Bengio, Y.", year: 2010, title: "Understanding the difficulty of training deep feedforward neural networks", venue: "AISTATS", url: "https://proceedings.mlr.press/v9/glorot10a.html" }
+he-2015: { authors: "He, K., Zhang, X., Ren, S., and Sun, J.", year: 2015, title: "Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification", venue: "ICCV", url: "https://arxiv.org/abs/1502.01852" }
+zhang-2017: { authors: "Zhang, C., Bengio, S., Hardt, M., Recht, B., and Vinyals, O.", year: 2017, title: "Understanding deep learning requires rethinking generalization", venue: "ICLR", url: "https://arxiv.org/abs/1611.03530" }
+belkin-2019: { authors: "Belkin, M., Hsu, D., Ma, S., and Mandal, S.", year: 2019, title: "Reconciling modern machine-learning practice and the classical bias–variance trade-off", venue: "PNAS 116(32), 15849–15854", url: "https://doi.org/10.1073/pnas.1903070116" }
+nakkiran-2020: { authors: "Nakkiran, P., Kaplun, G., Bansal, Y., Yang, T., Barak, B., and Sutskever, I.", year: 2020, title: "Deep Double Descent: Where Bigger Models and More Data Hurt", venue: "ICLR", url: "https://arxiv.org/abs/1912.02292" }
+bronstein-2021: { authors: "Bronstein, M. M., Bruna, J., Cohen, T., and Veličković, P.", year: 2021, title: "Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges", venue: "arXiv:2104.13478", url: "https://arxiv.org/abs/2104.13478" }
+bengio-2003: { authors: "Bengio, Y., Ducharme, R., Vincent, P., and Jauvin, C.", year: 2003, title: "A Neural Probabilistic Language Model", venue: "Journal of Machine Learning Research 3, 1137–1155", url: "https://www.jmlr.org/papers/v3/bengio03a.html" }
+mikolov-2013: { authors: "Mikolov, T., Chen, K., Corrado, G., and Dean, J.", year: 2013, title: "Efficient Estimation of Word Representations in Vector Space", venue: "arXiv:1301.3781", url: "https://arxiv.org/abs/1301.3781" }
+press-2017: { authors: "Press, O., and Wolf, L.", year: 2017, title: "Using the Output Embedding to Improve Language Models", venue: "EACL", url: "https://arxiv.org/abs/1608.05859" }
+lecun-1998: { authors: "LeCun, Y., Bottou, L., Bengio, Y., and Haffner, P.", year: 1998, title: "Gradient-based learning applied to document recognition", venue: "Proceedings of the IEEE 86(11), 2278–2324", url: "https://doi.org/10.1109/5.726791" }
+
+# --- Attention, transformers, sequence memory ---------------------------------
+bahdanau-2015: { authors: "Bahdanau, D., Cho, K., and Bengio, Y.", year: 2015, title: "Neural Machine Translation by Jointly Learning to Align and Translate", venue: "ICLR", url: "https://arxiv.org/abs/1409.0473" }
+vaswani-2017: { authors: "Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., and Polosukhin, I.", year: 2017, title: "Attention Is All You Need", venue: "NeurIPS", url: "https://arxiv.org/abs/1706.03762" }
+ba-2016: { authors: "Ba, J. L., Kiros, J. R., and Hinton, G. E.", year: 2016, title: "Layer Normalization", venue: "arXiv:1607.06450", url: "https://arxiv.org/abs/1607.06450" }
+he-2016: { authors: "He, K., Zhang, X., Ren, S., and Sun, J.", year: 2016, title: "Deep Residual Learning for Image Recognition", venue: "CVPR", url: "https://arxiv.org/abs/1512.03385" }
+xiong-2020: { authors: "Xiong, R., Yang, Y., He, D., et al.", year: 2020, title: "On Layer Normalization in the Transformer Architecture", venue: "ICML", url: "https://arxiv.org/abs/2002.04745" }
+su-2024: { authors: "Su, J., Ahmed, M., Lu, Y., Pan, S., Bo, W., and Liu, Y.", year: 2024, title: "RoFormer: Enhanced Transformer with Rotary Position Embedding", venue: "Neurocomputing 568", url: "https://arxiv.org/abs/2104.09864" }
+radford-2019: { authors: "Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., and Sutskever, I.", year: 2019, title: "Language Models are Unsupervised Multitask Learners", venue: "OpenAI technical report", url: "https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf" }
+milakov-2018: { authors: "Milakov, M., and Gimelshein, N.", year: 2018, title: "Online normalizer calculation for softmax", venue: "arXiv:1805.02867", url: "https://arxiv.org/abs/1805.02867" }
+dao-2022: { authors: "Dao, T., Fu, D. Y., Ermon, S., Rudra, A., and Ré, C.", year: 2022, title: "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness", venue: "NeurIPS", url: "https://arxiv.org/abs/2205.14135" }
+pope-2023: { authors: "Pope, R., Douglas, S., Chowdhery, A., et al.", year: 2023, title: "Efficiently Scaling Transformer Inference", venue: "MLSys", url: "https://arxiv.org/abs/2211.05102" }
+shazeer-2017: { authors: "Shazeer, N., Mirhoseini, A., Maziarz, K., et al.", year: 2017, title: "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer", venue: "ICLR", url: "https://arxiv.org/abs/1701.06538" }
+hochreiter-1997: { authors: "Hochreiter, S., and Schmidhuber, J.", year: 1997, title: "Long Short-Term Memory", venue: "Neural Computation 9(8), 1735–1780", url: "https://doi.org/10.1162/neco.1997.9.8.1735" }
+bengio-1994: { authors: "Bengio, Y., Simard, P., and Frasconi, P.", year: 1994, title: "Learning long-term dependencies with gradient descent is difficult", venue: "IEEE Transactions on Neural Networks 5(2), 157–166", url: "https://doi.org/10.1109/72.279181" }
+pascanu-2013: { authors: "Pascanu, R., Mikolov, T., and Bengio, Y.", year: 2013, title: "On the difficulty of training recurrent neural networks", venue: "ICML", url: "https://arxiv.org/abs/1211.5063" }
+gu-2022: { authors: "Gu, A., Goel, K., and Ré, C.", year: 2022, title: "Efficiently Modeling Long Sequences with Structured State Spaces", venue: "ICLR", url: "https://arxiv.org/abs/2111.00396" }
+gu-2024: { authors: "Gu, A., and Dao, T.", year: 2024, title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces", venue: "COLM", url: "https://arxiv.org/abs/2312.00752" }
+arora-2024: { authors: "Arora, S., Eyuboglu, S., Timalsina, A., et al.", year: 2024, title: "Zoology: Measuring and Improving Recall in Efficient Language Models", venue: "ICLR", url: "https://arxiv.org/abs/2312.04927" }
+jelassi-2024: { authors: "Jelassi, S., Brandfonbrener, D., Kakade, S. M., and Malach, E.", year: 2024, title: "Repeat After Me: Transformers are Better than State Space Models at Copying", venue: "ICML", url: "https://arxiv.org/abs/2402.01032" }
+
+# --- Scale, systems, data ------------------------------------------------------
+kaplan-2020: { authors: "Kaplan, J., McCandlish, S., Henighan, T., et al.", year: 2020, title: "Scaling Laws for Neural Language Models", venue: "arXiv:2001.08361", url: "https://arxiv.org/abs/2001.08361" }
+hoffmann-2022: { authors: "Hoffmann, J., Borgeaud, S., Mensch, A., et al.", year: 2022, title: "Training Compute-Optimal Large Language Models", venue: "NeurIPS", url: "https://arxiv.org/abs/2203.15556" }
+williams-2009: { authors: "Williams, S., Waterman, A., and Patterson, D.", year: 2009, title: "Roofline: an insightful visual performance model for multicore architectures", venue: "Communications of the ACM 52(4), 65–76", url: "https://doi.org/10.1145/1498765.1498785" }
+micikevicius-2018: { authors: "Micikevicius, P., Narang, S., Alben, J., et al.", year: 2018, title: "Mixed Precision Training", venue: "ICLR", url: "https://arxiv.org/abs/1710.03740" }
+narayanan-2021: { authors: "Narayanan, D., Shoeybi, M., Casper, J., et al.", year: 2021, title: "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM", venue: "SC21", url: "https://arxiv.org/abs/2104.04473" }
+eldan-2023: { authors: "Eldan, R., and Li, Y.", year: 2023, title: "TinyStories: How Small Can Language Models Be and Still Speak Coherent English?", venue: "arXiv:2305.07759", url: "https://arxiv.org/abs/2305.07759" }
+lee-2022: { authors: "Lee, K., Ippolito, D., Nystrom, A., et al.", year: 2022, title: "Deduplicating Training Data Makes Language Models Better", venue: "ACL", url: "https://arxiv.org/abs/2107.06499" }
+sennrich-2016: { authors: "Sennrich, R., Haddow, B., and Birch, A.", year: 2016, title: "Neural Machine Translation of Rare Words with Subword Units", venue: "ACL", url: "https://arxiv.org/abs/1508.07909" }
+
+# --- Self-supervision and generation ---------------------------------------------
+devlin-2019: { authors: "Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K.", year: 2019, title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding", venue: "NAACL", url: "https://arxiv.org/abs/1810.04805" }
+oord-2018: { authors: "van den Oord, A., Li, Y., and Vinyals, O.", year: 2018, title: "Representation Learning with Contrastive Predictive Coding", venue: "arXiv:1807.03748", url: "https://arxiv.org/abs/1807.03748" }
+radford-2021: { authors: "Radford, A., Kim, J. W., Hallacy, C., et al.", year: 2021, title: "Learning Transferable Visual Models From Natural Language Supervision", venue: "ICML", url: "https://arxiv.org/abs/2103.00020" }
+kingma-2014: { authors: "Kingma, D. P., and Welling, M.", year: 2014, title: "Auto-Encoding Variational Bayes", venue: "ICLR", url: "https://arxiv.org/abs/1312.6114" }
+ho-2020: { authors: "Ho, J., Jain, A., and Abbeel, P.", year: 2020, title: "Denoising Diffusion Probabilistic Models", venue: "NeurIPS", url: "https://arxiv.org/abs/2006.11239" }
+song-2021: { authors: "Song, Y., Sohl-Dickstein, J., Kingma, D. P., Kumar, A., Ermon, S., and Poole, B.", year: 2021, title: "Score-Based Generative Modeling through Stochastic Differential Equations", venue: "ICLR", url: "https://arxiv.org/abs/2011.13456" }
+lipman-2023: { authors: "Lipman, Y., Chen, R. T. Q., Ben-Hamu, H., Nickel, M., and Le, M.", year: 2023, title: "Flow Matching for Generative Modeling", venue: "ICLR", url: "https://arxiv.org/abs/2210.02747" }
+
+# --- Decision, post-training, alignment ------------------------------------------
+williams-1992: { authors: "Williams, R. J.", year: 1992, title: "Simple statistical gradient-following algorithms for connectionist reinforcement learning", venue: "Machine Learning 8, 229–256", url: "https://doi.org/10.1007/BF00992696" }
+schulman-2017: { authors: "Schulman, J., Wolski, F., Dhariwal, P., Radford, A., and Klimov, O.", year: 2017, title: "Proximal Policy Optimization Algorithms", venue: "arXiv:1707.06347", url: "https://arxiv.org/abs/1707.06347" }
+ouyang-2022: { authors: "Ouyang, L., Wu, J., Jiang, X., et al.", year: 2022, title: "Training language models to follow instructions with human feedback", venue: "NeurIPS", url: "https://arxiv.org/abs/2203.02155" }
+rafailov-2023: { authors: "Rafailov, R., Sharma, A., Mitchell, E., Ermon, S., Manning, C. D., and Finn, C.", year: 2023, title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model", venue: "NeurIPS", url: "https://arxiv.org/abs/2305.18290" }
+shao-2024: { authors: "Shao, Z., Wang, P., Zhu, Q., et al.", year: 2024, title: "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models", venue: "arXiv:2402.03300", url: "https://arxiv.org/abs/2402.03300" }
+deepseek-2025: { authors: "DeepSeek-AI", year: 2025, title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning", venue: "Nature 645 (2025); arXiv:2501.12948", url: "https://arxiv.org/abs/2501.12948" }
+amodei-2016: { authors: "Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J., and Mané, D.", year: 2016, title: "Concrete Problems in AI Safety", venue: "arXiv:1606.06565", url: "https://arxiv.org/abs/1606.06565" }
+
+# --- Evidence, failure, interpretation, method -----------------------------------
+guo-2017: { authors: "Guo, C., Pleiss, G., Sun, Y., and Weinberger, K. Q.", year: 2017, title: "On Calibration of Modern Neural Networks", venue: "ICML", url: "https://arxiv.org/abs/1706.04599" }
+recht-2019: { authors: "Recht, B., Roelofs, R., Schmidt, L., and Shankar, V.", year: 2019, title: "Do ImageNet Classifiers Generalize to ImageNet?", venue: "ICML", url: "https://arxiv.org/abs/1902.10811" }
+hendrycks-2019: { authors: "Hendrycks, D., and Dietterich, T.", year: 2019, title: "Benchmarking Neural Network Robustness to Common Corruptions and Perturbations", venue: "ICLR", url: "https://arxiv.org/abs/1903.12261" }
+kapoor-2023: { authors: "Kapoor, S., and Narayanan, A.", year: 2023, title: "Leakage and the reproducibility crisis in machine-learning-based science", venue: "Patterns 4(9)", url: "https://doi.org/10.1016/j.patter.2023.100804" }
+sainz-2023: { authors: "Sainz, O., Campos, J. A., García-Ferrero, I., Etxaniz, J., Lopez de Lacalle, O., and Agirre, E.", year: 2023, title: "NLP Evaluation in trouble: On the Need to Measure LLM Data Contamination for each Benchmark", venue: "Findings of EMNLP", url: "https://arxiv.org/abs/2310.18018" }
+elhage-2021: { authors: "Elhage, N., Nanda, N., Olsson, C., et al.", year: 2021, title: "A Mathematical Framework for Transformer Circuits", venue: "Transformer Circuits Thread", url: "https://transformer-circuits.pub/2021/framework/index.html" }
+olsson-2022: { authors: "Olsson, C., Elhage, N., Nanda, N., et al.", year: 2022, title: "In-context Learning and Induction Heads", venue: "Transformer Circuits Thread", url: "https://transformer-circuits.pub/2022/in-context-learning-and-induction-heads/index.html" }
+meng-2022: { authors: "Meng, K., Bau, D., Andonian, A., and Belinkov, Y.", year: 2022, title: "Locating and Editing Factual Associations in GPT", venue: "NeurIPS", url: "https://arxiv.org/abs/2202.05262" }
+wang-2023: { authors: "Wang, K., Variengien, A., Conmy, A., Shlegeris, B., and Steinhardt, J.", year: 2023, title: "Interpretability in the Wild: a Circuit for Indirect Object Identification in GPT-2 small", venue: "ICLR", url: "https://arxiv.org/abs/2211.00593" }
+belinkov-2022: { authors: "Belinkov, Y.", year: 2022, title: "Probing Classifiers: Promises, Shortcomings, and Advances", venue: "Computational Linguistics 48(1)", url: "https://arxiv.org/abs/2102.12452" }
+templeton-2024: { authors: "Templeton, A., Conerly, T., Marcus, J., et al.", year: 2024, title: "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet", venue: "Transformer Circuits Thread", url: "https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html" }
+henderson-2018: { authors: "Henderson, P., Islam, R., Bachman, P., Pineau, J., Precup, D., and Meger, D.", year: 2018, title: "Deep Reinforcement Learning that Matters", venue: "AAAI", url: "https://arxiv.org/abs/1709.06560" }
+pineau-2021: { authors: "Pineau, J., Vincent-Lamarre, P., Sinha, K., et al.", year: 2021, title: "Improving Reproducibility in Machine Learning Research (A Report from the NeurIPS 2019 Reproducibility Program)", venue: "Journal of Machine Learning Research 22(164)", url: "https://arxiv.org/abs/2003.12206" }
+lipton-2019: { authors: "Lipton, Z. C., and Steinhardt, J.", year: 2019, title: "Troubling Trends in Machine Learning Scholarship", venue: "ACM Queue 17(1)", url: "https://arxiv.org/abs/1807.03341" }
+romera-paredes-2024: { authors: "Romera-Paredes, B., Barekatain, M., Novikov, A., et al.", year: 2024, title: "Mathematical discoveries from program search with large language models", venue: "Nature 625, 468–475", url: "https://doi.org/10.1038/s41586-023-06924-6" }
+novikov-2025: { authors: "Novikov, A., Vũ, N., Eisenberger, M., et al.", year: 2025, title: "AlphaEvolve: A coding agent for scientific and algorithmic discovery", venue: "arXiv:2506.13131", url: "https://arxiv.org/abs/2506.13131" }
+lu-2024: { authors: "Lu, C., Lu, C., Lange, R. T., Foerster, J., Clune, J., and Ha, D.", year: 2024, title: "The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery", venue: "arXiv:2408.06292", url: "https://arxiv.org/abs/2408.06292" }
+
+# --- Learning science and AI in education ------------------------------------------
+bloom-1984: { authors: "Bloom, B. S.", year: 1984, title: "The 2 Sigma Problem: The Search for Methods of Group Instruction as Effective as One-to-One Tutoring", venue: "Educational Researcher 13(6), 4–16", url: "https://doi.org/10.3102/0013189X013006004" }
+kestin-2025: { authors: "Kestin, G., Miller, K., Klales, A., Milbourne, T., and Ponti, G.", year: 2025, title: "AI tutoring outperforms in-class active learning: an RCT introducing a novel research-based design in an authentic educational setting", venue: "Scientific Reports 15, 17458", url: "https://doi.org/10.1038/s41598-025-97652-6" }
+bastani-2025: { authors: "Bastani, H., Bastani, O., Sungu, A., Ge, H., Kabakcı, Ö., and Mariman, R.", year: 2025, title: "Generative AI without guardrails can harm learning: Evidence from high school mathematics", venue: "PNAS 122(26), e2422633122", url: "https://doi.org/10.1073/pnas.2422633122" }
+lee-2025: { authors: "Lee, H.-P., Sarkar, A., Tankelevitch, L., et al.", year: 2025, title: "The Impact of Generative AI on Critical Thinking: Self-Reported Reductions in Cognitive Effort and Confidence Effects From a Survey of Knowledge Workers", venue: "CHI" }
+becker-2025: { authors: "Becker, J., Rush, N., Barnes, E., and Rein, D.", year: 2025, title: "Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity", venue: "arXiv:2507.09089", url: "https://arxiv.org/abs/2507.09089" }
+chi-1981: { authors: "Chi, M. T. H., Feltovich, P. J., and Glaser, R.", year: 1981, title: "Categorization and representation of physics problems by experts and novices", venue: "Cognitive Science 5(2), 121–152", url: "https://doi.org/10.1207/s15516709cog0502_2" }
+chase-1973: { authors: "Chase, W. G., and Simon, H. A.", year: 1973, title: "Perception in chess", venue: "Cognitive Psychology 4(1), 55–81", url: "https://doi.org/10.1016/0010-0285(73)90004-2" }
+kirschner-2006: { authors: "Kirschner, P. A., Sweller, J., and Clark, R. E.", year: 2006, title: "Why Minimal Guidance During Instruction Does Not Work", venue: "Educational Psychologist 41(2), 75–86", url: "https://doi.org/10.1207/s15326985ep4102_1" }
+fyfe-2014: { authors: "Fyfe, E. R., McNeil, N. M., Son, J. Y., and Goldstone, R. L.", year: 2014, title: "Concreteness Fading in Mathematics and Science Instruction: a Systematic Review", venue: "Educational Psychology Review 26(1), 9–25", url: "https://doi.org/10.1007/s10648-014-9249-3" }
+chi-wylie-2014: { authors: "Chi, M. T. H., and Wylie, R.", year: 2014, title: "The ICAP Framework: Linking Cognitive Engagement to Active Learning Outcomes", venue: "Educational Psychologist 49(4), 219–243", url: "https://doi.org/10.1080/00461520.2014.965823" }
+roediger-2006: { authors: "Roediger, H. L., and Karpicke, J. D.", year: 2006, title: "Test-Enhanced Learning: Taking Memory Tests Improves Long-Term Retention", venue: "Psychological Science 17(3), 249–255", url: "https://doi.org/10.1111/j.1467-9280.2006.01693.x" }
+
+# --- Standards used by the platform -------------------------------------------------
+mcp-2024: { authors: "Model Context Protocol contributors", year: 2024, title: "Model Context Protocol specification", venue: "Open standard", url: "https://modelcontextprotocol.io/", kind: standard }
+llmstxt-2024: { authors: "Howard, J.", year: 2024, title: "The /llms.txt file", venue: "Proposed standard", url: "https://llmstxt.org/", kind: standard }

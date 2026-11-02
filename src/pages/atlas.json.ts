@@ -1,0 +1,25 @@
+import type { APIRoute } from 'astro';
+import { loadGraph, url } from '../lib/atlas';
+
+/** Machine-readable Atlas: every node with typed links, references and raw Markdown body. */
+export const GET: APIRoute = async ({ site }) => {
+  const { nodes, units, refs } = await loadGraph();
+  const abs = (p: string) => new URL(url(p), site).toString();
+  const body = {
+    schema: 'dlis-atlas/1',
+    generated: new Date().toISOString(),
+    units: [...units.values()]
+      .sort((a, b) => a.data.unit!.number - b.data.unit!.number)
+      .map((u) => ({ ...u.data.unit, title: u.data.title, url: abs(u.id + '/'), markdown: u.body })),
+    nodes: [...nodes.values()].map((n) => ({
+      ...n.data.atlas,
+      last_reviewed: n.data.atlas!.last_reviewed.toISOString().slice(0, 10),
+      title: n.data.title,
+      description: n.data.description,
+      url: abs(n.id + '/'),
+      markdown: n.body,
+    })),
+    references: Object.fromEntries([...refs].map(([k, r]) => [k, r.data])),
+  };
+  return new Response(JSON.stringify(body, null, 2), { headers: { 'Content-Type': 'application/json' } });
+};
