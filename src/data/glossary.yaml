@@ -1,0 +1,215 @@
+# English–Traditional Chinese (Taiwan) glossary. Rendered on /start/glossary/ and /zh-tw/start/glossary/.
+# Fields: en, zh (Taiwan academic usage), area, cn (common mainland-China variant, when different), note (optional, zh).
+# area: general | optimization | attention | memory | statistics | systems | book
+
+# --- The book itself
+anchor-exemplar: { en: "anchor exemplar", zh: "錨定範例", area: book }
+spine-project: { en: "spine project", zh: "主幹專案", area: book, cn: "主幹項目" }
+atlas: { en: "Atlas (verification layer)", zh: "知識圖譜 Atlas（驗證層）", area: book }
+mentor: { en: "Mentor (AI tutor)", zh: "AI 導師（Mentor）", area: book }
+ai-off: { en: "AI-off", zh: "不使用 AI", area: book }
+worked-example: { en: "worked example", zh: "詳解例題", area: book, cn: "例題 / 示例" }
+problem-set: { en: "problems (exercises)", zh: "習題", area: book }
+theorem: { en: "theorem", zh: "定理", area: book }
+lemma: { en: "lemma", zh: "引理", area: book }
+proposition: { en: "proposition", zh: "命題", area: book }
+corollary: { en: "corollary", zh: "系理", area: book, cn: "推論", note: "避免與「推論（inference）」混淆，本書用「系理」。" }
+proof: { en: "proof", zh: "證明", area: book }
+derivation: { en: "derivation", zh: "推導", area: book }
+invariant: { en: "invariant (test)", zh: "不變量（測試）", area: book }
+known-value: { en: "known value", zh: "已知數值", area: book }
+verification-kit: { en: "verification kit", zh: "驗證工具組", area: book }
+experimental-evidence: { en: "experimental evidence", zh: "實驗證據", area: book }
+engineering-observation: { en: "engineering observation", zh: "工程觀察", area: book }
+open-hypothesis: { en: "open hypothesis", zh: "開放假說", area: book }
+pedagogical-reconstruction: { en: "pedagogical reconstruction", zh: "教學重構", area: book }
+prediction: { en: "prediction (before running)", zh: "預測（執行前）", area: book }
+
+# --- General computing (Taiwan vs mainland usage differs most here)
+data: { en: "data", zh: "資料", area: general, cn: "數據" }
+information: { en: "information", zh: "資訊", area: general, cn: "信息" }
+program: { en: "program", zh: "程式", area: general, cn: "程序" }
+code: { en: "code", zh: "程式碼", area: general, cn: "代碼" }
+software: { en: "software", zh: "軟體", area: general, cn: "軟件" }
+hardware: { en: "hardware", zh: "硬體", area: general, cn: "硬件" }
+network: { en: "network", zh: "網路", area: general, cn: "網絡" }
+algorithm: { en: "algorithm", zh: "演算法", area: general, cn: "算法" }
+function-programming: { en: "function (in code)", zh: "函式", area: general, cn: "函數", note: "數學上的 function 仍稱「函數」。" }
+library: { en: "library", zh: "函式庫", area: general, cn: "庫" }
+default: { en: "default", zh: "預設", area: general, cn: "默認" }
+interface: { en: "interface", zh: "介面", area: general, cn: "接口" }
+implementation: { en: "implementation", zh: "實作", area: general, cn: "實現" }
+quality: { en: "quality", zh: "品質", area: general, cn: "質量" }
+file: { en: "file", zh: "檔案", area: general, cn: "文件" }
+parallel: { en: "parallel (computation)", zh: "平行", area: general, cn: "並行" }
+bit: { en: "bit", zh: "位元", area: general, cn: "比特" }
+project: { en: "project", zh: "專案", area: general, cn: "項目" }
+benchmark: { en: "benchmark", zh: "基準測試", area: general }
+memory-hw: { en: "memory (hardware)", zh: "記憶體", area: systems, cn: "內存 / 顯存", note: "模型的 memory（記憶）與硬體的記憶體要區分。" }
+cache: { en: "cache", zh: "快取", area: systems, cn: "緩存" }
+floating-point: { en: "floating point", zh: "浮點數", area: systems }
+mixed-precision: { en: "mixed precision", zh: "混合精度", area: systems }
+unit-roundoff: { en: "unit roundoff", zh: "單位捨入誤差", area: systems }
+rounding-error: { en: "rounding error", zh: "捨入誤差", area: systems }
+truncation-error: { en: "truncation error", zh: "截斷誤差", area: systems }
+checkpointing: { en: "(activation) checkpointing", zh: "檢查點重算", area: systems }
+flops: { en: "FLOPs (floating-point operations)", zh: "浮點運算次數（FLOPs）", area: systems }
+inference: { en: "inference", zh: "推論", area: systems, cn: "推理" }
+
+# --- Statistics and learning
+model: { en: "model", zh: "模型", area: statistics }
+parameter: { en: "parameter", zh: "參數", area: statistics }
+loss-function: { en: "loss function", zh: "損失函數", area: statistics }
+training-loss: { en: "training loss", zh: "訓練損失", area: statistics }
+cross-entropy: { en: "cross-entropy", zh: "交叉熵", area: statistics }
+likelihood: { en: "likelihood", zh: "概似", area: statistics, cn: "似然" }
+max-likelihood: { en: "maximum-likelihood estimation", zh: "最大概似估計", area: statistics, cn: "最大似然估計" }
+entropy: { en: "entropy", zh: "熵", area: statistics }
+probability: { en: "probability", zh: "機率", area: statistics, cn: "概率" }
+distribution: { en: "distribution", zh: "分布", area: statistics, note: "統計學中亦常稱「分配」，如常態分配。" }
+normal-distribution: { en: "normal (Gaussian) distribution", zh: "常態分配", area: statistics, cn: "正態分布" }
+expectation: { en: "expectation (expected value)", zh: "期望值", area: statistics }
+variance: { en: "variance", zh: "變異數", area: statistics, cn: "方差" }
+covariance: { en: "covariance", zh: "共變異數", area: statistics, cn: "協方差" }
+standard-deviation: { en: "standard deviation", zh: "標準差", area: statistics }
+unbiased: { en: "unbiased", zh: "不偏", area: statistics, cn: "無偏" }
+estimator: { en: "estimator", zh: "估計量", area: statistics }
+sampling: { en: "sampling", zh: "抽樣", area: statistics, cn: "採樣" }
+generalization: { en: "generalization", zh: "泛化", area: statistics }
+regularization: { en: "regularization", zh: "正則化", area: statistics, note: "與 normalization（正規化）區分。" }
+kernel-regression: { en: "kernel regression", zh: "核迴歸", area: statistics, cn: "核回歸" }
+sufficient-statistic: { en: "sufficient statistic", zh: "充分統計量", area: statistics }
+
+# --- Unit 03: optimization
+gradient: { en: "gradient", zh: "梯度", area: optimization }
+gradient-descent: { en: "gradient descent", zh: "梯度下降法", area: optimization }
+sgd: { en: "stochastic gradient descent (SGD)", zh: "隨機梯度下降法（SGD）", area: optimization }
+learning-rate: { en: "learning rate (step size)", zh: "學習率（步長）", area: optimization }
+optimization: { en: "optimization", zh: "最佳化", area: optimization, cn: "優化" }
+optimizer: { en: "optimizer", zh: "最佳化器", area: optimization, cn: "優化器" }
+convergence: { en: "convergence", zh: "收斂", area: optimization }
+divergence-opt: { en: "divergence (of iterates)", zh: "發散", area: optimization }
+derivative: { en: "derivative", zh: "導數", area: optimization }
+partial-derivative: { en: "partial derivative", zh: "偏導數", area: optimization }
+directional-derivative: { en: "directional derivative", zh: "方向導數", area: optimization }
+chain-rule: { en: "chain rule", zh: "連鎖律", area: optimization, cn: "鏈式法則" }
+jacobian: { en: "Jacobian (matrix)", zh: "雅可比矩陣", area: optimization }
+hessian: { en: "Hessian (matrix)", zh: "Hessian 矩陣（黑塞矩陣）", area: optimization, cn: "海森矩陣" }
+autodiff: { en: "automatic differentiation", zh: "自動微分", area: optimization }
+reverse-mode: { en: "reverse mode", zh: "反向模式", area: optimization }
+forward-mode: { en: "forward mode", zh: "前向模式", area: optimization }
+backpropagation: { en: "backpropagation", zh: "反向傳播", area: optimization }
+computation-graph: { en: "computation graph", zh: "計算圖", area: optimization }
+evaluation-trace: { en: "evaluation trace", zh: "求值軌跡", area: optimization }
+adjoint: { en: "adjoint", zh: "伴隨值", area: optimization }
+tangent: { en: "tangent (forward-mode derivative)", zh: "切向量（前向導數）", area: optimization }
+topological-order: { en: "topological order", zh: "拓撲排序", area: optimization }
+vjp: { en: "vector–Jacobian product (VJP)", zh: "向量–雅可比乘積（VJP）", area: optimization }
+finite-difference: { en: "finite difference", zh: "有限差分", area: optimization }
+central-difference: { en: "central difference", zh: "中央差分", area: optimization, cn: "中心差分" }
+gradient-check: { en: "gradient check", zh: "梯度檢查", area: optimization }
+smoothness: { en: "β-smoothness", zh: "β-平滑性", area: optimization }
+descent-lemma: { en: "descent lemma", zh: "下降引理", area: optimization }
+convex: { en: "convex", zh: "凸", area: optimization }
+strongly-convex: { en: "strongly convex", zh: "強凸", area: optimization }
+stationary-point: { en: "stationary point", zh: "駐點", area: optimization }
+saddle-point: { en: "saddle point", zh: "鞍點", area: optimization }
+local-minimum: { en: "local minimum", zh: "局部極小值", area: optimization }
+condition-number: { en: "condition number", zh: "條件數", area: optimization }
+eigenvalue: { en: "eigenvalue", zh: "特徵值", area: optimization }
+eigenvector: { en: "eigenvector", zh: "特徵向量", area: optimization }
+spectral-radius: { en: "spectral radius", zh: "譜半徑", area: optimization }
+momentum: { en: "momentum (heavy ball)", zh: "動量（重球法）", area: optimization }
+preconditioning: { en: "preconditioning", zh: "預條件化", area: optimization, cn: "預處理" }
+weight-decay: { en: "weight decay", zh: "權重衰減", area: optimization }
+bias-correction: { en: "bias correction", zh: "偏差校正", area: optimization }
+minibatch: { en: "minibatch", zh: "小批次", area: optimization, cn: "小批量" }
+batch-size: { en: "batch size", zh: "批次大小", area: optimization, cn: "批量大小" }
+epoch: { en: "epoch", zh: "訓練輪次（epoch）", area: optimization }
+noise-floor: { en: "noise floor", zh: "雜訊底限", area: optimization, cn: "噪聲底" }
+initialization: { en: "initialization", zh: "初始化", area: optimization }
+vanishing-gradient: { en: "vanishing gradient", zh: "梯度消失", area: optimization }
+exploding-gradient: { en: "exploding gradient", zh: "梯度爆炸", area: optimization }
+activation-function: { en: "activation function", zh: "激勵函數", area: optimization, cn: "激活函數" }
+normalization: { en: "normalization (layer)", zh: "正規化（層）", area: optimization, cn: "歸一化" }
+residual-connection: { en: "residual connection", zh: "殘差連接", area: optimization }
+learning-rate-schedule: { en: "learning-rate schedule (warmup, decay)", zh: "學習率排程（暖身、衰減）", area: optimization, cn: "學習率調度（預熱、衰減）" }
+edge-of-stability: { en: "edge of stability", zh: "穩定性邊緣", area: optimization }
+
+# --- Unit 04: interaction and attention
+attention: { en: "attention (mechanism)", zh: "注意力機制", area: attention }
+self-attention: { en: "self-attention", zh: "自注意力", area: attention }
+cross-attention: { en: "cross-attention", zh: "交叉注意力", area: attention }
+query: { en: "query", zh: "查詢", area: attention }
+key: { en: "key", zh: "鍵", area: attention }
+value: { en: "value", zh: "值", area: attention }
+score: { en: "(attention) score", zh: "（注意力）分數", area: attention }
+softmax: { en: "softmax", zh: "softmax 函數", area: attention }
+temperature: { en: "temperature", zh: "溫度", area: attention }
+dot-product: { en: "dot product", zh: "內積", area: attention, cn: "點積" }
+mixing-matrix: { en: "mixing matrix", zh: "混合矩陣", area: attention }
+causal-mask: { en: "causal mask", zh: "因果遮罩", area: attention, cn: "因果掩碼" }
+positional-encoding: { en: "positional encoding", zh: "位置編碼", area: attention }
+rope: { en: "rotary position embedding (RoPE)", zh: "旋轉位置嵌入（RoPE）", area: attention, cn: "旋轉位置編碼" }
+multi-head: { en: "multi-head attention", zh: "多頭注意力", area: attention }
+head: { en: "(attention) head", zh: "注意力頭", area: attention }
+feed-forward: { en: "position-wise feed-forward network (MLP)", zh: "逐位置前饋網路（MLP）", area: attention, cn: "前饋網絡" }
+residual-stream: { en: "residual stream", zh: "殘差流", area: attention }
+layer-norm: { en: "layer normalization", zh: "層正規化", area: attention, cn: "層歸一化" }
+transformer-block: { en: "Transformer block", zh: "Transformer 區塊", area: attention, cn: "Transformer 塊" }
+decoder-only: { en: "decoder-only (model)", zh: "僅解碼器（模型）", area: attention }
+language-model: { en: "language model", zh: "語言模型", area: attention }
+token: { en: "token", zh: "詞元", area: attention, cn: "詞元 / 令牌", note: "亦常直接稱 token。" }
+embedding: { en: "embedding", zh: "嵌入（向量）", area: attention }
+convolution: { en: "convolution", zh: "卷積", area: attention }
+receptive-field: { en: "receptive field", zh: "感受野", area: attention }
+equivariance: { en: "equivariance", zh: "等變性", area: attention }
+invariance: { en: "invariance", zh: "不變性", area: attention }
+permutation: { en: "permutation (matrix)", zh: "置換（矩陣）", area: attention }
+inductive-bias: { en: "inductive bias", zh: "歸納偏誤", area: attention, cn: "歸納偏置" }
+message-passing: { en: "message passing", zh: "訊息傳遞", area: attention, cn: "消息傳遞" }
+kv-cache: { en: "KV cache", zh: "KV 快取", area: attention, cn: "KV 緩存" }
+online-softmax: { en: "online softmax", zh: "線上 softmax", area: attention, cn: "在線 softmax" }
+gqa: { en: "grouped-query attention (GQA)", zh: "分組查詢注意力（GQA）", area: attention }
+moe: { en: "mixture of experts (MoE)", zh: "專家混合（MoE）", area: attention, cn: "混合專家" }
+rank-collapse: { en: "rank collapse", zh: "秩崩塌", area: attention }
+attention-sink: { en: "attention sink", zh: "注意力匯聚點", area: attention }
+
+# --- Unit 05: memory
+state: { en: "state", zh: "狀態", area: memory }
+memory-model: { en: "memory (of a model)", zh: "記憶", area: memory }
+recurrence: { en: "recurrence (relation)", zh: "遞迴（關係）", area: memory }
+rnn: { en: "recurrent neural network (RNN)", zh: "遞迴神經網路（RNN）", area: memory, cn: "循環神經網絡" }
+ema: { en: "exponential moving average (EMA)", zh: "指數移動平均（EMA）", area: memory }
+half-life: { en: "half-life", zh: "半衰期", area: memory }
+time-constant: { en: "time constant", zh: "時間常數", area: memory }
+discretization: { en: "discretization", zh: "離散化", area: memory }
+zoh: { en: "zero-order hold (ZOH)", zh: "零階保持（ZOH）", area: memory }
+forward-euler: { en: "forward Euler method", zh: "前向歐拉法", area: memory }
+backward-euler: { en: "backward (implicit) Euler method", zh: "後向（隱式）歐拉法", area: memory }
+stability: { en: "stability", zh: "穩定性", area: memory }
+impulse-response: { en: "impulse response", zh: "脈衝響應", area: memory }
+transfer-function: { en: "transfer function", zh: "轉移函數", area: memory, cn: "傳遞函數" }
+frequency-response: { en: "frequency response", zh: "頻率響應", area: memory }
+low-pass: { en: "low-pass filter", zh: "低通濾波器", area: memory }
+signal: { en: "signal", zh: "訊號", area: memory, cn: "信號" }
+noise: { en: "noise", zh: "雜訊", area: memory, cn: "噪聲" }
+snr: { en: "signal-to-noise ratio", zh: "訊雜比", area: memory, cn: "信噪比" }
+kalman: { en: "Kalman filter", zh: "卡爾曼濾波器", area: memory }
+ssm: { en: "state-space model (SSM)", zh: "狀態空間模型（SSM）", area: memory }
+selectivity: { en: "selectivity (selective SSM)", zh: "選擇性（選擇性 SSM）", area: memory }
+gate: { en: "gate", zh: "閘", area: memory, cn: "門" }
+forget-gate: { en: "forget gate", zh: "遺忘閘", area: memory, cn: "遺忘門" }
+lstm: { en: "long short-term memory (LSTM)", zh: "長短期記憶（LSTM）", area: memory }
+gru: { en: "gated recurrent unit (GRU)", zh: "閘控遞迴單元（GRU）", area: memory, cn: "門控循環單元" }
+cell-state: { en: "cell state", zh: "單元狀態", area: memory, cn: "細胞狀態" }
+bptt: { en: "backpropagation through time (BPTT)", zh: "時間反向傳播（BPTT）", area: memory, cn: "隨時間反向傳播" }
+gradient-clipping: { en: "gradient clipping", zh: "梯度裁剪", area: memory }
+non-normal: { en: "non-normal matrix", zh: "非正規矩陣", area: memory }
+transient-growth: { en: "transient growth", zh: "暫態增長", area: memory, cn: "瞬態增長" }
+parallel-scan: { en: "parallel (prefix) scan", zh: "平行前綴掃描", area: memory, cn: "並行掃描" }
+associative-memory: { en: "associative memory", zh: "聯想記憶", area: memory }
+linear-attention: { en: "linear attention", zh: "線性注意力", area: memory }
+capacity: { en: "(memory) capacity", zh: "（記憶）容量", area: memory }
+cross-talk: { en: "cross-talk (interference)", zh: "串擾（干擾）", area: memory }
+delta-rule: { en: "delta rule", zh: "delta 規則", area: memory }

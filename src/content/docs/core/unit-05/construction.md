@@ -143,6 +143,8 @@ The off-diagonal entry $5t\,0.9^{t-1}$ first **grows** linearly with $t$ before 
 
 *Figure 5.4 — Same eigenvalues, very different transients. Eigenvalues govern the long run; for the tens of steps that matter in training, the whole matrix matters.*
 
+<div class="dlis-widget not-content" data-widget="eigen-modes">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
+
 The phenomenon is called **non-normal transient growth**: it occurs whenever $A$ does not commute with its transpose, and is strongest when eigenvectors are nearly parallel (large $\kappa(V)$). It is a standard topic in numerical analysis ([Trefethen & Embree 2005](/references/#trefethen-2005)). For memory design the lesson is concrete: *"$\rho(A) < 1$" guarantees eventual forgetting, not gentle forgetting.* This is one reason state-space models (§5.3.9) restrict $A$ to diagonal or other well-conditioned forms.
 
 ## 5.3.6 Nonlinear memory: the recurrent neural network

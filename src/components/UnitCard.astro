@@ -1,35 +1,42 @@
 ---
-import { loadGraph, url, MASTERY_CLASS, MASTERY_LABEL } from '../lib/atlas';
+import { loadGraph, url, titleIn, masteryLabel, MASTERY_CLASS } from '../lib/atlas';
 const { unit } = Astro.props;
-const { nodes } = await loadGraph();
-const status = {
-  complete: 'Complete — reviewed against the writing standard',
-  draft: 'Full draft — awaiting subject and pedagogical review',
-  outline: 'Planning outline — not yet textbook text',
-}[unit.status as 'complete' | 'draft' | 'outline'];
+const locale = Astro.locals.starlightRoute.locale;
+const zh = locale === 'zh-tw';
+const g = await loadGraph();
+const L = zh
+  ? { q: '核心問題', anchor: '錨定範例', internal: '（須內化）', spine: '主幹專案進度', check: '不使用 AI 的檢核點', atlas: 'Atlas 節點', part: '第', partUnit: '部 · 單元', status: '狀態' }
+  : { q: 'Question', anchor: 'Anchor exemplar', internal: '(internalize)', spine: 'Spine-project increment', check: 'AI-off checkpoint', atlas: 'Atlas nodes', part: 'Part', partUnit: '· Unit', status: 'Status' };
+const STATUS: Record<string, [string, string]> = {
+  complete: ['Complete — reviewed against the writing standard', '完成：已依撰寫標準審查'],
+  draft: ['Full draft — awaiting subject and pedagogical review', '完整初稿：等待學科與教學審查'],
+  outline: ['Planning outline — not yet textbook text', '規劃大綱：尚非教科書正文'],
+};
+const status = STATUS[unit.status][zh ? 1 : 0];
+const meta = zh && Astro.props.zh ? { ...unit, ...Astro.props.zh } : unit;
 ---
 
-<aside class="unit-card" aria-label="Unit summary">
-  <p class="unit-q"><span class="unit-label">Question</span> {unit.question}</p>
+<aside class="unit-card" aria-label={zh ? '單元摘要' : 'Unit summary'}>
+  <p class="unit-q"><span class="unit-label">{L.q}</span> {meta.question}</p>
   <dl>
-    <dt>Anchor exemplar <small>(internalize)</small></dt>
-    <dd>{unit.anchor}</dd>
-    <dt>Spine-project increment</dt>
-    <dd>{unit.spine}</dd>
-    <dt>AI-off checkpoint</dt>
-    <dd>{unit.checkpoint}</dd>
+    <dt>{L.anchor} <small>{L.internal}</small></dt>
+    <dd>{meta.anchor}</dd>
+    <dt>{L.spine}</dt>
+    <dd>{meta.spine}</dd>
+    <dt>{L.check}</dt>
+    <dd>{meta.checkpoint}</dd>
     {
       unit.atlas.length > 0 && (
         <>
-          <dt>Atlas nodes</dt>
+          <dt>{L.atlas}</dt>
           <dd>
             {unit.atlas.map((id: string, i: number) => {
-              const n = nodes.get(id)!;
+              const n = g.nodes.get(id)!;
               return (
                 <>
                   {i > 0 && ' · '}
-                  <a href={url(n.id + '/')}>{n.data.title}</a>{' '}
-                  <span class={MASTERY_CLASS[n.data.atlas!.mastery]}>{MASTERY_LABEL[n.data.atlas!.mastery]}</span>
+                  <a href={url(n.id + '/', locale)}>{titleIn(g, n, locale)}</a>{' '}
+                  <span class={MASTERY_CLASS[n.data.atlas!.mastery]}>{masteryLabel(n.data.atlas!.mastery, locale)}</span>
                 </>
               );
             })}
@@ -38,7 +45,9 @@ const status = {
       )
     }
   </dl>
-  <p class="unit-status">Part {unit.part} · Unit {String(unit.number).padStart(2, '0')} · Status: <strong>{status}</strong></p>
+  <p class="unit-status">
+    {zh ? `第 ${unit.part} 部 · 單元 ${String(unit.number).padStart(2, '0')}` : `Part ${unit.part} · Unit ${String(unit.number).padStart(2, '0')}`} · {L.status}: <strong>{status}</strong>
+  </p>
 </aside>
 
 <style>

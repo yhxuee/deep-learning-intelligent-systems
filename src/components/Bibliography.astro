@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+const refs = (await getCollection('references')).sort(
+  (a, b) => a.data.authors.localeCompare(b.data.authors) || a.data.year - b.data.year,
+);
+---
+
+<ol class="refs">
+  {
+    refs.map((r) => (
+      <li id={r.id}>
+        {r.data.authors} ({r.data.year}). {r.data.url ? <a href={r.data.url}>{r.data.title}</a> : r.data.title}. <em>{r.data.venue}</em>. <code>{r.id}</code>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .refs li { margin-bottom: 0.5rem; }
+  .refs code { font-size: var(--sl-text-xs); }
+</style>

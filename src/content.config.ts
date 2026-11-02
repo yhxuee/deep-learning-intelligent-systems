@@ -33,7 +33,19 @@ const atlas = z.object({
   last_reviewed: z.coerce.date(),
 });
 
+const glossary = defineCollection({
+  loader: file('src/data/glossary.yaml'),
+  schema: z.object({
+    en: z.string(),
+    zh: z.string(),
+    area: z.enum(['general', 'optimization', 'attention', 'memory', 'statistics', 'systems', 'book']),
+    cn: z.string().optional(),
+    note: z.string().optional(),
+  }),
+});
+
 export const collections = {
+  glossary,
   docs: defineCollection({
     loader: docsLoader(),
     schema: docsSchema({ extend: z.object({ unit: unit.optional(), atlas: atlas.optional() }) }),

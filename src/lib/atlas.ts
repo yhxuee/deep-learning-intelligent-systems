@@ -5,11 +5,24 @@ export type RefEntry = CollectionEntry<'references'>;
 
 const REPO = (import.meta.env.REPO_URL as string | undefined) ?? 'https://github.com/yhxuee/deep-learning-intelligent-systems';
 
-/** Join the configured base path with a site-relative path, e.g. url('core/unit-03/'). */
-export function url(path: string): string {
+export const LOCALES = ['zh-tw'] as const;
+export type Locale = (typeof LOCALES)[number] | undefined;
+
+/** Join the configured base path with a site-relative path, e.g. url('core/unit-03/'), optionally under a locale. */
+export function url(path: string, locale?: string): string {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const clean = path.replace(/^\//, '');
-  return `${base}/${clean}`;
+  return locale ? `${base}/${locale}/${clean}` : `${base}/${clean}`;
+}
+
+/** Strip a locale prefix from a docs entry id ("zh-tw/core/unit-03" -> "core/unit-03"). */
+export function baseId(id: string): string {
+  for (const l of LOCALES) if (id.startsWith(l + '/')) return id.slice(l.length + 1);
+  return id;
+}
+
+export function isLocalized(id: string): boolean {
+  return LOCALES.some((l) => id === l || id.startsWith(l + '/'));
 }
 
 export function repoUrl(path = ''): string {
@@ -22,6 +35,13 @@ export interface Graph {
   nodes: Map<string, DocEntry>;
   units: Map<number, DocEntry>;
   refs: Map<string, RefEntry>;
+  /** locale -> (base id -> localized title) */
+  titles: Map<string, Map<string, string>>;
+}
+
+/** Title of an English docs entry in the given locale, falling back to English. */
+export function titleIn(g: Graph, entry: DocEntry, locale?: string): string {
+  return (locale && g.titles.get(locale)?.get(entry.id)) || entry.data.title;
 }
 
 /**
@@ -30,7 +50,17 @@ export interface Graph {
  */
 export function loadGraph(): Promise<Graph> {
   cache ??= (async () => {
-    const docs = await getCollection('docs');
+    const all = await getCollection('docs');
+    const docs = all.filter((d) => !isLocalized(d.id));
+    const titles = new Map<string, Map<string, string>>();
+    for (const d of all) {
+      for (const l of LOCALES) {
+        if (d.id.startsWith(l + '/')) {
+          if (!titles.has(l)) titles.set(l, new Map());
+          titles.get(l)!.set(baseId(d.id), d.data.title);
+        }
+      }
+    }
     const refs = new Map((await getCollection('references')).map((r) => [r.id, r]));
     const nodes = new Map<string, DocEntry>();
     const units = new Map<number, DocEntry>();
@@ -54,7 +84,7 @@ export function loadGraph(): Promise<Graph> {
       for (const t of d.data.unit!.atlas) if (!nodes.has(t)) errors.push(`unit ${n}.atlas → unknown node "${t}"`);
     }
     if (errors.length) throw new Error(`Atlas validation failed:\n  ${errors.join('\n  ')}`);
-    return { nodes, units, refs };
+    return { nodes, units, refs, titles };
   })();
   return cache;
 }
@@ -74,6 +104,14 @@ export const MASTERY_LABEL: Record<string, string> = {
   'understand-and-verify': 'Understand & verify',
   'access-on-demand': 'Access on demand',
 };
+export const MASTERY_LABEL_ZH: Record<string, string> = {
+  internalize: '內化（Internalize）',
+  'understand-and-verify': '理解與驗證（Understand & verify）',
+  'access-on-demand': '按需查閱（Access on demand）',
+};
+export function masteryLabel(m: string, locale?: string): string {
+  return locale === 'zh-tw' ? MASTERY_LABEL_ZH[m] : MASTERY_LABEL[m];
+}
 export const MASTERY_CLASS: Record<string, string> = {
   internalize: 'tier tier-internalize',
   'understand-and-verify': 'tier tier-verify',

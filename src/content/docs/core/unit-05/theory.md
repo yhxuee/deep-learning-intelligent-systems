@@ -89,6 +89,8 @@ At $n = d_k$ the noise is already as large as the signal. Figure 5.6 compares th
 
 *Figure 5.6 — Interference grows like $\sqrt{n/d_k}$: a fixed matrix state degrades gracefully, not abruptly.*
 
+<div class="dlis-widget not-content" data-widget="linear-attention-capacity">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
+
 Classical Hopfield networks, a different associative memory with binary states and a recurrent recall dynamics, store about $0.15N$ patterns in $N$ units before recall breaks down ([Hopfield 1982](/references/#hopfield-1982)). The same moral holds across associative memories: capacity is linear in the dimension, and exceeding it causes interference.
 
 ## 5.5.4 One matrix to describe every sequence layer

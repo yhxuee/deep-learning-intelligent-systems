@@ -74,6 +74,8 @@ To evaluate it we need the adjoints of all children before the parent: visit the
 | $\bar w_1$ | $\bar v_1\,x_1$ | 0.098678 |
 | $\bar w_2$ | $\bar v_2\,x_2$ | 0.197356 |
 
+<div class="dlis-widget not-content" data-widget="backprop-neuron">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
+
 One backward sweep produced all three parameter gradients. Notice two features that every implementation must respect:
 
 - **Accumulation.** If a value has several children, its adjoint is a *sum* of contributions, one per child. An implementation therefore initializes adjoints to zero and **adds** ($\mathrel{+}=$) each contribution. Assigning ($=$) instead keeps only the last child's contribution — the most common autodiff bug.
@@ -207,6 +209,8 @@ Unrolling the velocity gives $v_{k+1} = -\eta\sum_{j\le k}\beta^{k-j}\nabla L(\t
 ![Paths of gradient descent and heavy-ball momentum from (1, 1) on the quadratic with curvatures 1 and 10: gradient descent zig-zags across the steep direction; momentum reaches the minimum in fewer steps.](/figures/u03-quadratic-paths.svg)
 
 *Figure 3.2 — Ill-conditioning ($\kappa = 10$): gradient descent with its best fixed step versus tuned momentum. Worked Example 3.5 gives the numbers.*
+
+<div class="dlis-widget not-content" data-widget="gd-2d">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
 
 **Adaptive per-coordinate steps: Adam.** A second idea is to give each coordinate its own step size, scaled by how large its gradients typically are. Adam ([Kingma & Ba 2015](/references/#kingma-2015)) keeps exponential moving averages of the gradient and of its elementwise square:
 

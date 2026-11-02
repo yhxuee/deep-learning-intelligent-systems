@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+const locale = Astro.locals.starlightRoute.locale;
+const zh = locale === 'zh-tw';
+const AREAS: [string, string, string][] = [
+  ['optimization', 'Optimization (Unit 03)', '最佳化（單元 03）'],
+  ['attention', 'Interaction and attention (Unit 04)', '交互作用與注意力（單元 04）'],
+  ['memory', 'Memory (Unit 05)', '記憶（單元 05）'],
+  ['statistics', 'Statistics and learning', '統計與學習'],
+  ['systems', 'Systems and numerics', '系統與數值計算'],
+  ['general', 'General computing', '一般資訊用語'],
+  ['book', 'This book', '本書用語'],
+];
+const all = await getCollection('glossary');
+---
+
+{
+  AREAS.map(([area, en, zhLabel]) => {
+    const rows = all.filter((g) => g.data.area === area).sort((a, b) => a.data.en.localeCompare(b.data.en));
+    return (
+      <section>
+        <h2 id={`area-${area}`}>{zh ? `${zhLabel}` : en}</h2>
+        <table>
+          <thead>
+            {zh ? (
+              <tr><th>中文（臺灣）</th><th>English</th><th>中國大陸常見用法</th><th>說明</th></tr>
+            ) : (
+              <tr><th>English</th><th>中文（臺灣）</th><th>Mainland-China variant</th><th>Note (zh)</th></tr>
+            )}
+          </thead>
+          <tbody>
+            {rows.map((g) =>
+              zh ? (
+                <tr id={g.id}><td><strong>{g.data.zh}</strong></td><td>{g.data.en}</td><td>{g.data.cn ?? '—'}</td><td>{g.data.note ?? ''}</td></tr>
+              ) : (
+                <tr id={g.id}><td><strong>{g.data.en}</strong></td><td lang="zh-TW">{g.data.zh}</td><td lang="zh-CN">{g.data.cn ?? '—'}</td><td lang="zh-TW">{g.data.note ?? ''}</td></tr>
+              ),
+            )}
+          </tbody>
+        </table>
+      </section>
+    );
+  })
+}

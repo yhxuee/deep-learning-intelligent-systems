@@ -24,7 +24,12 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: 'Deep Learning and Intelligent Systems',
+      title: { en: 'Deep Learning and Intelligent Systems', 'zh-TW': '深度學習與智慧系統' },
+      defaultLocale: 'root',
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        'zh-tw': { label: '繁體中文（臺灣）', lang: 'zh-TW' },
+      },
       description:
         'An AI-native deep learning textbook: a 12-unit Core, a verification-first Atlas, portable AI Mentor prompts, and runnable Labs.',
       social: [{ icon: 'github', label: 'GitHub', href: REPO }],
@@ -34,40 +39,41 @@ export default defineConfig({
       customCss: ['katex/dist/katex.min.css', './src/styles/custom.css'],
       head: [
         { tag: 'link', attrs: { rel: 'alternate', type: 'text/plain', title: 'llms.txt', href: `${BASE}/llms.txt` } },
+        { tag: 'script', attrs: { type: 'module', src: `${BASE}/widgets/dlis-widgets.js` } },
       ],
       sidebar: [
-        { label: 'Start here', items: [
-          { label: 'Overview', link: '/' },
+        { label: 'Start here', translations: { 'zh-TW': '從這裡開始' }, items: [
           { slug: 'start/philosophy' },
           { slug: 'start/how-to-study' },
+          { slug: 'start/glossary' },
           { slug: 'start/changelog' },
         ] },
-        { label: 'The Core', items: [
+        { label: 'The Core', translations: { 'zh-TW': '核心教材' }, items: [
           { slug: 'core' },
-          { label: 'I · The Nature of Learning', items: ['core/unit-01', 'core/unit-02', { label: '03 · Optimization', collapsed: true, items: [{ autogenerate: { directory: 'core/unit-03' } }] }] },
-          { label: 'II · Representation, Memory, Computation', items: [{ label: '04 · Interaction', collapsed: true, items: [{ autogenerate: { directory: 'core/unit-04' } }] }, { label: '05 · Memory', collapsed: true, items: [{ autogenerate: { directory: 'core/unit-05' } }] }, 'core/unit-06'] },
-          { label: 'III · Prediction, Generation, Decision', items: ['core/unit-07', 'core/unit-08', 'core/unit-09'] },
-          { label: 'IV · Evidence, Reliability, Discovery', items: ['core/unit-10', 'core/unit-11', 'core/unit-12'] },
+          { label: 'I · The Nature of Learning', translations: { 'zh-TW': '第一部 · 學習的本質' }, items: ['core/unit-01', 'core/unit-02', { label: '03 · Optimization', translations: { 'zh-TW': '03 · 最佳化' }, collapsed: true, items: [{ autogenerate: { directory: 'core/unit-03' } }] }] },
+          { label: 'II · Representation, Memory, Computation', translations: { 'zh-TW': '第二部 · 表示、記憶與計算' }, items: [{ label: '04 · Interaction', translations: { 'zh-TW': '04 · 交互作用' }, collapsed: true, items: [{ autogenerate: { directory: 'core/unit-04' } }] }, { label: '05 · Memory', translations: { 'zh-TW': '05 · 記憶' }, collapsed: true, items: [{ autogenerate: { directory: 'core/unit-05' } }] }, 'core/unit-06'] },
+          { label: 'III · Prediction, Generation, Decision', translations: { 'zh-TW': '第三部 · 預測、生成與決策' }, items: ['core/unit-07', 'core/unit-08', 'core/unit-09'] },
+          { label: 'IV · Evidence, Reliability, Discovery', translations: { 'zh-TW': '第四部 · 證據、可靠性與發現' }, items: ['core/unit-10', 'core/unit-11', 'core/unit-12'] },
         ] },
-        { label: 'Spine project', items: [{ slug: 'spine' }] },
-        { label: 'The Atlas', items: [{ slug: 'atlas' }, { label: 'Nodes', items: [{ autogenerate: { directory: 'atlas/nodes' } }] }] },
-        { label: 'The Mentor', items: [
+        { label: 'Spine project', translations: { 'zh-TW': '主幹專案' }, items: [{ slug: 'spine' }] },
+        { label: 'The Atlas', translations: { 'zh-TW': '知識圖譜 Atlas' }, items: [{ slug: 'atlas' }, { label: 'Nodes', translations: { 'zh-TW': '節點' }, items: [{ autogenerate: { directory: 'atlas/nodes' } }] }] },
+        { label: 'The Mentor', translations: { 'zh-TW': 'AI 導師（Mentor）' }, items: [
           { slug: 'mentor' },
           { slug: 'mentor/modes' },
           { slug: 'mentor/unit-prompts' },
           { slug: 'mentor/machine-readable' },
         ] },
-        { label: 'Laboratory', items: [{ slug: 'labs' }] },
-        { label: 'Assessment & pathways', items: [
+        { label: 'Laboratory', translations: { 'zh-TW': '實驗室' }, items: [{ slug: 'labs' }, { slug: 'labs/interactive' }] },
+        { label: 'Assessment & pathways', translations: { 'zh-TW': '評量與學習路徑' }, items: [
           { slug: 'assessment' },
           { slug: 'pathways/undergraduate' },
           { slug: 'pathways/graduate' },
         ] },
-        { label: 'Project', items: [
+        { label: 'Project', translations: { 'zh-TW': '專案' }, items: [
           { slug: 'project/roadmap' },
           { slug: 'project/writing-standard' },
           { slug: 'project/governance' },
-          { label: 'References', link: '/references/' },
+          { slug: 'references' },
         ] },
       ],
     }),

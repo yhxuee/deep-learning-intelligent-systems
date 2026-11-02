@@ -87,6 +87,8 @@ $$
 
 The exponential makes weights positive (2), dividing by the sum normalizes (3), the softmax is differentiable (4), and scaling the scores by a factor $\beta$ sharpens the weights: as $\beta\to\infty$, $w_{ij}\to1$ for the highest-scoring $j$ and $0$ for the rest, because each ratio $w_{ij'}/w_{ij} = e^{\beta(s_{ij'}-s_{ij})}$ goes to 0 when $s_{ij'} < s_{ij}$ (5). For scores $(2, 1, 0)$ the softmax gives $(0.665, 0.245, 0.090)$; at twice the scale, $(0.867, 0.117, 0.016)$; at ten times, essentially $(1, 0, 0)$.
 
+<div class="dlis-widget not-content" data-widget="softmax-temperature">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
+
 For the score, the cheapest similarity between two vectors is their **dot product**, $s_{ij} = x_i^{\top}x_j$: large when the vectors point the same way, and computable for all pairs at once as the matrix product $XX^{\top}$. It provides exactly the multiplicative interaction requirement 1 asks for.
 
 ## 4.2.7 Three roles: queries, keys and values
@@ -132,6 +134,8 @@ $$
 
 *Figure 4.1 — Soft lookup becomes hard lookup as the scores grow. Worked Example 4.1 repeats the computation in full.*
 
+<div class="dlis-widget not-content" data-widget="soft-lookup">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
+
 Shuffling the pairs changes nothing: the weights follow the **content**, not the position. Changing the query to $?a$ moves the weight to $(a,3)$. The construction is the multiplicative interaction Theorem 4.1 demanded: the score $q^{\top}k$ multiplies query content by key content, and the output multiplies the resulting weight by the value. In practice $W_Q, W_K, W_V$ are learned; the construction proves that a solution exists in this model class.
 
 :::note[Pedagogical reconstruction, not history]
@@ -163,6 +167,8 @@ Measured on random unit-variance vectors, the variance of $q^{\top}k$ is $4.00, 
 ![Mean largest attention weight over 64 keys for random unit-variance queries and keys, as the key dimension grows from 4 to 512: unscaled scores push it from about 0.22 to about 0.94, while scaled scores keep it near 0.1.](/figures/u04-softmax-saturation.svg)
 
 *Figure 4.2 — Without the $1/\sqrt{d_k}$ factor, attention collapses toward one-hot as the dimension grows.*
+
+<div class="dlis-widget not-content" data-widget="attention-scaling">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
 
 ## 4.2.9 What we have established
 
