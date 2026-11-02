@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
@@ -11,6 +12,19 @@ import remarkBaseLinks from './src/plugins/remark-base-links.mjs';
 const SITE = process.env.SITE ?? 'https://yhxuee.github.io';
 const BASE = process.env.BASE ?? '/deep-learning-intelligent-systems';
 const REPO = process.env.REPO_URL ?? 'https://github.com/yhxuee/deep-learning-intelligent-systems';
+
+/** Sidebar entry for a Core unit: a collapsible ten-page group once the unit is a chapter folder. */
+const UNIT_NAMES = {
+  1: ['Learning', '學習'], 2: ['Representation', '表示'], 3: ['Optimization', '最佳化'], 4: ['Interaction', '交互作用'],
+  5: ['Memory', '記憶'], 6: ['Compute', '計算'], 7: ['Self-supervision', '自監督'], 8: ['Generation', '生成'],
+  9: ['Decision', '決策'], 10: ['Failure', '失效'], 11: ['Interpretation', '詮釋'], 12: ['Discovery', '發現'],
+};
+function unitItem(n) {
+  const id = String(n).padStart(2, '0');
+  const [en, zh] = UNIT_NAMES[n];
+  if (!existsSync(new URL(`./src/content/docs/core/unit-${id}`, import.meta.url))) return `core/unit-${id}`;
+  return { label: `${id} · ${en}`, translations: { 'zh-TW': `${id} · ${zh}` }, collapsed: true, items: [{ autogenerate: { directory: `core/unit-${id}` } }] };
+}
 
 export default defineConfig({
   site: SITE,
@@ -51,10 +65,10 @@ export default defineConfig({
         ] },
         { label: 'The Core', translations: { 'zh-TW': '核心教材' }, items: [
           { slug: 'core' },
-          { label: 'I · The Nature of Learning', translations: { 'zh-TW': '第一部 · 學習的本質' }, items: ['core/unit-01', 'core/unit-02', { label: '03 · Optimization', translations: { 'zh-TW': '03 · 最佳化' }, collapsed: true, items: [{ autogenerate: { directory: 'core/unit-03' } }] }] },
-          { label: 'II · Representation, Memory, Computation', translations: { 'zh-TW': '第二部 · 表示、記憶與計算' }, items: [{ label: '04 · Interaction', translations: { 'zh-TW': '04 · 交互作用' }, collapsed: true, items: [{ autogenerate: { directory: 'core/unit-04' } }] }, { label: '05 · Memory', translations: { 'zh-TW': '05 · 記憶' }, collapsed: true, items: [{ autogenerate: { directory: 'core/unit-05' } }] }, 'core/unit-06'] },
-          { label: 'III · Prediction, Generation, Decision', translations: { 'zh-TW': '第三部 · 預測、生成與決策' }, items: ['core/unit-07', 'core/unit-08', 'core/unit-09'] },
-          { label: 'IV · Evidence, Reliability, Discovery', translations: { 'zh-TW': '第四部 · 證據、可靠性與發現' }, items: ['core/unit-10', 'core/unit-11', 'core/unit-12'] },
+          { label: 'I · The Nature of Learning', translations: { 'zh-TW': '第一部 · 學習的本質' }, items: [1, 2, 3].map(unitItem) },
+          { label: 'II · Representation, Memory, Computation', translations: { 'zh-TW': '第二部 · 表示、記憶與計算' }, items: [4, 5, 6].map(unitItem) },
+          { label: 'III · Prediction, Generation, Decision', translations: { 'zh-TW': '第三部 · 預測、生成與決策' }, items: [7, 8, 9].map(unitItem) },
+          { label: 'IV · Evidence, Reliability, Discovery', translations: { 'zh-TW': '第四部 · 證據、可靠性與發現' }, items: [10, 11, 12].map(unitItem) },
         ] },
         { label: 'Spine project', translations: { 'zh-TW': '主幹專案' }, items: [{ slug: 'spine' }] },
         { label: 'The Atlas', translations: { 'zh-TW': '知識圖譜 Atlas' }, items: [{ slug: 'atlas' }, { label: 'Nodes', translations: { 'zh-TW': '節點' }, items: [{ autogenerate: { directory: 'atlas/nodes' } }] }] },
