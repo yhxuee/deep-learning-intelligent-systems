@@ -1,0 +1,56 @@
+---
+title: 深度學習與智慧系統
+description: 為 2027–2037 年撰寫的深度學習教科書：原理、實驗與發現。
+template: splash
+hero:
+  tagline: 一本能獨立教會你的深度學習教科書——主題較少，但每個都完整推導；AI 只是學習夥伴；一個小型語言模型貫穿全部十二個單元；外加一層驗證工具，讓你能檢查 AI 說的話。
+  actions:
+    - text: 從核心教材開始
+      link: core/
+      icon: right-arrow
+    - text: 如何搭配 AI 學習
+      link: start/how-to-study/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+> **核心主張。** 教科書不該再試圖把學生可能需要知道的一切壓縮進來。它應該建立耐久的心智模型與獨立判斷力，培養與 AI 協作時創造與驗證知識的能力。
+> **你只能把你驗證得了的事交給 AI；而你只驗證得了你已經內化的東西。**
+
+<CardGrid>
+  <Card title="核心教材（Core）" icon="open-book">
+    十二個單元，每個都是一章完整的教材，分成十個部分——問題、第一原理、完整推導、詳解例題、一般理論、跨領域連結、限制、近期發展、實驗、習題——並圍繞**一個你必須徹底掌握的錨定範例（anchor exemplar）**。
+  </Card>
+  <Card title="主幹專案（Spine project）" icon="rocket">
+    一個小型語言模型貫穿十二個單元：二元語法基準 → 自己寫的自動微分 → 注意力機制 → KV 快取 → 尺度定律擬合 → 後訓練 → 在自己的模型裡找出歸納頭（induction head）。
+  </Card>
+  <Card title="知識圖譜 Atlas" icon="puzzle">
+    不是百科全書，而是一組有上限的**驗證工具組（verification kit）**：參考實作、不變量測試、已知數值與常見錯誤——這些正是 AI 無法可靠提供的「標準答案」。
+  </Card>
+  <Card title="AI 導師（Mentor）" icon="comment-alt">
+    教科書負責教，AI 負責輔助。與模型無關的提示詞：先講解、後提問，提供替代推導與練習變化題；另有 `llms.txt`、`atlas.json` 與 MCP 伺服器，讓你自己的 AI 代理直接讀這本書。
+  </Card>
+</CardGrid>
+
+## 知識掌握的三個層次
+
+| 層次 | 你要做到 | 例子 | 如何證明已掌握 |
+|---|---|---|---|
+| <span class="tier tier-internalize">內化（Internalize）</span> | 不靠 AI 也能重建並推理 | 連鎖律、概似、注意力機制、梯度下降法、泛化 | 獨立推導、遷移、找出反例 |
+| <span class="tier tier-verify">理解與驗證（Understand & verify）</span> | 說明機制與失效方式；檢查外部答案 | 各種最佳化器、擴散模型目標函數、平行化策略 | 評論 AI 產生的解答，並設計檢驗方法 |
+| <span class="tier tier-access">按需查閱（Access on demand）</span> | 找到、理解脈絡並正確套用 | API、模型設定、基準測試版本 | 找到權威來源並加上防護措施 |
+
+## 下一步
+
+<CardGrid>
+  <LinkCard title="教育理念" href="start/philosophy/" description="為什麼「涵蓋一切」是錯誤目標，而「在範例上做深」才是對的。" />
+  <LinkCard title="單元 03 · 最佳化（完整初稿）" href="core/unit-03/" description="從斜率與步長，到反向傳播、收斂證明，以及讓深層網路可訓練的方法。" />
+  <LinkCard title="單元 04 · 交互作用（完整初稿）" href="core/unit-04/" description="為什麼固定的混合權重做不到查找，以及注意力機制與 Transformer 如何由此推出。" />
+  <LinkCard title="單元 05 · 記憶（完整初稿）" href="core/unit-05/" description="從感測器上的平滑濾波，到遞迴神經網路、狀態空間模型與注意力機制。" />
+  <LinkCard title="互動圖表" href="labs/interactive/" description="十個可直接在瀏覽器操作的探索工具：步長、動量、反向傳播、注意力、濾波、特徵值……" />
+  <LinkCard title="中英術語對照表" href="start/glossary/" description="本書關鍵術語的臺灣學術用語、英文原文，以及常見的中國大陸用法。" />
+</CardGrid>
+
+<small>狀態：v1.2。單元 03–05 已依十部分章節結構完成完整初稿，等待審查；其餘九個單元仍是規劃大綱。本書的設計是不靠 AI 也能完整學習，AI 導師只負責輔助。內容 © 貢獻者，採 CC BY 4.0 授權；程式碼採 MIT 授權。</small>

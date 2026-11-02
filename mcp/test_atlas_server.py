@@ -83,6 +83,9 @@ def test_get_prompt_reads_repo_prompts(atlas):
     text = call(atlas, "get_prompt", name="base-policy")["content"][0]["text"]
     assert "Mentor" in text
     assert call(atlas, "get_prompt", name="unit-05-tutor")["isError"] is False
+    zh = call(atlas, "get_prompt", name="tutor", lang="zh-tw")
+    assert zh["isError"] is False and "家教" in zh["content"][0]["text"]
+    assert call(atlas, "get_prompt", name="tutor", lang="fr")["isError"] is True
 
 
 def test_stdio_round_trip(tmp_path):

@@ -102,12 +102,18 @@ class Atlas:
         return [{"id": i, "title": self.nodes[i]["title"], "mastery": self.nodes[i]["mastery"]} for i in order]
 
 
-def get_prompt(name):
+PROMPT_LANGS = {"en": PROMPTS_DIR, "zh-tw": PROMPTS_DIR / "zh-tw"}
+
+
+def get_prompt(name, lang="en"):
     name = re.sub(r"[^a-z0-9-]", "", name.lower())
-    for path in (PROMPTS_DIR / f"{name}.md", PROMPTS_DIR / "units" / f"{name}.md"):
+    base = PROMPT_LANGS.get((lang or "en").lower())
+    if base is None:
+        raise KeyError(f"unknown language '{lang}'. Available: {', '.join(PROMPT_LANGS)}")
+    for path in (base / f"{name}.md", base / "units" / f"{name}.md"):
         if path.exists():
             return path.read_text(encoding="utf-8")
-    available = sorted(p.stem for p in PROMPTS_DIR.rglob("*.md") if p.stem.lower() != "readme")
+    available = sorted({p.stem for p in base.glob("*.md")} | {p.stem for p in (base / "units").glob("*.md")} - {"README"})
     raise KeyError(f"unknown prompt '{name}'. Available: {', '.join(available)}")
 
 
@@ -129,8 +135,8 @@ TOOLS = [
     },
     {
         "name": "get_prompt",
-        "description": "A Mentor prompt: base-policy, tutor, critic, collaborator, practice, or a unit prompt such as unit-05-tutor.",
-        "inputSchema": {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]},
+        "description": "A Mentor prompt: base-policy, tutor, critic, collaborator, practice, or a unit prompt such as unit-05-tutor. lang='zh-tw' returns the Traditional Chinese (Taiwan) version.",
+        "inputSchema": {"type": "object", "properties": {"name": {"type": "string"}, "lang": {"type": "string", "enum": ["en", "zh-tw"]}}, "required": ["name"]},
     },
     {
         "name": "list_prerequisites",
@@ -148,7 +154,7 @@ def call_tool(atlas, name, args):
     if name == "get_unit":
         return atlas.get_unit(args.get("number", 0))
     if name == "get_prompt":
-        return get_prompt(args.get("name", ""))
+        return get_prompt(args.get("name", ""), args.get("lang", "en"))
     if name == "list_prerequisites":
         return atlas.prerequisites(args.get("id", ""))
     raise KeyError(f"unknown tool '{name}'")
