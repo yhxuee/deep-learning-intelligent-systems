@@ -10,7 +10,7 @@ Copying prompts is fragile: learners omit context, and models drift. The book th
 |---|---|---|
 | [`/llms.txt`](/llms.txt) | Index of units, Atlas nodes and Mentor pages with one-line summaries | [llms.txt proposal](/references/#llmstxt-2024) |
 | [`/llms-full.txt`](/llms-full.txt) | Full Markdown of the Core, Atlas and Mentor pages | — |
-| [`/atlas.json`](/atlas.json) | Every unit and node with typed links, mastery tier, references and raw Markdown | schema `dlis-atlas/1` |
+| [`/atlas.json`](/atlas.json) | Every unit and node with typed links, mastery tier, references and raw Markdown | schema `dlis-atlas/1.1` (units include their section pages) |
 | `mcp/atlas_server.py` | MCP server exposing search and retrieval tools over `atlas.json` | [Model Context Protocol](/references/#mcp-2024) |
 
 ## Using the MCP server
@@ -41,7 +41,7 @@ Tools exposed:
 |---|---|
 | `search_atlas(query, limit?)` | Rank units and nodes by keyword match over titles, descriptions and text |
 | `get_node(id)` | Full Atlas node: invariants, known values, bugs, typed links, references |
-| `get_unit(number)` | A Core unit: question, anchor exemplar, spine increment, checkpoint, text |
+| `get_unit(number)` | A Core unit: question, anchor exemplar, spine increment, checkpoint, and the full text of all ten sections |
 | `get_prompt(name)` | A Mentor prompt (`base-policy`, `tutor`, `critic`, `collaborator`, `practice`, or a unit prompt) |
 | `list_prerequisites(id)` | Transitive prerequisite chain for a node, in learning order |
 

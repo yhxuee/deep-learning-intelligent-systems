@@ -6,23 +6,24 @@
 
 > You can delegate only what you can verify — and you can verify only what you have internalized.
 
-This book does not try to cover everything. It builds durable mental models, independent judgment, and the ability to create and verify knowledge with AI. It has four layers:
+This book covers fewer topics than a survey and treats each one completely — derivations, worked examples, limits, experiments — so that it teaches on its own. AI augments it; it never replaces the explanation. It has four layers:
 
 | Layer | What it is | Where |
 |---|---|---|
-| **Core** | 12 units, each an enduring question + one **anchor exemplar** you internalize (e.g. the Transformer block) | `src/content/docs/core/` |
+| **Core** | 12 self-contained chapters, each an enduring question + one **anchor exemplar** treated in full depth | `src/content/docs/core/` |
 | **Spine project** | one small language model built across all 12 units, each stage with a verification target | `spine/` |
 | **Atlas** | ≤150 **verification kits**: invariants, known values, reference code, common bugs; typed links validated at build time | `src/content/docs/atlas/` |
 | **Mentor** | model-agnostic prompt packs + `llms.txt`, `atlas.json` and a zero-dependency **MCP server** | `prompts/`, `mcp/` |
 | **Labs** | laptop-scale AI-off construction tasks with invariant tests | `labs/` |
 
-## Status (Phase 1 — static MVP)
+## Status (v1.2 — depth rewrite)
 
-- Units **03** (optimization / autodiff) and **04** (attention / Transformer) complete; Unit 05 full draft; others reviewed outlines.
-- 15 Atlas nodes; labs for Units 03–05 (incl. a five-bug attention bug hunt); spine stages 01 and 03.
-- 87 tests (labs, spine, MCP) run in CI against reference implementations; the site build fails on any dangling Atlas link or unknown citation, and a link checker verifies every internal link and anchor.
-
-See the [roadmap](https://yhxuee.github.io/deep-learning-intelligent-systems/project/roadmap/).
+- **Units 03, 04, 05** — optimization, interaction (attention/Transformer), memory — are **full drafts**: self-contained chapters in a ten-part structure (problem → first principles → construction → worked examples → theory → connections → limitations → modern developments → experiments → problems), about 41 000 words with 27 worked examples, 14 code-generated figures and 60 graded problems. They await subject and pedagogical review.
+- The other nine units are **planning outlines**, not yet textbook text.
+- Target scale: 600–750 pages plus 100–200 pages of appendices. See the [writing standard](https://yhxuee.github.io/deep-learning-intelligent-systems/project/writing-standard/).
+- **The textbook educates; the AI augments.** Every derivation is in the text; the Mentor prompts explain first, then question.
+- 15 Atlas nodes; labs for Units 03–05 (incl. a five-bug attention bug hunt); spine stages 01 and 03. Tests run in CI against reference implementations; the build fails on dangling Atlas links or unknown citations; a link checker verifies every internal link and anchor.
+- **Feature freeze** on agent tooling until the Core meets the writing standard.
 
 ## Quick start
 
@@ -42,7 +43,8 @@ python3 mcp/atlas_server.py --self-test
 ## Repository layout
 
 ```
-src/content/docs/   Core units, Atlas nodes, Mentor, assessment, pathways (Markdown/MDX)
+src/content/docs/   Core units (core/unit-0X/ = ten pages each), Atlas nodes, Mentor, pathways
+figures/            make_figures.py — regenerates every figure in public/figures/
 src/data/           bibliography.yaml — citation keys validated at build time
 src/pages/          atlas.json, llms.txt, llms-full.txt endpoints; references page
 prompts/            Mentor prompt packs (source of truth; rendered on the site)

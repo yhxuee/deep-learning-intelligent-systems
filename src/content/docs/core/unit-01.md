@@ -13,8 +13,8 @@ unit:
   atlas: ["mech-cross-entropy"]
 ---
 
-:::note[Reviewed outline]
-This unit is a reviewed outline: question, exemplar, outcomes and activities are fixed; full prose is scheduled for Phase 2 (see the [roadmap](/project/roadmap/)). Contributions welcome.
+:::caution[Planning outline — not yet textbook text]
+This page records the unit's question, anchor exemplar, outcomes and activities. It is a syllabus, not a chapter: it states topics without teaching them. It will be rewritten into the ten-part structure of the [writing standard](/project/writing-standard/), as Units 03–05 have been (see the [roadmap](/project/roadmap/)). Contributions welcome.
 :::
 
 ## The problem

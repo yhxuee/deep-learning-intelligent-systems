@@ -44,8 +44,8 @@ export default defineConfig({
         ] },
         { label: 'The Core', items: [
           { slug: 'core' },
-          { label: 'I · The Nature of Learning', items: ['core/unit-01', 'core/unit-02', 'core/unit-03'] },
-          { label: 'II · Representation, Memory, Computation', items: ['core/unit-04', 'core/unit-05', 'core/unit-06'] },
+          { label: 'I · The Nature of Learning', items: ['core/unit-01', 'core/unit-02', { label: '03 · Optimization', collapsed: true, items: [{ autogenerate: { directory: 'core/unit-03' } }] }] },
+          { label: 'II · Representation, Memory, Computation', items: [{ label: '04 · Interaction', collapsed: true, items: [{ autogenerate: { directory: 'core/unit-04' } }] }, { label: '05 · Memory', collapsed: true, items: [{ autogenerate: { directory: 'core/unit-05' } }] }, 'core/unit-06'] },
           { label: 'III · Prediction, Generation, Decision', items: ['core/unit-07', 'core/unit-08', 'core/unit-09'] },
           { label: 'IV · Evidence, Reliability, Discovery', items: ['core/unit-10', 'core/unit-11', 'core/unit-12'] },
         ] },
@@ -65,6 +65,7 @@ export default defineConfig({
         ] },
         { label: 'Project', items: [
           { slug: 'project/roadmap' },
+          { slug: 'project/writing-standard' },
           { slug: 'project/governance' },
           { label: 'References', link: '/references/' },
         ] },

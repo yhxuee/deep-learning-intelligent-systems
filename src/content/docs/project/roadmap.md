@@ -13,11 +13,16 @@ sidebar: { order: 1 }
 | Phase | Deliverables | Gate | Status |
 |---|---|---|---|
 | 0 · Editorial proof of concept | outcomes; 12-unit structure; Atlas schema; one complete unit; rubric; reference policy | a reader completes the sample unit without AI | ✅ |
-| 1 · Static MVP + prompt packs | site, search, bibliography, typed Atlas, prompts, **two complete units (03, 04)** with labs; llms.txt/atlas.json; MCP server | reproducible build; automated checks; mobile; no accounts | ✅ **current** |
-| 2 · Lab and content expansion | remaining units; spine stages 04–11; client-side widgets; more Atlas nodes; pilot feedback | experiments reproducible; AI-off transfer gains observed | ⏳ |
+| 1 · Static MVP + prompt packs | site, search, bibliography, typed Atlas, prompts, labs for Units 03–05; llms.txt/atlas.json; MCP server | reproducible build; automated checks; mobile; no accounts | ✅ |
+| 1.5 · Depth rewrite | Units 03–05 rewritten as full ten-part chapters; writing standard; explain-first Mentor policy; **feature freeze** on agent tooling | each unit teachable with no AI service; every worked-example number reproduced by code; subject and pedagogical review passed | ⏳ **current** — full drafts written, review pending |
+| 2 · Content expansion | remaining nine units to the writing standard (≈40–70 pages each); mathematical appendices; spine stages 04–11; more Atlas nodes; pilot feedback | experiments reproducible; AI-off transfer gains observed | ⏳ |
 | 3 · Pedagogical evaluation | compare conventional instruction, Core + general AI, Core + structured Mentor; delayed and transfer tests; pre-registration | independent-learning gains justify expansion; null results published | ⏳ |
 | 4 · Optional hosted Mentor | serverless gateway, provider abstraction, opt-in learner state, capped budgets, security and pedagogy tests | material added value over prompt packs at acceptable cost, privacy and vendor risk | ⏳ |
 | 5 · Community and adoption | contribution model, instructor guides, assessment packages, translations, semver releases | independent instructors teach from it without project infrastructure | ⏳ |
+
+## Feature freeze (from v1.2)
+
+Until the Core meets the [writing standard](/project/writing-standard/), no new work on agent tooling, graph visualizers, hosted tutoring or personalization pipelines. The existing infrastructure — site, Atlas, MCP server, prompt packs, labs, CI — is sufficient. Effort goes into the text.
 
 ## Out of scope for the MVP
 

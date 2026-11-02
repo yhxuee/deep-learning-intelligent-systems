@@ -8,19 +8,23 @@ sidebar: { order: 2 }
 
 | Layer | What it is | Changes | Needs AI? |
 |---|---|---|---|
-| **Core** | ~280 pages, 12 units, peer-reviewed | major review ~every 5 years | No |
+| **Core** | 12 units of 10 parts each; target 600–750 pages plus appendices; peer-reviewed | major review ~every 5 years | No |
 | **Atlas** | ≤150 short verification kits with typed links | incremental, annual release | No |
 | **Mentor** | Versioned prompt contracts + machine-readable endpoints | continuous, regression-tested | Optional (your own model) |
 | **Laboratory** | Laptop-scale labs, tests, the spine project | per release | No |
 
-Everything required for mastery works **without** an AI service. AI makes it faster and more adaptive; it is never the source of truth.
+Everything required for mastery works **without** an AI service: the Core text contains every derivation and worked example. AI makes study more interactive and adaptive; it is never the source of truth and never the main explanation.
+
+## How a unit is organized
+
+Each Core unit has ten parts, always in the same order: **the problem → first principles → mathematical construction → worked examples → general theory → connections → limitations and counterexamples → modern developments → experiments → problems and further study.** Read parts 1–4 in order on a first pass; parts 5–8 deepen and widen; parts 9–10 are where you check that you can do it yourself. Sections marked ★ Advanced can be skipped on a first reading. The [writing standard](/project/writing-standard/) defines each part.
 
 ## Six stages per unit
 
 | Stage | You do | AI policy |
 |---|---|---|
 | 1. **Problem** | Face an unfamiliar problem; write a prediction and its assumptions | **Off** |
-| 2. **Theory** | Read the Core; re-derive the key steps on paper | Tutor mode only (hints, no completions) |
+| 2. **Theory** | Read the Core text and its worked examples; re-derive the key steps on paper | Optional Tutor mode: alternative explanations, algebra walkthroughs, intermediate numbers |
 | 3. **Construction** | Implement the anchor kernel from scratch; pass the Atlas invariant tests | **Off** |
 | 4. **Challenge** | Hunt for counterexamples; critique an AI explanation of the same topic | Critic mode |
 | 5. **Experiment** | Design a discriminating test; extend the spine project | Collaborator mode — AI may write code; *you* own hypotheses and interpretation |

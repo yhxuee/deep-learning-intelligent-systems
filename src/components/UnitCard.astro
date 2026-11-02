@@ -2,7 +2,11 @@
 import { loadGraph, url, MASTERY_CLASS, MASTERY_LABEL } from '../lib/atlas';
 const { unit } = Astro.props;
 const { nodes } = await loadGraph();
-const status = { complete: 'Complete', draft: 'Draft', outline: 'Outline' }[unit.status as 'complete' | 'draft' | 'outline'];
+const status = {
+  complete: 'Complete — reviewed against the writing standard',
+  draft: 'Full draft — awaiting subject and pedagogical review',
+  outline: 'Planning outline — not yet textbook text',
+}[unit.status as 'complete' | 'draft' | 'outline'];
 ---
 
 <aside class="unit-card" aria-label="Unit summary">

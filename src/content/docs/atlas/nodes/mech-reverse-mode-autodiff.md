@@ -19,7 +19,7 @@ Record the forward computation as a graph. Seed the output's adjoint with $\bar 
 
 ## Invariants (tested in the lab)
 
-1. **Worked example:** the one-neuron network in [Unit 03 §4](/core/unit-03/) gives $\bar w_1 = 0.098678$, $\bar w_2 = 0.197356$, $\bar b = 0.098678$.
+1. **Worked example:** the one-neuron network in [Unit 03, §3.3.3](/core/unit-03/construction/) gives $\bar w_1 = 0.098678$, $\bar w_2 = 0.197356$, $\bar b = 0.098678$.
 2. **Fan-out accumulates:** for $y = a\cdot a$, $\bar a = 2a$; for $y = a + a$, $\bar a = 2$.
 3. **Agreement with central differences** on random expression graphs to relative error $<10^{-6}$ (float64).
 4. **Linearity:** the gradient of $\alpha f + \beta g$ is $\alpha\nabla f + \beta\nabla g$.

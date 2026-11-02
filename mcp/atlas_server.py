@@ -19,7 +19,7 @@ import urllib.request
 DEFAULT_SOURCE = "https://yhxuee.github.io/deep-learning-intelligent-systems/atlas.json"
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 PROMPTS_DIR = REPO_ROOT / "prompts"
-SERVER_INFO = {"name": "dlis-atlas", "version": "1.1.0"}
+SERVER_INFO = {"name": "dlis-atlas", "version": "1.2.0"}
 SUPPORTED_PROTOCOLS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 INSTRUCTIONS = (
     "Read-only access to the Deep Learning and Intelligent Systems textbook. Cite Atlas node ids and "
@@ -62,6 +62,7 @@ class Atlas:
             raise ValueError("query must contain at least one word")
         docs = [("node", n["id"], n["title"], n.get("description", ""), n.get("markdown", ""), n["url"]) for n in self.nodes.values()]
         docs += [("unit", f"unit-{u['number']:02d}", u["title"], u.get("question", ""), u.get("markdown", ""), u["url"]) for u in self.units.values()]
+        docs += [("section", f"unit-{u['number']:02d}", s_["title"], "", s_.get("markdown", ""), s_["url"]) for u in self.units.values() for s_ in u.get("sections", [])]
         scored = []
         for kind, ident, title, desc, body, url in docs:
             t, d, b = _tokens(title + " " + ident), _tokens(desc), _tokens(body)
@@ -113,7 +114,7 @@ def get_prompt(name):
 TOOLS = [
     {
         "name": "search_atlas",
-        "description": "Keyword search over Core units and Atlas nodes (titles, summaries, text). Returns ids, titles and URLs.",
+        "description": "Keyword search over Core units, their section pages, and Atlas nodes (titles, summaries, text). Returns ids, titles and URLs.",
         "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 25}}, "required": ["query"]},
     },
     {
@@ -123,7 +124,7 @@ TOOLS = [
     },
     {
         "name": "get_unit",
-        "description": "A Core unit: question, anchor exemplar, spine increment, AI-off checkpoint, status and full text.",
+        "description": "A Core unit: question, anchor exemplar, spine increment, AI-off checkpoint, status, and the full text of each of its section pages.",
         "inputSchema": {"type": "object", "properties": {"number": {"type": "integer", "minimum": 1, "maximum": 12}}, "required": ["number"]},
     },
     {

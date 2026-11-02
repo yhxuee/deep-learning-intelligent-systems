@@ -12,7 +12,8 @@ import atlas_server as srv  # noqa: E402
 
 FIXTURE = {
     "schema": "dlis-atlas/1",
-    "units": [{"number": 4, "title": "Unit 04 · Interaction", "question": "How should information be combined?", "markdown": "attention softmax", "url": "u4"}],
+    "units": [{"number": 4, "title": "Unit 04 · Interaction", "question": "How should information be combined?", "markdown": "attention softmax", "url": "u4",
+               "sections": [{"title": "4.3 Construction", "url": "u4c", "markdown": "rotary embeddings rotate queries and keys"}]}],
     "nodes": [
         {"id": "math-softmax", "title": "Softmax", "description": "normalized exponential", "mastery": "internalize", "prerequisites": [], "references": ["r1"], "markdown": "softmax shift invariance", "url": "n1"},
         {"id": "mech-attention", "title": "Attention", "description": "content-dependent aggregation", "mastery": "internalize", "prerequisites": ["math-softmax"], "references": ["r1"], "markdown": "causal mask attention", "url": "n2"},
@@ -56,6 +57,11 @@ def call(atlas, tool, **args):
 def test_search_ranks_title_matches_first(atlas):
     res = json.loads(call(atlas, "search_atlas", query="attention")["content"][0]["text"])
     assert res[0]["id"] == "mech-attention"
+
+
+def test_search_reaches_unit_sections(atlas):
+    res = json.loads(call(atlas, "search_atlas", query="rotary")["content"][0]["text"])
+    assert res and res[0]["kind"] == "section" and res[0]["url"] == "u4c"
 
 
 def test_get_node_resolves_references(atlas):

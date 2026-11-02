@@ -11,6 +11,7 @@ Labs turn mathematical ideas into predictions and measurements. Each lab has an 
 | [`labs/unit-04-attention`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/labs/unit-04-attention) | [04](/core/unit-04/) | causal multi-head self-attention in NumPy | row sums, causality, permutation equivariance, KV-cache equivalence, √d scaling, GPT-2 parameter count; **bug hunt** over five planted variants |
 | [`labs/unit-05-memory`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/labs/unit-05-memory) | [05](/core/unit-05/) | linear recurrence (loop + closed form), linear-attention memory | closed form, spectral decay, non-normal transient growth, exact recall ≤ $d_k$ vs. interference beyond |
 | [`spine/`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/spine) | 01–12 | the spine language model | stage verification targets |
+| [`labs/test_worked_examples.py`](https://github.com/yhxuee/deep-learning-intelligent-systems/blob/main/labs/test_worked_examples.py) | 03–05 | — | recomputes every number quoted in the units' worked examples, so text and computation cannot drift apart |
 
 ## Running a lab
 

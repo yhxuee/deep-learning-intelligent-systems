@@ -16,6 +16,16 @@ Expert judgment rests on richly organized domain knowledge held in memory; exper
 
 So this book **cuts breadth of detail** — where AI is a good on-demand supplement — and **keeps depth on a small number of concrete exemplars**, because that depth is what makes verification possible.
 
+## Reduce breadth, not depth
+
+Version 1.0 of the blueprint confused two different goals: covering fewer **topics**, and explaining each topic **less**. Only the first is right. The fact that a language model can produce endless explanations does not justify a thinner textbook; it makes the author's real work — deciding what must come first, finding the smallest problem that makes a tool necessary, choosing the canonical example, writing the definitive derivation — more valuable, not less. Three tenets follow:
+
+1. **Reduce topical breadth, not explanatory depth.** Fewer topics, each treated completely: motivation, derivation, worked numbers, limits, connections.
+2. **The textbook educates; the AI augments.** A student who never touches an AI tool must be able to learn from the text alone. The [Mentor](/mentor/) adapts pace, offers alternative derivations, generates practice and critiques experiments — it never carries the main explanation.
+3. **Foundational synthesis over API literacy.** The measure of success is whether a student can derive, implement, stress-test and analyse a mechanism from first principles.
+
+Consequently the Core targets **600–750 pages** for twelve units, plus 100–200 pages of appendices, and every unit follows a ten-part structure defined in the [writing standard](/project/writing-standard/).
+
 ## Three outcomes
 
 - **Understand** — construct mathematical and conceptual explanations that survive changes of architecture.
@@ -41,8 +51,8 @@ Version 1.0 of the blueprint placed *all* concrete architectures in the Atlas. T
 ## Eight pedagogical invariants
 
 1. **Problem before terminology.** Start from a scientific or engineering dilemma; introduce methods as candidate solutions.
-2. **Prediction before execution.** State a predicted outcome and its assumptions before seeing code output or AI feedback.
-3. **Derivation before black-box trust.** Reconstruct the essential equations and information flow yourself.
+2. **Explain before you ask.** A concept new to the reader is first explained, with a worked example; prediction prompts appear where the reader already has what is needed for a reasoned guess. Experiments always start with a written prediction.
+3. **Derivation before black-box trust.** Every essential equation is derived in the text, with no omitted steps in the main line.
 4. **Evidence before confidence.** Separate proof, controlled experiment, benchmark observation, and speculation.
 5. **Selective cognitive offloading.** Use AI only for work that does not bypass the cognition currently being trained.
 6. **Transfer before certification.** Confirm learning on unfamiliar, AI-off problems — not only polished AI-assisted work.
