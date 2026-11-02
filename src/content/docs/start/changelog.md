@@ -1,8 +1,14 @@
 ---
 title: Changelog
-description: What changed between blueprint v1.0 and the v1.1 edition published here.
+description: What changed between blueprint v1.0 and each edition published here.
 sidebar: { order: 3 }
 ---
+
+## v1.3 — 2 November 2026: interactive figures and Traditional Chinese edition
+
+1. **Ten interactive figures**, embedded in the relevant sections of Units 03–05 and collected on the [interactive figures](/labs/interactive/) page: step size and divergence, ill-conditioning and momentum, forward and backward pass through one neuron, softmax temperature, soft lookup, attention-score scaling, an EMA smoothing filter, discretization stability, 2×2 eigenmodes and transient growth, and linear-attention memory capacity. They run entirely in the browser with no external services, and their labels follow the page language.
+2. **Traditional Chinese (Taiwan) edition** at [/zh-tw/](/zh-tw/): every page, including Units 03–05 in full, the Atlas and the Chinese Mentor prompts (`prompts/zh-tw/`, also served by the MCP server via `get_prompt(name, lang="zh-tw")`). It uses Taiwanese academic usage and gives the English term in parentheses at first use on each page. A [bilingual glossary](/start/glossary/) of ~180 terms lists the Taiwan term, the English term and, where usage differs, the common mainland-China rendering.
+3. **CI check** (`scripts/check-math-cjk.mjs`) that fails on CJK characters inside math not wrapped in `\text{}`.
 
 ## v1.2 — 2 November 2026: depth rewrite
 

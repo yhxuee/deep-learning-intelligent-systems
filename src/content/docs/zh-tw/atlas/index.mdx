@@ -1,0 +1,39 @@
+---
+title: 知識圖譜 Atlas
+description: 一組有上限、有版本的驗證工具組——參考實作、不變量、已知數值與常見錯誤——以有型別的關係相連。
+sidebar: { label: 總覽, order: 0 }
+---
+
+import AtlasTable from '../../../../components/AtlasTable.astro';
+
+Atlas **不是百科全書**。AI 系統已經很會解釋；它們無法可靠提供的，是*可以拿來檢查它們的標準答案*。所以每個節點都是一個簡短的**驗證工具組（verification kit）**：
+
+- 一段附關鍵方程式的定義；
+- 任何正確實作都必須滿足的**不變量（invariant）**；
+- 你可以手算重現的**已知數值（known value）**；
+- **參考實作**與測試（若有對應的實驗）；
+- **常見錯誤**，以及每個錯誤由哪個不變量抓到；
+- 以穩定的文獻鍵引用的原始文獻。
+
+節點以有型別的連結相連——*先備知識*、*相關*、*歷史前身*、*替代機制*——只要任何連結、單元編號或引用鍵不存在，網站建置就會**失敗**。Atlas 的上限約為 150 個節點；新增一個節點，通常意味著合併或淘汰另一個。
+
+<AtlasTable />
+
+## 節點格式
+
+```yaml
+atlas:
+  id: mech-attention            # (math|mech|arch|method|opt|para)-slug
+  type: mechanism
+  mastery: internalize          # internalize | understand-and-verify | access-on-demand
+  core_units: [4, 5, 11]
+  prerequisites: [math-softmax]
+  related: [arch-transformer-block]
+  predecessors: []
+  alternatives: [mech-linear-recurrence]
+  lab: labs/unit-04-attention   # 程式庫中選用的驗證工具組
+  references: [vaswani-2017]    # src/data/bibliography.yaml 中的鍵
+  last_reviewed: 2026-11-02
+```
+
+同樣的資料也以 [`atlas.json`](/atlas.json) 的形式發布，供 AI 代理與工具使用——見[機器可讀的書](/zh-tw/mentor/machine-readable/)。節點的欄位名稱與 `id` 保持英文，以便與程式碼及英文版對應。

@@ -2,7 +2,7 @@
 
 **Principles, Experiments, and Discovery — an AI-native deep learning textbook for 2027–2037.**
 
-📖 **Read it:** https://yhxuee.github.io/deep-learning-intelligent-systems/
+📖 **Read it:** https://yhxuee.github.io/deep-learning-intelligent-systems/ · **繁體中文版：** https://yhxuee.github.io/deep-learning-intelligent-systems/zh-tw/
 
 > You can delegate only what you can verify — and you can verify only what you have internalized.
 
@@ -16,13 +16,15 @@ This book covers fewer topics than a survey and treats each one completely — d
 | **Mentor** | model-agnostic prompt packs + `llms.txt`, `atlas.json` and a zero-dependency **MCP server** | `prompts/`, `mcp/` |
 | **Labs** | laptop-scale AI-off construction tasks with invariant tests | `labs/` |
 
-## Status (v1.2 — depth rewrite)
+## Status (v1.3 — interactive figures and Traditional Chinese edition)
 
 - **Units 03, 04, 05** — optimization, interaction (attention/Transformer), memory — are **full drafts**: self-contained chapters in a ten-part structure (problem → first principles → construction → worked examples → theory → connections → limitations → modern developments → experiments → problems), about 41 000 words with 27 worked examples, 14 code-generated figures and 60 graded problems. They await subject and pedagogical review.
 - The other nine units are **planning outlines**, not yet textbook text.
 - Target scale: 600–750 pages plus 100–200 pages of appendices. See the [writing standard](https://yhxuee.github.io/deep-learning-intelligent-systems/project/writing-standard/).
 - **The textbook educates; the AI augments.** Every derivation is in the text; the Mentor prompts explain first, then question.
 - 15 Atlas nodes; labs for Units 03–05 (incl. a five-bug attention bug hunt); spine stages 01 and 03. Tests run in CI against reference implementations; the build fails on dangling Atlas links or unknown citations; a link checker verifies every internal link and anchor.
+- **Ten interactive figures** (vanilla JS, no external services) embedded in Units 03–05 and collected at [/labs/interactive/](https://yhxuee.github.io/deep-learning-intelligent-systems/labs/interactive/).
+- **Traditional Chinese (Taiwan) edition** of every page, with English terms at first use and a [bilingual glossary](https://yhxuee.github.io/deep-learning-intelligent-systems/zh-tw/start/glossary/) (Taiwan / English / mainland variant). Chinese Mentor prompts in `prompts/zh-tw/`. Machine-readable endpoints (`llms.txt`, `atlas.json`) remain English.
 - **Feature freeze** on agent tooling until the Core meets the writing standard.
 
 ## Quick start
@@ -44,14 +46,17 @@ python3 mcp/atlas_server.py --self-test
 
 ```
 src/content/docs/   Core units (core/unit-0X/ = ten pages each), Atlas nodes, Mentor, pathways
+src/content/docs/zh-tw/  Traditional Chinese (Taiwan) edition, mirroring every English page
+src/data/glossary.yaml   bilingual glossary (Taiwan / English / mainland variant)
+public/widgets/     dlis-widgets.js — the interactive figures (no dependencies)
 figures/            make_figures.py — regenerates every figure in public/figures/
 src/data/           bibliography.yaml — citation keys validated at build time
 src/pages/          atlas.json, llms.txt, llms-full.txt endpoints; references page
-prompts/            Mentor prompt packs (source of truth; rendered on the site)
+prompts/            Mentor prompt packs (source of truth; rendered on the site); prompts/zh-tw/ in Chinese
 labs/               unit labs: learner stub, reference, invariant tests
 spine/              the spine-project language model
 mcp/                Atlas MCP server + tests
-scripts/            link checker
+scripts/            link checker; CJK-in-math checker
 ```
 
 ## Origins
