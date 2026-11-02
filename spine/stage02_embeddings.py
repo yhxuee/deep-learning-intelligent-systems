@@ -10,7 +10,13 @@ Verification targets:
   * the gradient of a table lookup equals the gradient of a one-hot matrix product (Unit 02 §2.3)
   * training loss never goes below the count-based maximum-likelihood bigram (the best any bigram can do)
   * characters that occur in identical contexts get nearly identical embeddings (distributional hypothesis)
+
+Second model (Bengio et al. 2003): a *neural n-gram*.  The embeddings of the previous k characters are
+concatenated, passed through one tanh layer and read out:  z = W2 tanh(W1 [e_{t-k}; ...; e_{t-1}] + b1) + b2.
+Its parameter count grows linearly in k, while a count table needs up to V^k rows; Unit 02 §2.4 compares them.
 """
+from collections import defaultdict
+import math
 import argparse
 
 import numpy as np
@@ -80,6 +86,73 @@ def nearest(p, vocab, ch, k=4):
     return [(vocab[j], float(sims[j])) for j in order]
 
 
+# ----------------------------------------------------------------------------- neural n-gram (Bengio et al. 2003)
+def ngram_windows(ids, k):
+    X = np.stack([ids[i : len(ids) - k + i] for i in range(k)], 1)
+    return X, ids[k:]
+
+
+def ngram_init(V, k, d=16, H=128, seed=0):
+    rng = np.random.default_rng(seed)
+    return {"E": rng.normal(0, 0.3, (V, d)), "W1": rng.normal(0, 1 / np.sqrt(k * d), (k * d, H)), "b1": np.zeros(H),
+            "W2": rng.normal(0, 0.1 / np.sqrt(H), (H, V)), "b2": np.zeros(V)}
+
+
+def ngram_loss_and_grad(p, X, y):
+    N, k = X.shape
+    d = p["E"].shape[1]
+    x = p["E"][X].reshape(N, k * d)
+    h = np.tanh(x @ p["W1"] + p["b1"])
+    z = h @ p["W2"] + p["b2"]
+    z = z - z.max(1, keepdims=True)
+    logp = z - np.log(np.exp(z).sum(1, keepdims=True))
+    loss = -logp[np.arange(N), y].mean()
+    dz = np.exp(logp)
+    dz[np.arange(N), y] -= 1.0
+    dz /= N
+    g = {"W2": h.T @ dz, "b2": dz.sum(0)}
+    da = (dz @ p["W2"].T) * (1 - h * h)
+    g["W1"], g["b1"] = x.T @ da, da.sum(0)
+    dE = np.zeros_like(p["E"])
+    np.add.at(dE, X, (da @ p["W1"].T).reshape(N, k, d))   # each position's slice goes back to its token's row
+    g["E"] = dE
+    return loss, g
+
+
+def train_ngram(ids, V, k=4, d=16, H=128, steps=2500, lr=3e-3, batch=512, seed=0, weight_decay=1e-4):
+    X, y = ngram_windows(ids, k)
+    p = ngram_init(V, k, d, H, seed)
+    rng = np.random.default_rng(seed)
+    m = {a: np.zeros_like(b) for a, b in p.items()}
+    s = {a: np.zeros_like(b) for a, b in p.items()}
+    for t in range(1, steps + 1):
+        i = rng.integers(0, len(y), batch)
+        _, g = ngram_loss_and_grad(p, X[i], y[i])
+        for a in p:
+            ga = g[a] + weight_decay * p[a]
+            m[a] = 0.9 * m[a] + 0.1 * ga
+            s[a] = 0.999 * s[a] + 0.001 * ga * ga
+            p[a] -= lr * (m[a] / (1 - 0.9 ** t)) / (np.sqrt(s[a] / (1 - 0.999 ** t)) + 1e-8)
+    return p
+
+
+def ngram_nll(p, ids, k):
+    X, y = ngram_windows(ids, k)
+    return float(ngram_loss_and_grad(p, X, y)[0])
+
+
+def count_ngram_nll(train_ids, test_ids, V, k, alpha):
+    """Add-alpha count model on the previous k characters; unseen contexts get the uniform distribution."""
+    C = defaultdict(lambda: np.zeros(V))
+    for i in range(k, len(train_ids)):
+        C[tuple(train_ids[i - k : i])][train_ids[i]] += 1
+    total = 0.0
+    for i in range(k, len(test_ids)):
+        c = C.get(tuple(test_ids[i - k : i]))
+        total += math.log(V) if c is None else -math.log((c[test_ids[i]] + alpha) / (c.sum() + alpha * V))
+    return total / (len(test_ids) - k), len(C)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=DEFAULT_DATA)
@@ -95,6 +168,11 @@ def main():
     for ch in ["a", "3", "T", "."]:
         if ch in vocab:
             print(f"nearest to {ch!r}: " + ", ".join(f"{c!r} {s:.2f}" for c, s in nearest(p, vocab, ch)))
+    print("count vs neural 4-gram (held-out NLL) as the training text grows:")
+    for n in [5000, 20000, 80000, len(tr)]:
+        cnt = min(count_ngram_nll(tr[:n], va, V, 4, a)[0] for a in [0.003, 0.01, 0.03, 0.1, 0.3])
+        q = train_ngram(tr[:n], V, k=4)
+        print(f"   n={n:7d}  count {cnt:.3f}  neural {ngram_nll(q, va, 4):.3f}")
 
 
 if __name__ == "__main__":

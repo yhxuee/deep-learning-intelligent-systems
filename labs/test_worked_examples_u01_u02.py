@@ -137,3 +137,78 @@ def test_unit01_problem_answers():
     assert f08 == pytest.approx(0.7777, abs=5e-5) and f06 == pytest.approx(0.6730, abs=5e-5)
     assert math.ceil(math.log(200) / (2 * 0.005 ** 2)) == 105_967
     assert math.ceil((math.log(1000) + math.log(200)) / (2 * 0.005 ** 2)) == 244_122
+
+
+# ----------------------------------------------------------------------------- Unit 02
+from math import comb  # noqa: E402
+
+import stage02_embeddings as S2  # noqa: E402
+
+
+def test_we_2_1_xor():
+    pts = [(0, 0, 0), (0, 1, 1), (1, 0, 1), (1, 1, 0)]
+    w, b = (1, 1, -2), -0.5
+    scores = [w[0] * x1 + w[1] * x2 + w[2] * x1 * x2 + b for x1, x2, _ in pts]
+    assert scores == [-0.5, 0.5, 0.5, -0.5]
+    assert all((s > 0) == bool(y) for s, (_, _, y) in zip(scores, pts))
+    # no affine separator on a fine grid of (w1, w2, b)
+    g = np.linspace(-3, 3, 61)
+    W1, W2, B = np.meshgrid(g, g, g, indexing="ij")
+    ok = (B <= 0) & (W2 + B > 0) & (W1 + B > 0) & (W1 + W2 + B <= 0)
+    assert not ok.any()
+
+
+def test_we_2_2_one_hot_readout_is_a_table():
+    W = np.log(np.array([[1 / 5, 3 / 5, 1 / 5], [2 / 6, 1 / 6, 3 / 6], [2 / 5, 2 / 5, 1 / 5]]))
+    z = W.T @ np.array([0, 1, 0])
+    assert np.allclose(z, [-1.0986, -1.7918, -0.6931], atol=5e-5)
+    p = np.exp(z) / np.exp(z).sum()
+    assert np.allclose(p, [2 / 6, 1 / 6, 3 / 6])
+
+
+@pytest.mark.parametrize("k,params", [(1, 9426), (2, 11474), (3, 13522), (4, 15570), (6, 19666)])
+def test_we_2_3_neural_ngram_parameters(k, params):
+    p = S2.ngram_init(50, k, d=16, H=128)
+    assert sum(v.size for v in p.values()) == params == 7378 + 2048 * k
+
+
+@pytest.mark.parametrize("k,seen", [(1, 50), (2, 401), (3, 2078), (4, 4502), (6, 12903)])
+def test_we_2_3_contexts_seen(k, seen):
+    contexts = {tuple(TR[i - k : i]) for i in range(k, len(TR))}
+    assert len(contexts) == seen
+
+
+def test_we_2_4_and_2_5_factorized_bigram_width_and_geometry():
+    p, _ = S2.train(TR, V, d=16, steps=1500)
+    assert S2.heldout_nll(p, VA) == pytest.approx(2.15, abs=0.01)
+    assert sum(v.size for v in p.values()) == 1106
+    near3 = [c for c, _ in S2.nearest(p, VOCAB, "3", k=4)]
+    assert all(c.isdigit() for c in near3)
+    nearT = [c for c, _ in S2.nearest(p, VOCAB, "T", k=3)]
+    assert all(c.isupper() for c in nearT)
+
+
+def test_we_2_7_lookup_gradient():
+    G = np.array([[1.0, 2], [3, 4], [5, 6]])
+    dE = np.zeros((3, 2))
+    np.add.at(dE, [0, 2, 0], G)
+    U = np.eye(3)[[0, 2, 0]]
+    assert np.array_equal(dE, [[6, 8], [0, 0], [3, 4]]) and np.array_equal(dE, U.T @ G)
+    bug = np.zeros((3, 2))
+    bug[[0, 2, 0]] = G
+    assert np.array_equal(bug[0], [5, 6])
+
+
+def cover(N, p):
+    return 2 * sum(comb(N - 1, k) for k in range(p))
+
+
+def test_we_2_8_cover_count():
+    assert cover(4, 3) == 14 and cover(4, 4) == 16
+    assert cover(10, 3) == 92
+
+
+def test_unit02_problem_answers():
+    assert 256 * 32 + 8 * 32 * 512 + 512 + 512 * 256 + 256 == 271_104
+    assert math.ceil(8 * math.log(1e4) / 0.1 ** 2) == 7369
+    assert math.ceil(8 * math.log(1e4) / 0.01 ** 2) == 736_828

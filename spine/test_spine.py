@@ -100,6 +100,33 @@ def test_stage02_never_beats_the_count_mle():
     assert S2.heldout_nll(p, SMALL) >= mle - 1e-9
 
 
+def test_stage02_neural_ngram_gradient_matches_finite_differences():
+    rng = np.random.default_rng(5)
+    p = S2.ngram_init(V, 3, d=4, H=6, seed=1)
+    for k in p:
+        p[k] = p[k] + rng.normal(0, 0.2, p[k].shape)
+    X, y = S2.ngram_windows(SMALL[:200], 3)
+    _, g = S2.ngram_loss_and_grad(p, X, y)
+    for k in p:
+        for _ in range(5):
+            i = tuple(rng.integers(0, s) for s in p[k].shape)
+            old = p[k][i]
+            p[k][i] = old + 1e-6
+            lp = S2.ngram_loss_and_grad(p, X, y)[0]
+            p[k][i] = old - 1e-6
+            lm = S2.ngram_loss_and_grad(p, X, y)[0]
+            p[k][i] = old
+            assert (lp - lm) / 2e-6 == pytest.approx(g[k][i], rel=1e-5, abs=1e-10)
+
+
+def test_stage02_neural_ngram_beats_counts_when_data_is_scarce():
+    """Unit 02, Worked Example 2.6: with 5 000 training characters, sharing through embeddings wins."""
+    n = 5000
+    count = min(S2.count_ngram_nll(TRAIN[:n], VAL, V, 4, a)[0] for a in [0.003, 0.01, 0.03, 0.1, 0.3])
+    q = S2.train_ngram(TRAIN[:n], V, k=4, steps=2500)
+    assert S2.ngram_nll(q, VAL, 4) < count - 0.08
+
+
 def test_stage02_interchangeable_symbols_get_the_same_embedding():
     """Distributional hypothesis, planted: symbols 1 and 2 have identical contexts."""
     rng = np.random.default_rng(0)
