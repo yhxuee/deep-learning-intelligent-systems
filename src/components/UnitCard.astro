@@ -1,12 +1,12 @@
 ---
-import { loadGraph, url, titleIn, masteryLabel, MASTERY_CLASS } from '../lib/atlas';
+import { loadGraph, url, titleIn, masteryLabel, MASTERY_CLASS, unitIn, prevUnit, nextUnit } from '../lib/atlas';
 const { unit } = Astro.props;
 const locale = Astro.locals.starlightRoute.locale;
 const zh = locale === 'zh-tw';
 const g = await loadGraph();
 const L = zh
-  ? { q: '核心問題', anchor: '錨定範例', internal: '（須內化）', spine: '主幹專案進度', check: '不使用 AI 的檢核點', atlas: 'Atlas 節點', part: '第', partUnit: '部 · 單元', status: '狀態' }
-  : { q: 'Question', anchor: 'Anchor exemplar', internal: '(internalize)', spine: 'Spine-project increment', check: 'AI-off checkpoint', atlas: 'Atlas nodes', part: 'Part', partUnit: '· Unit', status: 'Status' };
+  ? { q: '核心問題', anchor: '錨定範例', internal: '（須內化）', spine: '主幹專案進度', check: '不使用 AI 的檢核點', atlas: 'Atlas 節點', part: '第', partUnit: '部 · 單元', status: '狀態', from: '承接', loop: '（循環回到起點）', builds: '用到的先前結果', leads: '留下的問題', next: '由此進入', unitW: '單元' }
+  : { q: 'Question', anchor: 'Anchor exemplar', internal: '(internalize)', spine: 'Spine-project increment', check: 'AI-off checkpoint', atlas: 'Atlas nodes', part: 'Part', partUnit: '· Unit', status: 'Status', from: 'Arrives from', loop: '(the argument closes its loop)', builds: 'Builds on', leads: 'Leaves open', next: 'which leads to', unitW: 'Unit' };
 const STATUS: Record<string, [string, string]> = {
   complete: ['Complete — reviewed against the writing standard', '完成：已依撰寫標準審查'],
   draft: ['Full draft — awaiting subject and pedagogical review', '完整初稿：等待學科與教學審查'],
@@ -14,11 +14,33 @@ const STATUS: Record<string, [string, string]> = {
 };
 const status = STATUS[unit.status][zh ? 1 : 0];
 const meta = zh && Astro.props.zh ? { ...unit, ...Astro.props.zh } : unit;
+const pad = (n: number) => String(n).padStart(2, '0');
+const prev = unitIn(g, prevUnit(unit.number), locale);
+const next = unitIn(g, nextUnit(unit.number), locale);
+const link = (n: number) => url(`core/unit-${pad(n)}/`, locale);
 ---
 
 <aside class="unit-card" aria-label={zh ? '單元摘要' : 'Unit summary'}>
+  <p class="unit-from">
+    <span class="unit-label">{L.from} <a href={link(prev.data.unit!.number)}>{prev.data.title}</a>{unit.number === 1 && ' ' + L.loop}</span>
+    {prev.data.unit!.leaves}
+  </p>
   <p class="unit-q"><span class="unit-label">{L.q}</span> {meta.question}</p>
   <dl>
+    {
+      unit.builds_on.length > 0 && (
+        <>
+          <dt>{L.builds}</dt>
+          <dd>
+            <ul class="unit-builds">
+              {unit.builds_on.map((b: { unit: number; uses: string }) => (
+                <li><a href={link(b.unit)}>{L.unitW} {pad(b.unit)}</a>{zh ? '：' : ': '}{b.uses}</li>
+              ))}
+            </ul>
+          </dd>
+        </>
+      )
+    }
     <dt>{L.anchor} <small>{L.internal}</small></dt>
     <dd>{meta.anchor}</dd>
     <dt>{L.spine}</dt>
@@ -45,6 +67,10 @@ const meta = zh && Astro.props.zh ? { ...unit, ...Astro.props.zh } : unit;
       )
     }
   </dl>
+  <p class="unit-leads">
+    <span class="unit-label">{L.leads}</span>
+    {unit.leaves} <span class="unit-next">→ {L.next} <a href={link(next.data.unit!.number)}>{next.data.title}</a></span>
+  </p>
   <p class="unit-status">
     {zh ? `第 ${unit.part} 部 · 單元 ${String(unit.number).padStart(2, '0')}` : `Part ${unit.part} · Unit ${String(unit.number).padStart(2, '0')}`} · {L.status}: <strong>{status}</strong>
   </p>
@@ -58,5 +84,10 @@ const meta = zh && Astro.props.zh ? { ...unit, ...Astro.props.zh } : unit;
   dt { font-weight: 600; font-size: var(--sl-text-sm); color: var(--sl-color-gray-2); margin-top: 0.5rem; }
   dt small { font-weight: 400; color: var(--sl-color-gray-3); }
   dd { margin: 0; font-size: var(--sl-text-sm); }
+  .unit-from { font-size: var(--sl-text-sm); color: var(--sl-color-gray-2); margin: 0 0 0.9rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--sl-color-gray-5); }
+  .unit-leads { font-size: var(--sl-text-sm); margin: 0.9rem 0 0; padding-top: 0.75rem; border-top: 1px dashed var(--sl-color-gray-5); }
+  .unit-next { font-weight: 600; }
+  .unit-builds { margin: 0; padding-left: 1.1rem; }
+  .unit-builds li { margin: 0; }
   .unit-status { margin: 0.75rem 0 0; font-size: var(--sl-text-xs); color: var(--sl-color-gray-3); }
 </style>

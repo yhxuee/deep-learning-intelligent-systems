@@ -11,6 +11,11 @@ unit:
   checkpoint: 不使用 AI，推導線性遞迴的封閉解，說明其特徵值與記憶衰減、穩定性的關係，並設計一個記憶壓力測試。
   status: draft
   atlas: [mech-linear-recurrence, mech-kv-cache, arch-selective-ssm, mech-attention]
+  answer: "遞迴狀態把歷史壓縮成固定大小，並在動態收縮時保持穩定；選擇性狀態空間模型與線性注意力以精確回憶換取常數記憶體，而 KV 快取以線性成本保留一切。"
+  leaves: "每種架構選擇都有 FLOPs、記憶體流量與延遲的代價；要在它們之間做選擇、決定模型該多大，就必須明確地計算運算成本。"
+  builds_on:
+    - { unit: 3, uses: "穿越時間的梯度流、特徵值與穩定性" }
+    - { unit: 4, uses: "注意力與 KV 快取" }
 ---
 
 ## 5.1 問題

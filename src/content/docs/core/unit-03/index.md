@@ -11,6 +11,11 @@ unit:
   checkpoint: Derive backpropagation for a small network and the step-size condition for gradient descent on a quadratic; implement and gradient-check a reverse-mode engine without AI.
   status: draft
   atlas: [math-chain-rule, mech-reverse-mode-autodiff, method-gradient-check, opt-adamw, mech-residual-connection]
+  answer: "Reverse-mode differentiation computes the exact gradient of any program at a small constant multiple of its cost, and gradient descent converges when the step size respects the curvature; initialization, normalization and residual connections keep deep networks trainable."
+  leaves: "A trainable model that sees only the previous token cannot retrieve information from earlier in the context, and any fixed, content-independent mixing of positions provably fails at lookup."
+  builds_on:
+    - { unit: 1, uses: "the cross-entropy objective and the ln V baseline" }
+    - { unit: 2, uses: "embedding tables and linear read-outs" }
 ---
 
 ## 3.1 The problem

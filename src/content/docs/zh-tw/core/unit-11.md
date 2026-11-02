@@ -11,6 +11,11 @@ unit:
   checkpoint: "設計一個能區分「同一模型行為的兩種解釋」的實驗。"
   status: outline
   atlas: ["mech-attention", "mech-residual-connection", "arch-transformer-block"]
+  answer: "機制性主張是對內部計算的因果主張：探測顯示資訊存在，歸因顯示相關，只有介入——帶對照組的消融與激活修補——才能確立某個元件確實被使用。"
+  leaves: "每個可解釋性發現都是可能無法重現的實驗結果；要讓任何主張變得可靠——無論關於一個模型或整個領域——都需要發現的方法論。"
+  builds_on:
+    - { unit: 4, uses: "注意力頭與殘差流" }
+    - { unit: 10, uses: "帶對照組的評估" }
 ---
 
 :::caution[規劃大綱——尚非教科書正文]

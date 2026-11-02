@@ -11,6 +11,11 @@ unit:
   checkpoint: 證明沒有任何固定的線性混合能解決鍵值查找；推導縮放點積注意力及其反向傳遞；不看資料實作因果自注意力。
   status: draft
   atlas: [mech-attention, math-softmax, mech-positional-encoding, arch-transformer-block, mech-residual-connection, mech-kv-cache]
+  answer: "注意力以由內容計算出的權重混合各位置——一種可微分、置換等變的軟查找——Transformer 區塊再把它與逐位置的 MLP、殘差路徑與正規化組合起來。"
+  leaves: "注意力保留每一個過去的詞元，因此記憶體與計算量隨上下文成長；這引出一個問題：有界的狀態能從無界的歷史中保留什麼？"
+  builds_on:
+    - { unit: 2, uses: "嵌入與不變性" }
+    - { unit: 3, uses: "穿過 softmax 與殘差堆疊的反向傳播" }
 ---
 
 ## 4.1 問題

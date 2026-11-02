@@ -11,6 +11,10 @@ unit:
   checkpoint: "Explain when a representation discards information necessary for a task, with a constructed example."
   status: outline
   atlas: []
+  answer: "Learning is easy when the representation makes the target simple — ideally linear — in its features; learned embeddings share statistical strength across similar symbols, and built-in invariances remove what the task does not depend on."
+  leaves: "A learned representation has no closed-form fit like counting: its parameters must be found by searching a high-dimensional, non-convex loss surface, which needs gradients computed efficiently and a theory of when descent works."
+  builds_on:
+    - { unit: 1, uses: "empirical risk, cross-entropy and held-out evaluation" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

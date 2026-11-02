@@ -11,6 +11,11 @@ unit:
   checkpoint: Prove that no fixed linear mixing can solve key–value lookup; derive scaled dot-product attention and its backward pass; implement causal self-attention from memory.
   status: draft
   atlas: [mech-attention, math-softmax, mech-positional-encoding, arch-transformer-block, mech-residual-connection, mech-kv-cache]
+  answer: "Attention mixes positions with weights computed from content — a differentiable, permutation-equivariant soft lookup — and the Transformer block composes it with per-position MLPs, residual paths and normalization."
+  leaves: "Attention keeps every past token, so its memory and compute grow with the context; this raises the question of what a bounded state can retain from an unbounded history."
+  builds_on:
+    - { unit: 2, uses: "embeddings and invariance" }
+    - { unit: 3, uses: "backpropagation through softmax and residual stacks" }
 ---
 
 ## 4.1 The problem

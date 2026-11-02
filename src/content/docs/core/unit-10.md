@@ -11,6 +11,12 @@ unit:
   checkpoint: "Diagnose why a near-perfect validation score may be spurious."
   status: outline
   atlas: ["method-contamination-check", "mech-cross-entropy"]
+  answer: "A score is evidence only to the extent that the evaluation matches deployment: distribution shift, leakage and contamination break the i.i.d. argument of Unit 01, while calibration, confidence intervals and shifted or adversarial test sets measure what a single number hides."
+  leaves: "Behavioural tests can show that a model fails, not why; to anticipate failures nobody has tested for, we need to know which mechanism produces the behaviour."
+  builds_on:
+    - { unit: 1, uses: "the i.i.d. argument and held-out evaluation" }
+    - { unit: 7, uses: "contamination" }
+    - { unit: 9, uses: "reward hacking" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

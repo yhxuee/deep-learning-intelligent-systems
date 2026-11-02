@@ -11,6 +11,12 @@ unit:
   checkpoint: "診斷為什麼一個接近完美的驗證分數可能是假的。"
   status: outline
   atlas: ["method-contamination-check", "mech-cross-entropy"]
+  answer: "分數只有在評估與部署情境相符時才是證據：分布偏移、洩漏與污染破壞了單元 01 的 i.i.d. 論證；校準、信賴區間，以及偏移或對抗性的測試集，量測了單一數字所隱藏的東西。"
+  leaves: "行為測試能顯示模型「會」失敗，卻不能說明「為什麼」；要預見沒有人測過的失敗，就必須知道是哪個機制產生了這個行為。"
+  builds_on:
+    - { unit: 1, uses: "i.i.d. 論證與保留資料評估" }
+    - { unit: 7, uses: "污染" }
+    - { unit: 9, uses: "獎勵駭客" }
 ---
 
 :::caution[規劃大綱——尚非教科書正文]

@@ -11,6 +11,12 @@ unit:
   checkpoint: "Defend a complete experimental plan and state exactly what its results could establish."
   status: outline
   atlas: []
+  answer: "A finding becomes knowledge when a pre-registered prediction survives a controlled ablation across seeds, its uncertainty is quantified, and an independent replication reproduces it; AI can accelerate every step but cannot replace the verification."
+  leaves: "A scientist generalizing from a finite set of experiments faces the problem of Unit 01 again — inference from samples to cases not yet seen — and each new question starts the cycle anew."
+  builds_on:
+    - { unit: 1, uses: "generalization from finite samples" }
+    - { unit: 10, uses: "statistical uncertainty and evaluation validity" }
+    - { unit: 11, uses: "interventional experiments" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

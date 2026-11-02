@@ -11,6 +11,13 @@ unit:
   checkpoint: "Explain why theoretical FLOPs can disagree with observed runtime, using arithmetic intensity."
   status: outline
   atlas: ["method-scaling-law-fit", "arch-transformer-block", "mech-kv-cache", "opt-adamw"]
+  answer: "Training costs about 6 FLOPs per parameter per token, runtime is bounded by arithmetic intensity relative to the hardware's compute-to-bandwidth ratio, and held-out loss falls as a predictable power law in parameters and data that fixes the compute-optimal split between them."
+  leaves: "Compute-optimal models need trillions of tokens — far more than anyone can label — so the learning signal itself must be manufactured from raw data."
+  builds_on:
+    - { unit: 1, uses: "held-out loss as the yardstick" }
+    - { unit: 3, uses: "the cost of a backward pass and optimizer state" }
+    - { unit: 4, uses: "the FLOPs of attention and the MLP" }
+    - { unit: 5, uses: "KV-cache memory" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

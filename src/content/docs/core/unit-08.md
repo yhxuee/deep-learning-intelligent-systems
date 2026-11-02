@@ -11,6 +11,12 @@ unit:
   checkpoint: "Compare two generative mechanisms in terms of objectives, sampling procedure and approximation error."
   status: outline
   atlas: []
+  answer: "A generative model is a sampler: autoregressive models sample one conditional at a time, latent-variable models train through an evidence lower bound, and diffusion and flow-matching models integrate a learned velocity field that transports noise into data."
+  leaves: "Sampling reproduces the data distribution, not the behaviour we want: high likelihood is not helpfulness or correctness, so a model must be shaped by goals and feedback."
+  builds_on:
+    - { unit: 3, uses: "training by gradient descent" }
+    - { unit: 5, uses: "ODE discretization and stability" }
+    - { unit: 7, uses: "pretrained conditional distributions" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

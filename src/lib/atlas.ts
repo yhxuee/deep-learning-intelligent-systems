@@ -37,7 +37,18 @@ export interface Graph {
   refs: Map<string, RefEntry>;
   /** locale -> (base id -> localized title) */
   titles: Map<string, Map<string, string>>;
+  /** locale -> (unit number -> localized unit index page) */
+  localUnits: Map<string, Map<number, DocEntry>>;
 }
+
+/** The unit index page in the given locale, falling back to English. */
+export function unitIn(g: Graph, n: number, locale?: string): DocEntry {
+  return (locale && g.localUnits.get(locale)?.get(n)) || g.units.get(n)!;
+}
+
+/** Unit that precedes / follows n in the book's argument (the chain closes: 12 → 1). */
+export const prevUnit = (n: number) => (n === 1 ? 12 : n - 1);
+export const nextUnit = (n: number) => (n === 12 ? 1 : n + 1);
 
 /** Title of an English docs entry in the given locale, falling back to English. */
 export function titleIn(g: Graph, entry: DocEntry, locale?: string): string {
@@ -53,11 +64,16 @@ export function loadGraph(): Promise<Graph> {
     const all = await getCollection('docs');
     const docs = all.filter((d) => !isLocalized(d.id));
     const titles = new Map<string, Map<string, string>>();
+    const localUnits = new Map<string, Map<number, DocEntry>>();
     for (const d of all) {
       for (const l of LOCALES) {
         if (d.id.startsWith(l + '/')) {
           if (!titles.has(l)) titles.set(l, new Map());
           titles.get(l)!.set(baseId(d.id), d.data.title);
+          if (d.data.unit) {
+            if (!localUnits.has(l)) localUnits.set(l, new Map());
+            localUnits.get(l)!.set(d.data.unit.number, d);
+          }
         }
       }
     }
@@ -81,10 +97,25 @@ export function loadGraph(): Promise<Graph> {
       for (const r of a.references) if (!refs.has(r)) errors.push(`${id}.references → unknown key "${r}"`);
     }
     for (const [n, d] of units) {
-      for (const t of d.data.unit!.atlas) if (!nodes.has(t)) errors.push(`unit ${n}.atlas → unknown node "${t}"`);
+      const u = d.data.unit!;
+      for (const t of u.atlas) if (!nodes.has(t)) errors.push(`unit ${n}.atlas → unknown node "${t}"`);
+      for (const b of u.builds_on) if (b.unit >= n) errors.push(`unit ${n}.builds_on → unit ${b.unit} is not an earlier unit`);
+    }
+    // The argument must be a complete chain 1 → 2 → … → 12 (→ 1).
+    for (let n = 1; n <= 12; n++) if (!units.has(n)) errors.push(`the argument of the book is missing unit ${n}`);
+    // Localized unit pages must make the same structural claims as the English ones.
+    for (const [l, m] of localUnits) {
+      for (const [n, d] of m) {
+        const en = units.get(n);
+        if (!en) { errors.push(`${l} unit ${n} has no English counterpart`); continue; }
+        const a = en.data.unit!, b = d.data.unit!;
+        const same = (x: unknown, y: unknown) => JSON.stringify(x) === JSON.stringify(y);
+        if (a.part !== b.part || a.status !== b.status || !same(a.atlas, b.atlas) || !same(a.builds_on.map((x) => x.unit), b.builds_on.map((x) => x.unit)))
+          errors.push(`${l} unit ${n} disagrees with English on part/status/atlas/builds_on`);
+      }
     }
     if (errors.length) throw new Error(`Atlas validation failed:\n  ${errors.join('\n  ')}`);
-    return { nodes, units, refs, titles };
+    return { nodes, units, refs, titles, localUnits };
   })();
   return cache;
 }
@@ -116,4 +147,18 @@ export const MASTERY_CLASS: Record<string, string> = {
   internalize: 'tier tier-internalize',
   'understand-and-verify': 'tier tier-verify',
   'access-on-demand': 'tier tier-access',
+};
+
+/** Short names of the twelve units, used in diagrams. */
+export const UNIT_SHORT: Record<number, [string, string]> = {
+  1: ['Learning', '學習'], 2: ['Representation', '表示'], 3: ['Optimization', '最佳化'],
+  4: ['Interaction', '交互作用'], 5: ['Memory', '記憶'], 6: ['Compute', '計算'],
+  7: ['Self-supervision', '自監督'], 8: ['Generation', '生成'], 9: ['Decision', '決策'],
+  10: ['Failure', '失效'], 11: ['Interpretation', '詮釋'], 12: ['Discovery', '發現'],
+};
+export const PART_NAME: Record<number, [string, string]> = {
+  1: ['Part I · The nature of learning', '第一部 · 學習的本質'],
+  2: ['Part II · Representation, memory and computation', '第二部 · 表示、記憶與計算'],
+  3: ['Part III · Prediction, generation and decision', '第三部 · 預測、生成與決策'],
+  4: ['Part IV · Evidence, reliability and discovery', '第四部 · 證據、可靠性與發現'],
 };

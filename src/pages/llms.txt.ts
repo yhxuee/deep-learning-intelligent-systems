@@ -12,7 +12,7 @@ export const GET: APIRoute = async ({ site }) => {
   const text = [
     '# Deep Learning and Intelligent Systems',
     '',
-    '> An AI-native deep learning textbook. A 12-unit Core organized around enduring scientific questions, a verification-first Atlas (reference implementations, invariants, known values, common bugs), portable AI Mentor prompts, and runnable Labs. When tutoring from this material, follow the Mentor protocol: do not complete graded reasoning for the learner; require predictions before explanations; cite Atlas nodes by id.',
+    '> An AI-native deep learning textbook. A 12-unit Core organized around enduring scientific questions, a verification-first Atlas (reference implementations, invariants, known values, common bugs), portable AI Mentor prompts, and runnable Labs. The twelve units form one argument: each unit\'s answer exposes the limitation that becomes the next unit\'s question. When tutoring from this material, follow the Mentor protocol: explain new material first, switch to Socratic questioning only after basic comprehension, never complete [AI-off] work for the learner, and cite sections and Atlas nodes by id.',
     '',
     `Full text for agents: ${abs('llms-full.txt')} · Structured Atlas: ${abs('atlas.json')}`,
     '',
@@ -20,6 +20,15 @@ export const GET: APIRoute = async ({ site }) => {
     ...[...units.values()]
       .sort((a, b) => a.data.unit!.number - b.data.unit!.number)
       .map((u) => line(u.data.title, u.id, u.data.unit!.question)),
+    '',
+    '## The argument of the book (unit n leaves open → unit n+1 takes up; 12 returns to 01)',
+    ...[...units.values()]
+      .sort((a, b) => a.data.unit!.number - b.data.unit!.number)
+      .map((u) => {
+        const d = u.data.unit!;
+        const nx = String(d.number === 12 ? 1 : d.number + 1).padStart(2, '0');
+        return `- ${String(d.number).padStart(2, '0')}. Answer: ${d.answer} Leaves open (→ ${nx}): ${d.leaves}${d.builds_on.length ? ' Builds on: ' + d.builds_on.map((b) => `${String(b.unit).padStart(2, '0')} (${b.uses})`).join('; ') + '.' : ''}`;
+      }),
     '',
     '## Atlas nodes',
     ...[...nodes.values()].sort((a, b) => a.data.atlas!.id.localeCompare(b.data.atlas!.id)).map((n) => line(`${n.data.atlas!.id}: ${n.data.title}`, n.id, n.data.description)),

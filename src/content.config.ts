@@ -16,6 +16,12 @@ const unit = z.object({
   checkpoint: z.string().describe('The AI-off independent checkpoint'),
   status: z.enum(['complete', 'draft', 'outline']),
   atlas: z.array(z.string()).default([]),
+  /** The book's argument: the one-sentence answer this unit gives to its question. */
+  answer: z.string(),
+  /** The open problem this unit leaves, which the next unit (12 → 1 closes the loop) takes up. */
+  leaves: z.string(),
+  /** Earlier units whose results this unit uses, and what it uses from each. */
+  builds_on: z.array(z.object({ unit: z.number().int().min(1).max(12), uses: z.string() })).default([]),
 });
 
 /** Metadata carried by Atlas node pages (the verification layer). */

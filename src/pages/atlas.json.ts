@@ -13,7 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
       .sort((a, b) => (a.data.sidebar.order ?? 0) - (b.data.sidebar.order ?? 0))
       .map((d) => ({ title: d.data.title, url: abs(d.id + '/'), markdown: d.body }));
   const body = {
-    schema: 'dlis-atlas/1.1',
+    schema: 'dlis-atlas/1.2',
     generated: new Date().toISOString(),
     units: [...units.values()]
       .sort((a, b) => a.data.unit!.number - b.data.unit!.number)

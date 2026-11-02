@@ -11,6 +11,11 @@ unit:
   checkpoint: Derive the closed form of a linear recurrence, relate its eigenvalues to memory decay and stability, and design a memory stress test — without AI.
   status: draft
   atlas: [mech-linear-recurrence, mech-kv-cache, arch-selective-ssm, mech-attention]
+  answer: "A recurrent state compresses history into a fixed size and is stable when its dynamics contract; selective state-space models and linear attention trade exact recall for constant memory, while the KV cache keeps everything at linear cost."
+  leaves: "Every architectural choice has a price in FLOPs, memory traffic and latency; to choose between them, and to decide how large a model should be, computation must be accounted for explicitly."
+  builds_on:
+    - { unit: 3, uses: "gradient flow through time, eigenvalues and stability" }
+    - { unit: 4, uses: "attention and the KV cache" }
 ---
 
 ## 5.1 The problem

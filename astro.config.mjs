@@ -45,6 +45,7 @@ export default defineConfig({
         { label: 'Start here', translations: { 'zh-TW': '從這裡開始' }, items: [
           { slug: 'start/philosophy' },
           { slug: 'start/how-to-study' },
+          { slug: 'start/notation' },
           { slug: 'start/glossary' },
           { slug: 'start/changelog' },
         ] },

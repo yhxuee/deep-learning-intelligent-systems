@@ -11,6 +11,11 @@ unit:
   checkpoint: "Design an experiment that distinguishes two explanations of the same model behavior."
   status: outline
   atlas: ["mech-attention", "mech-residual-connection", "arch-transformer-block"]
+  answer: "A mechanistic claim is a causal claim about internal computation: probes show that information is present, attributions show correlation, and only interventions — ablation and activation patching with controls — establish that a component is used."
+  leaves: "Every interpretability finding is an experimental result that may fail to replicate; making any claim reliable — about one model or about the field — requires the methodology of discovery."
+  builds_on:
+    - { unit: 4, uses: "attention heads and the residual stream" }
+    - { unit: 10, uses: "evaluation with controls" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

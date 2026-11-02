@@ -1,0 +1,64 @@
+---
+/**
+ * The argument of the book, generated from unit frontmatter: for each unit, its question,
+ * its one-sentence answer, and the open problem it hands to the next unit.
+ */
+import { loadGraph, url, unitIn, nextUnit, PART_NAME, UNIT_SHORT } from '../lib/atlas';
+const locale = Astro.locals.starlightRoute.locale;
+const zh = locale === 'zh-tw';
+const g = await loadGraph();
+const pad = (n: number) => String(n).padStart(2, '0');
+const L = zh
+  ? { q: '問題', a: '回答', l: '留下的問題', st: { complete: '完成', draft: '完整初稿', outline: '規劃大綱' } as Record<string, string> }
+  : { q: 'Question', a: 'Answer', l: 'Leaves open', st: { complete: 'complete', draft: 'full draft', outline: 'outline' } as Record<string, string> };
+const parts = [1, 2, 3, 4].map((p) => ({
+  p,
+  units: [...Array(12).keys()].map((i) => unitIn(g, i + 1, locale)).filter((u) => u.data.unit!.part === p),
+}));
+---
+
+<ol class="arg-chain">
+  {
+    parts.map(({ p, units }) => (
+      <li class="arg-part">
+        <p class="arg-part-name">{PART_NAME[p][zh ? 1 : 0]}</p>
+        <ol>
+          {units.map((u) => {
+            const d = u.data.unit!;
+            const n = d.number;
+            return (
+              <li class="arg-step" id={`step-${pad(n)}`}>
+                <p class="arg-head">
+                  <a href={url(`core/unit-${pad(n)}/`, locale)}>
+                    <span class="arg-num">{pad(n)}</span> {UNIT_SHORT[n][zh ? 1 : 0]}
+                  </a>{' '}
+                  <span class="arg-status">{L.st[d.status]}</span>
+                </p>
+                <p><strong>{L.q}.</strong> {d.question}</p>
+                <p><strong>{L.a}.</strong> {d.answer}</p>
+                <p class="arg-leaves">
+                  <strong>{L.l}.</strong> {d.leaves}{' '}
+                  <a class="arg-next" href={`#step-${pad(nextUnit(n))}`}>→ {pad(nextUnit(n))} {UNIT_SHORT[nextUnit(n)][zh ? 1 : 0]}</a>
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .arg-chain, .arg-chain ol { list-style: none; padding: 0; margin: 0; }
+  .arg-part { margin-top: 1.5rem; }
+  .arg-part-name { font-size: var(--sl-text-sm); text-transform: uppercase; letter-spacing: 0.05em; color: var(--sl-color-gray-3); font-weight: 600; margin: 0 0 0.5rem; }
+  .arg-step { border-left: 3px solid var(--sl-color-accent); padding: 0.25rem 0 0.25rem 1rem; margin: 0 0 1rem; }
+  .arg-step p { margin: 0.25rem 0; }
+  .arg-head { font-size: var(--sl-text-lg); font-weight: 600; }
+  .arg-head a { text-decoration: none; }
+  .arg-num { font-variant-numeric: tabular-nums; color: var(--sl-color-gray-3); }
+  .arg-status { font-size: var(--sl-text-xs); font-weight: 400; color: var(--sl-color-gray-3); border: 1px solid var(--sl-color-gray-5); border-radius: 999px; padding: 0 0.5rem; vertical-align: middle; }
+  .arg-leaves { color: var(--sl-color-gray-2); }
+  .arg-next { font-weight: 600; white-space: nowrap; }
+</style>

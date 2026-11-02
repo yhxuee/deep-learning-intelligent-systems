@@ -11,6 +11,12 @@ unit:
   checkpoint: "Analyze the inductive assumptions of two self-supervised objectives (autoregressive vs. masked)."
   status: outline
   atlas: ["mech-cross-entropy", "method-contamination-check"]
+  answer: "Predicting hidden parts of the data from the rest — the next token, a masked token, or which pairs belong together — turns raw data into supervision; what the model learns is set by what is hidden and by data quality, deduplication and contamination control."
+  leaves: "A pretrained model is a probability distribution; to use it we must draw samples from it — and continuous data such as images has no next token to predict — so we need principled ways to generate."
+  builds_on:
+    - { unit: 1, uses: "likelihood and held-out evaluation" }
+    - { unit: 2, uses: "which representations transfer" }
+    - { unit: 6, uses: "the data demands of scaling laws" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

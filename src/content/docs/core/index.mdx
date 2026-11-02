@@ -1,0 +1,67 @@
+---
+title: The Core
+description: Twelve units that form one argument — each unit's answer exposes the limitation that becomes the next unit's question — tied together by one model, one yardstick and one notation.
+sidebar: { label: Overview, order: 0 }
+---
+
+import UnitGraph from '../../../components/UnitGraph.astro';
+import ArgumentChain from '../../../components/ArgumentChain.astro';
+
+The Core is a **finite curriculum treated in depth**: twelve units, each organized around a scientific question that will outlast today's architectures and grounded in **one anchor exemplar** that you internalize completely and build yourself. Every unit has the same ten parts — the problem, first principles, mathematical construction, worked examples, general theory, connections, limitations and counterexamples, modern developments, experiments, and problems — defined in the [writing standard](/project/writing-standard/). The target is **600–750 pages** plus 100–200 pages of mathematical appendices.
+
+## The argument of the book
+
+The twelve units are not a list of topics. They are **one argument, and each step is forced by the step before it.** Every unit answers its question completely enough to expose a limitation, and that limitation is the next unit's question.
+
+- **Part I — the nature of learning** asks what it means to learn from data at all. Unit 01 establishes the logic of generalization with the simplest model there is, a table of counts. The table cannot share what it learns between similar contexts, which calls for a *representation* in which similar things are close (Unit 02). A representation with parameters cannot be counted into place; it must be *optimized*, which needs gradients and a theory of when descent works (Unit 03).
+- **Part II — representation, memory and computation** builds the machinery. A model that sees one token at a time cannot retrieve anything from earlier in its input, and no fixed mixing of positions can; content-dependent mixing — *attention* — can (Unit 04). Attention remembers everything at a cost that grows with the context, which raises the question of what a bounded *memory* can keep (Unit 05). Every such choice has a price in arithmetic, memory traffic and latency, which must be *accounted for* before one can decide how large a model should be (Unit 06).
+- **Part III — prediction, generation and decision** puts the machinery to use. The scaling laws of Unit 06 demand more data than anyone could label, so supervision must be manufactured from raw data — *self-supervision* (Unit 07). The result is a probability distribution, and a distribution is used by *sampling* from it (Unit 08). Samples reproduce the data rather than the behaviour we want, so the model must be shaped by *goals and feedback* (Unit 09).
+- **Part IV — evidence, reliability and discovery** asks how we know any of it worked. Optimizing a measured reward shows how a score can mislead; Unit 10 asks when a score is evidence of *reliability* at all. Behavioural tests show *that* a model fails but not *why*, which requires claims about *mechanism* (Unit 11). Every such claim is an experiment that can fail to replicate, and the methodology that makes findings reliable is the subject of Unit 12. The last step returns to the first: generalizing from finitely many experiments is the problem of Unit 01, now faced by the scientist instead of the model.
+
+<UnitGraph />
+
+### The chain, step by step
+
+Each step below is generated from the unit pages themselves, so the overview and the chapters cannot drift apart. The same three sentences — where a unit comes from, what it builds on, and what it leaves open — open every unit.
+
+<ArgumentChain />
+
+## Three threads through every unit
+
+1. **One object.** The [spine project](/spine/) is one small language model, carried through the whole book: counted (01), embedded (02), trained with your own gradients (03), given attention (04) and a cache (05), sized by a scaling fit (06), pretrained on deduplicated data (07), sampled (08), post-trained against a checkable reward (09), evaluated with honest uncertainty (10), dissected (11) and finally the subject of a reproduction study (12). Each stage has a verification target that does not depend on any AI.
+2. **One yardstick.** Held-out negative log-likelihood in nats per token, introduced in Unit 01 together with its uniform baseline $\ln V$, is the number every later unit reports, decomposes or tries to improve — and Units 10 and 12 ask when a change in it is real.
+3. **One notation.** All units use the conventions in [Notation](/start/notation/): $\theta$ for parameters, $L(\theta)$ for the loss, $\eta$ for the step size, $h_t$ for a state, $\bar x$ for the adjoint $\partial L/\partial x$, and so on.
+
+## Anchor exemplars and spine stages
+
+| # | Anchor exemplar (internalize) | Spine-project stage |
+|---|---|---|
+| [01](/core/unit-01/) | Count-based bigram LM; train/held-out gap | 01 · bigram baseline, held-out NLL vs. $\ln V$ |
+| [02](/core/unit-02/) | Learned token embeddings | 02 · embedding table with tied read-out |
+| [03](/core/unit-03/) | Reverse-mode autodiff (hand-built) + Adam | 03 · neural bigram via your own gradients |
+| [04](/core/unit-04/) | Transformer block (causal self-attention) | 04 · add attention; pass the invariants |
+| [05](/core/unit-05/) | Linear recurrence vs. KV cache | 05 · KV-cache decoding equals full recompute |
+| [06](/core/unit-06/) | FLOP/memory accounting; scaling-law fit | 06 · fit a scaling law over five sizes; predict a sixth |
+| [07](/core/unit-07/) | Next-token pretraining; deduplication | 07 · dedup + contamination check before pretraining |
+| [08](/core/unit-08/) | Autoregressive sampling; flow matching in 2-D | 08 · samplers, and a 2-D flow-matching model |
+| [09](/core/unit-09/) | Policy gradient → DPO / verifiable-reward RL | 09 · post-train on a checkable task; audit for hacking |
+| [10](/core/unit-10/) | Calibration; leakage diagnosis; bootstrap CIs | 10 · evaluation harness |
+| [11](/core/unit-11/) | Activation patching; induction heads | 11 · find and ablate an induction head |
+| [12](/core/unit-12/) | Pre-registered ablation and replication | 12 · capstone: reproduce → challenge → extend |
+
+## Why questions *and* exemplars
+
+Questions keep the Core durable: attention, recurrence and convolution are all answers to Unit 04's question, and whatever replaces the Transformer will be another. Exemplars keep it **verifiable**: you cannot judge an AI-written attention kernel unless you have written and tested one yourself. Topics such as CNN families, GANs, MoE routing, distributed-training strategies or neural operators live in the [Atlas](/atlas/), reached through typed links from the unit where their mechanism becomes relevant.
+
+## The six strands of mathematics
+
+Mathematics is a continuous spine, not a prerequisite block. Each strand is introduced where the argument first needs it and reused afterwards:
+
+| Strand | Internalize | Introduced → reused |
+|---|---|---|
+| Linear algebra & geometry | projection, spectra, SVD, matrix calculus | 02 → 04, 05, 11 |
+| Calculus & optimization | Jacobians, chain rule, gradient flow, conditioning | 03 → 05, 06, 09 |
+| Probability & information | conditioning, expectation, likelihood, entropy, KL | 01 → 07, 08, 09 |
+| Statistical inference | estimators, uncertainty, controls, tests | 01 → 10, 12 |
+| Dynamical systems & control | state, stability, feedback, Bellman equations | 05 → 08, 09 |
+| Numerical computing | floating point, conditioning, complexity, memory hierarchy | 03 → 06, 08 |

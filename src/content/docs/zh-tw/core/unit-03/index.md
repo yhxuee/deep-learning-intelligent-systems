@@ -11,6 +11,11 @@ unit:
   checkpoint: 不使用 AI，推導小型網路的反向傳播與梯度下降法在二次函數上的步長條件；實作反向模式引擎並通過梯度檢查。
   status: draft
   atlas: [math-chain-rule, mech-reverse-mode-autodiff, method-gradient-check, opt-adamw, mech-residual-connection]
+  answer: "反向模式微分能以程式本身成本的小常數倍，算出任何程式的精確梯度；當步長配合曲率時，梯度下降法收斂；初始化、正規化與殘差連接讓深層網路保持可訓練。"
+  leaves: "只看前一個詞元的可訓練模型，無法從上下文較早處取回資訊；而任何固定、與內容無關的位置混合，都可證明無法完成查找。"
+  builds_on:
+    - { unit: 1, uses: "交叉熵目標與 ln V 基準" }
+    - { unit: 2, uses: "嵌入表與線性讀出" }
 ---
 
 ## 3.1 問題

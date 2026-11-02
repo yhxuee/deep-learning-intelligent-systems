@@ -11,6 +11,12 @@ unit:
   checkpoint: "Identify a reward specification that encourages undesirable behavior, and propose a measurable fix."
   status: outline
   atlas: []
+  answer: "When the objective is a reward rather than a target, the policy-gradient estimator turns trial and error into gradient steps; RLHF, DPO and verifiable-reward RL apply it to language models, with a KL anchor to the pretrained model limiting drift."
+  leaves: "Optimizing a measured reward exposes every gap between the measurement and the intent — reward hacking — so we must ask when a score is evidence of reliability at all."
+  builds_on:
+    - { unit: 3, uses: "stochastic gradients and their variance" }
+    - { unit: 7, uses: "the pretrained model as the initial policy" }
+    - { unit: 8, uses: "sampling and the KL divergence" }
 ---
 
 :::caution[Planning outline — not yet textbook text]

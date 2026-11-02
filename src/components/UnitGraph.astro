@@ -1,0 +1,71 @@
+---
+/**
+ * Arc diagram of the Core: units top to bottom; the main chain (n → n+1) on the left,
+ * "builds on" dependencies as arcs on the right. Generated from unit frontmatter.
+ */
+import { loadGraph, url, unitIn, UNIT_SHORT } from '../lib/atlas';
+const locale = Astro.locals.starlightRoute.locale;
+const zh = locale === 'zh-tw';
+const g = await loadGraph();
+const pad = (n: number) => String(n).padStart(2, '0');
+const ROW = 40, TOP = 16, BOX_X = 40, BOX_W = 190, BOX_H = 28, ARC_X = BOX_X + BOX_W;
+const y = (n: number) => TOP + (n - 1) * ROW + Math.floor((n - 1) / 3) * 14;
+const units = [...Array(12).keys()].map((i) => unitIn(g, i + 1, locale).data.unit!);
+const arcs = units.flatMap((u) => u.builds_on.map((b) => ({ from: b.unit, to: u.number })));
+const W = ARC_X + 12 + 11 * 20 + 20;
+const H = y(12) + BOX_H + TOP + 30;
+const title = zh ? '十二個單元的論證鏈與依賴關係' : 'The chain of twelve units and their dependencies';
+const desc = zh
+  ? '左側箭頭是主要論證鏈：每個單元留下的問題由下一個單元承接，單元 12 再回到單元 01。右側弧線表示單元用到哪些先前單元的結果。'
+  : 'Arrows on the left are the main chain: each unit leaves an open problem the next one takes up, and Unit 12 loops back to Unit 01. Arcs on the right show which earlier results each unit builds on.';
+---
+
+<figure class="dlis-figure unit-graph">
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="ug-title ug-desc" style={`max-width:${W}px`}>
+    <title id="ug-title">{title}</title>
+    <desc id="ug-desc">{desc}</desc>
+    <defs>
+      <marker id="ug-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" class="ug-chain-head" />
+      </marker>
+    </defs>
+    {
+      arcs.map(({ from, to }) => {
+        const y1 = y(from) + BOX_H / 2, y2 = y(to) + BOX_H / 2;
+        const bulge = 12 + (to - from) * 20;
+        return <path class="ug-arc" d={`M${ARC_X},${y1} C${ARC_X + bulge},${y1} ${ARC_X + bulge},${y2} ${ARC_X},${y2}`} />;
+      })
+    }
+    {
+      units.slice(0, 11).map((u) => (
+        <line class="ug-chain" x1={BOX_X + 18} y1={y(u.number) + BOX_H} x2={BOX_X + 18} y2={y(u.number + 1) - 1} marker-end="url(#ug-arrow)" />
+      ))
+    }
+    <path class="ug-loop" d={`M${BOX_X},${y(12) + BOX_H / 2} C${BOX_X - 34},${y(12)} ${BOX_X - 34},${y(1) + BOX_H} ${BOX_X},${y(1) + BOX_H / 2}`} marker-end="url(#ug-arrow)" />
+    {
+      units.map((u) => (
+        <a href={url(`core/unit-${pad(u.number)}/`, locale)}>
+          <rect class={`ug-box ug-${u.status}`} x={BOX_X} y={y(u.number)} width={BOX_W} height={BOX_H} rx="6" />
+          <text class="ug-label" x={BOX_X + 10} y={y(u.number) + BOX_H / 2 + 5}>
+            {pad(u.number)} · {UNIT_SHORT[u.number][zh ? 1 : 0]}
+          </text>
+        </a>
+      ))
+    }
+  </svg>
+  <figcaption>{desc}</figcaption>
+</figure>
+
+<style>
+  .unit-graph { border: 1px solid var(--sl-color-gray-5); border-radius: 0.5rem; padding: 0.75rem; margin: 1.5rem 0; }
+  .unit-graph figcaption { font-size: var(--sl-text-sm); color: var(--sl-color-gray-3); margin-top: 0.5rem; }
+  .unit-graph svg { width: 100%; height: auto; display: block; margin: 0 auto; }
+  .ug-box { fill: var(--sl-color-bg); stroke: var(--sl-color-gray-4); stroke-width: 1.2; }
+  .ug-draft, .ug-complete { stroke: var(--dlis-s1); stroke-width: 1.8; }
+  .ug-label { font-size: 13px; fill: var(--sl-color-white); font-family: var(--sl-font); }
+  .ug-arc { fill: none; stroke: var(--dlis-s2); stroke-opacity: 0.55; stroke-width: 1.3; }
+  .ug-chain, .ug-loop { stroke: var(--dlis-s1); stroke-width: 1.6; fill: none; }
+  .ug-loop { stroke-dasharray: 4 3; }
+  .ug-chain-head { fill: var(--dlis-s1); }
+  a:hover .ug-box { stroke-width: 2.6; }
+</style>

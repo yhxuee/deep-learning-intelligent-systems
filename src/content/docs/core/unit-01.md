@@ -11,6 +11,8 @@ unit:
   checkpoint: "Construct a counterexample where training accuracy does not imply generalization."
   status: outline
   atlas: ["mech-cross-entropy"]
+  answer: "If training data and future cases are drawn from the same distribution, the average loss on held-out data estimates future loss; likelihood supplies a loss that rewards calibrated probabilities, and every model must beat the uniform baseline ln V."
+  leaves: "The count-based bigram treats every symbol as an unrelated index: it cannot transfer what it learns about one context to a similar one, and its table grows as V² — generalization needs a representation in which similar things are close."
 ---
 
 :::caution[Planning outline — not yet textbook text]

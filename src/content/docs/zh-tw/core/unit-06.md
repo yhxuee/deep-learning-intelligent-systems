@@ -11,6 +11,13 @@ unit:
   checkpoint: "以算術強度說明為什麼理論 FLOPs 可能與實測執行時間不一致。"
   status: outline
   atlas: ["method-scaling-law-fit", "arch-transformer-block", "mech-kv-cache", "opt-adamw"]
+  answer: "訓練成本約為每個參數每個詞元 6 FLOPs；執行時間受算術強度相對於硬體計算／頻寬比的限制；保留資料損失隨參數量與資料量呈可預測的冪律下降，並由此決定兩者之間的計算最適分配。"
+  leaves: "計算最適的模型需要上兆個詞元——遠超過任何人能標註的量——所以學習訊號本身必須從原始資料中製造出來。"
+  builds_on:
+    - { unit: 1, uses: "以保留資料損失作為衡量標準" }
+    - { unit: 3, uses: "反向傳遞與最佳化器狀態的成本" }
+    - { unit: 4, uses: "注意力與 MLP 的 FLOPs" }
+    - { unit: 5, uses: "KV 快取的記憶體" }
 ---
 
 :::caution[規劃大綱——尚非教科書正文]
