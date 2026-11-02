@@ -24,7 +24,7 @@ The levels are not interchangeable. Successful behaviour does not reveal the mec
 
 ## 11.2.3 Why attention patterns are not explanations
 
-An attention weight says how much of each value vector is mixed into a position's update. It does not say what the value vector carries, whether the mixed vector is used downstream, or whether the same information arrives by another route. Debates about attention as explanation in NLP reached the same conclusion from both sides ([Jain & Wallace 2019](/references/#jain-2019); [Wiegreffe & Pinter 2019](/references/#wiegreffe-2019)): attention patterns are observations, informative when combined with interventions and misleading alone. Worked Example 11.6 makes the point with a model whose behaviour depends on every head while no head attends to the position the textbook mechanism requires.
+An attention weight says how much of each value vector is mixed into a position's update. It does not say what the value vector carries, whether the mixed vector is used downstream, or whether the same information arrives by another route. Debates about attention as explanation in NLP reached the same conclusion from both sides ([Jain & Wallace 2019](/references/#jain-2019); [Wiegreffe & Pinter 2019](/references/#wiegreffe-2019)): attention patterns are observations, informative when combined with interventions and misleading alone. Worked Example 11.5 makes the point with a model whose behaviour depends on every head while no head attends to the position the textbook mechanism requires.
 
 ## 11.2.4 Ground truth first
 
@@ -41,4 +41,4 @@ Only after a method passes on known ground truth is it applied to a model whose 
 
 ## 11.2.5 Behaviour before mechanism
 
-The last principle is the simplest and the most often skipped: **establish the behaviour before explaining it.** The spine model's loss on the second mention of a made-up pet name is 6.8–10.6 nats per letter — worse than the 3.9 of uniform guessing (Worked Example 11.7). It does not copy novel names. Searching its heads for an induction mechanism would find the head with the highest "induction score" (0.02) and invite a story about a weak induction head; the behavioural test says there is nothing to explain. Interpretability results start from a measured behaviour, with its uncertainty, exactly as in Unit 10.
+The last principle is the simplest and the most often skipped: **establish the behaviour before explaining it.** The spine model's loss on the second mention of a made-up pet name is 6.8–10.6 nats per letter — worse than the 3.9 of uniform guessing (Worked Example 11.6). It does not copy novel names. Searching its heads for an induction mechanism would find the head with the highest "induction score" (0.02) and invite a story about a weak induction head; the behavioural test says there is nothing to explain. Interpretability results start from a measured behaviour, with its uncertainty, exactly as in Unit 10.

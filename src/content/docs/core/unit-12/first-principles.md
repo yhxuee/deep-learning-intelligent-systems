@@ -16,7 +16,7 @@ An **ablation** removes or changes one factor and holds everything else fixed: s
 
 ## 12.2.3 Randomness is a factor too
 
-A training run depends on its random seed — through initialization, data order and sampling. Two runs that differ only in seed can differ in held-out loss by more than many claimed improvements ([Henderson et al. 2018](/references/#henderson-2018); [Bouthillier et al. 2021](/references/#bouthillier-2021)). Treat seeds as the experimental units: run each condition on several seeds, and **pair** the conditions by seed — condition A and condition B with seed 0, A and B with seed 1, and so on — so that whatever a seed does to both conditions cancels in the difference (Unit 10, §10.3.5).
+A training run depends on its random seed — through initialization, data order and sampling. Two runs that differ only in seed can differ in held-out loss by more than many claimed improvements ([Henderson et al. 2018](/references/#henderson-2018); [Bouthillier et al. 2021](/references/#bouthillier-2021)). Treat seeds as the experimental units: run each condition on several seeds, and **pair** the conditions by seed — condition A and condition B with seed 0, A and B with seed 1, and so on — so that whatever a seed does to both conditions cancels in the difference (Unit 10, §10.3.5) — provided the seed really does the same thing in both conditions, which Worked Example 12.3 shows is easy to get wrong.
 
 ## 12.2.4 The garden of forking paths
 
