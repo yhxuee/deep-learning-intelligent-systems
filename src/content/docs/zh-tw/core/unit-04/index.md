@@ -7,7 +7,7 @@ unit:
   part: 2
   question: 來自不同位置、實體或鄰域的資訊應該如何組合？
   anchor: 帶因果多頭自注意力的前置層正規化（pre-LN）Transformer 區塊，由固定混合權重的失敗推導而來。
-  spine: "階段 04——在主幹模型中加入因果自注意力（從此改用框架的自動微分），並通過每一項注意力不變量測試。"
+  spine: "階段 04——在主幹模型中加入因果自注意力（參考主幹以 NumPy 手推每一個反向傳播；你自己的實作可改用框架的自動微分，但須通過相同的梯度檢查），並通過每一項注意力不變量測試。"
   checkpoint: 證明沒有任何固定的線性混合能解決鍵值查找；推導縮放點積注意力及其反向傳遞；不看資料實作因果自注意力。
   status: draft
   atlas: [mech-attention, math-softmax, mech-positional-encoding, arch-transformer-block, mech-residual-connection, mech-kv-cache]

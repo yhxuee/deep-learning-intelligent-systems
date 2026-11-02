@@ -1,0 +1,25 @@
+{
+ "record": {
+  "analysis": "paired bootstrap 95% CI over seeds of NLL(no positions) - NLL(positions); rule: decide()",
+  "hypothesis": "Learned positional embeddings are needed by the spine model.",
+  "metric": "held-out NLL (nats/char), stage-04 architecture at d=32, 2 layers, 64-character context",
+  "prediction": "Removing them raises held-out NLL by more than 0.02 nats/char.",
+  "replication_seeds": [
+   10,
+   11,
+   12,
+   13,
+   14
+  ],
+  "seeds": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "steps": 400,
+  "threshold": 0.02
+ },
+ "sha256": "e66b6c1a6bd4f8f6f0eb25b4c01b17eb0880752a6cd9e7e8ad0d99517972491f"
+}

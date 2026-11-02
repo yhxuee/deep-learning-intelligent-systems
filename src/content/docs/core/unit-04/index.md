@@ -7,7 +7,7 @@ unit:
   part: 2
   question: How should information from different positions, entities, or neighborhoods be combined?
   anchor: The pre-LayerNorm Transformer block with causal multi-head self-attention, derived from the failure of fixed mixing weights.
-  spine: "Stage 04 — add causal self-attention to the spine model (now using a framework's autograd) and pass every attention invariant test."
+  spine: "Stage 04 — add causal self-attention to the spine model (the reference spine derives every backward pass by hand in NumPy; a framework's autograd is allowed in your own implementation if it passes the same gradient checks) and pass every attention invariant test."
   checkpoint: Prove that no fixed linear mixing can solve key–value lookup; derive scaled dot-product attention and its backward pass; implement causal self-attention from memory.
   status: draft
   atlas: [mech-attention, math-softmax, mech-positional-encoding, arch-transformer-block, mech-residual-connection, mech-kv-cache]

@@ -66,6 +66,6 @@ Write a prediction before running each experiment. Code: [`labs/unit-04-attentio
 
 **Tests:** §4.3.9, the [spine project](/spine/). **Predict:** the validation loss of the spine model with one causal attention block versus the Stage 03 bigram, and its loss at initialization.
 
-**Procedure.** Add one pre-LN Transformer block with learned positions to the spine model (framework autograd from here on). Before training, run all attention invariants on your block. Train with AdamW; record validation loss.
+**Procedure.** Add one pre-LN Transformer block with learned positions to the spine model (a framework's autograd is allowed from here on; the reference `spine/model.py` keeps hand-derived gradients, checked by `spine/test_model.py`). Before training, run all attention invariants on your block. Train with AdamW; record validation loss.
 
 **Look for:** loss at initialization near $\ln V$; all invariants passing; validation loss below the bigram's because the model can now use more than one previous character. If invariants fail, find the bug before interpreting any loss.

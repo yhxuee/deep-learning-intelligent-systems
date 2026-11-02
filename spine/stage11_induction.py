@@ -32,6 +32,26 @@ def repeated_batch(rng, B, K, half):
     return np.concatenate([np.full((B, 1), K), s, s], axis=1)
 
 
+def shifted_batch(rng, B, K=24, n=8, T=28):
+    """[BOS, noise, s, noise, s, noise] with random gaps, so the distance between the two copies of s
+    varies and no fixed positional offset solves the task; noise tokens are drawn with replacement.
+    Returns X (B, T), the (row, i, j) triples (i in the second copy, j after the same token in the
+    first copy) and a weight mask selecting the predictable tokens of the second copy."""
+    X = rng.integers(0, K, (B, T))
+    X[:, 0] = K
+    triples, w = [], np.zeros((B, T - 1))
+    for r in range(B):
+        s = rng.permutation(K)[:n]
+        a = 1 + rng.integers(0, 4)
+        b = a + n + rng.integers(0, 4)
+        X[r, a : a + n] = s
+        X[r, b : b + n] = s
+        for k in range(n - 1):
+            triples.append((r, b + k, a + k + 1))
+            w[r, b + k] = 1.0
+    return X, np.array(triples), w / w.sum()
+
+
 def head_scores(cache, half):
     """For each (layer, head): mean attention from second-half position i to i-1 (previous token)
     and to i-half+1 (the position after the previous occurrence of the current token)."""
@@ -84,11 +104,12 @@ def build_induction_circuit(K=8, c=60.0, lam=10.0):
     return p, cfg
 
 
-def train_attention_only(K=24, half=10, steps=2500, seed=0, d=48, lr=3e-3, log_every=250):
-    """K > half matters: if every sequence used all K tokens, the repeat could be predicted by
-    *exclusion* (which token has not appeared yet?) instead of copying — and a trained model finds
-    that shortcut (Unit 11, §11.7)."""
-    cfg = M.Config(vocab=K + 1, d=d, n_layer=2, n_head=2, max_len=2 * half + 1, mlp=False, layernorm=False, positions=True)
+def train_attention_only(K=24, n=8, T=28, steps=8000, seed=0, d=48, lr=3e-3, log_every=1000):
+    """Train a 2-layer attention-only model on `shifted_batch` sequences.  The gaps matter: with the
+    two copies always the same distance apart, a trained model solves the task with position-specific
+    circuits that never attend to the induction target, and induction scores read zero although the
+    loss is near zero (Unit 11, §11.7)."""
+    cfg = M.Config(vocab=K + 1, d=d, n_layer=2, n_head=2, max_len=T, mlp=False, layernorm=False, positions=True)
     p = M.init_params(cfg, seed=seed)
     for k in p:
         if k in ("wte", "wpe"):
@@ -96,13 +117,15 @@ def train_attention_only(K=24, half=10, steps=2500, seed=0, d=48, lr=3e-3, log_e
     rng = np.random.default_rng(seed)
     opt = M.AdamW(p, lr=lr, weight_decay=0.0)
     curve = []
+    Xe, te, we = shifted_batch(np.random.default_rng(99), 64, K, n, T)
     for s in range(steps):
-        X = repeated_batch(rng, 32, K, half)
+        X, _, _ = shifted_batch(rng, 32, K, n, T)
         loss, g = M.loss_and_grads(p, cfg, X[:, :-1], X[:, 1:])
         opt.step(p, g)
         if (s + 1) % log_every == 0:
-            Xe = repeated_batch(np.random.default_rng(99), 64, K, half)
-            curve.append((s + 1, second_half_loss(p, cfg, Xe, half)))
+            _, cache = M.forward(p, cfg, Xe[:, :-1], keep=True)
+            ind = probe_scores(cache, te)
+            curve.append((s + 1, probe_loss(p, cfg, Xe, we), max(ind.values())))
     return p, cfg, curve
 
 
@@ -122,7 +145,7 @@ def pet_probe(vocab, rng, B=48):
         name, friend = r.sample(["Mia", "Tom", "Lily", "Ben", "Sam", "Anna", "Max", "Zoe"], 2)
         pet = pet_name(r)
         a = f"\n{name} had a red kite. {name} also had a cat called "
-        b = f"{pet}. One sunny day {name} went to the park with {friend}. Then the kite fell. "
+        b = f"{pet}. One sunny day {name} went to the park with {friend}. "
         texts.append(a + b + pet + " ran to " + name + ".")
         spans.append((len(a), len(a) + len(b), len(pet)))
     T = min(len(t) for t in texts)
@@ -153,19 +176,22 @@ def probe_loss(p, cfg, X, w, head_mask=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--steps", type=int, default=2500)
+    ap.add_argument("--steps", type=int, default=8000)
     args = ap.parse_args()
     p, cfg = build_induction_circuit()
     X = repeated_batch(np.random.default_rng(0), 64, 8, 8)
     print(f"hand-built circuit: second-half loss {second_half_loss(p, cfg, X, 8):.4f} nats")
     p, cfg, curve = train_attention_only(steps=args.steps)
-    print("trained attention-only model, loss on the repeated half:")
-    for s, l in curve:
-        print(f"   step {s:5d}  {l:.3f}")
-    _, cache = M.forward(p, cfg, repeated_batch(np.random.default_rng(1), 64, 24, 10)[:, :-1], keep=True)
-    prev, ind = head_scores(cache, 10)
-    print("   previous-token scores", {k: round(v, 2) for k, v in prev.items()})
-    print("   induction scores     ", {k: round(v, 2) for k, v in ind.items()})
+    print("trained attention-only model (random gaps): loss on the second copy, best induction score")
+    for s, l, sc in curve:
+        print(f"   step {s:5d}  loss {l:.3f}  induction {sc:.2f}")
+    X, te, we = shifted_batch(np.random.default_rng(1), 64)
+    _, cache = M.forward(p, cfg, X[:, :-1], keep=True)
+    print("   induction scores", {k: round(v, 2) for k, v in probe_scores(cache, te).items()})
+    for k in [(0, 0), (0, 1), (1, 0), (1, 1)]:
+        m = np.ones((2, 2))
+        m[k] = 0
+        print(f"   ablate {k}: loss {probe_loss(p, cfg, X, we, head_mask=m):.3f}")
     from common import load_checkpoint, load_corpus
 
     ck = load_checkpoint("stage07")
@@ -173,15 +199,21 @@ def main():
         p, cfg, _ = ck
         vocab = load_corpus()[2]
         X, triples, w = pet_probe(vocab, np.random.default_rng(0))
-        _, cache = M.forward(p, cfg, X[:, :-1], keep=True)
+        logits, cache = M.forward(p, cfg, X[:, :-1], keep=True)
+        z = logits - logits.max(-1, keepdims=True)
+        lp = z - np.log(np.exp(z).sum(-1, keepdims=True))
+        r, i, _ = triples.T
+        per = -lp[r, i, X[r, i + 1]]
+        start = {}
+        for rr, ii in zip(r, i):
+            start.setdefault(rr, ii)
+        off = np.array([ii - start[rr] for rr, ii in zip(r, i)])
+        print("spine model, second mention of a made-up pet name (behaviour first):")
+        for o in range(3):
+            print(f"   letter {o + 2} of the name: loss {per[off == o].mean():.2f} nats  (uniform: {np.log(cfg.vocab):.2f})")
         ind = probe_scores(cache, triples)
-        ranked = sorted(ind, key=ind.get, reverse=True)
-        base = probe_loss(p, cfg, X, w)
-        print(f"spine model, second occurrence of a made-up pet name: loss {base:.3f} nats/char")
-        for k in ranked:
-            m = np.ones((cfg.n_layer, cfg.n_head))
-            m[k] = 0
-            print(f"   head {k}: induction score {ind[k]:.2f}; loss when ablated {probe_loss(p, cfg, X, w, head_mask=m):.3f}")
+        top = max(ind, key=ind.get)
+        print(f"   best induction score {ind[top]:.2f} at head {top}: no copying behaviour, so no copying mechanism to find")
 
 
 if __name__ == "__main__":

@@ -60,7 +60,7 @@ def train_size(d, tr, va, V, steps, seed=0, n_layer=2, T=64, B=16):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--steps", type=int, default=600)
+    ap.add_argument("--steps", type=int, default=2000)
     ap.add_argument("--widths", default="8,12,16,24,32")
     ap.add_argument("--predict", type=int, default=48)
     args = ap.parse_args()
