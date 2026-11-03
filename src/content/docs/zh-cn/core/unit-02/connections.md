@@ -4,13 +4,13 @@ description: 表示在语言学、信息检索、核方法、信号处理与物�
 sidebar: { label: "2.6 联系", order: 6 }
 ---
 
-## 2.6.1 语言学：分布语意
+## 2.6.1 语言学：分布语义
 
 分布假说（§2.2.5）来自结构语言学（[Harris 1954](/zh-cn/references/#harris-1954)）。它在意义的向量空间模型中变得可计算，而神经嵌入让它能大规模实用：word2vec（[Mikolov et al. 2013](/zh-cn/references/#mikolov-2013)）与 GloVe（[Pennington et al. 2014](/zh-cn/references/#pennington-2014)）学出的词向量中，简单的向量运算捕捉到某些关系——著名的“king − man + woman ≈ queen”（[Mikolov et al. 2013b](/zh-cn/references/#mikolov-2013b)）。例题 2.5 的字符层级几何是同一个现象，只是规模小到可以完整查看。
 
-## 2.6.2 信息检索：潜在语意分析
+## 2.6.2 信息检索：潜在语义分析
 
-搜索引擎比语言模型早数十年就面对独热问题：查询“car”应该找到关于“automobile”的文档。潜在语意分析计算词–文档矩阵的截断 SVD，并在得到的低维空间中比较文档（[Deerwester et al. 1990](/zh-cn/references/#deerwester-1990)）——把定理 2.1 当成表示学习器使用。现代的稠密检索以学习的编码器取代 SVD，但原则——映射到一个以内积衡量相关性的空间——没有改变（单元 05 把检索当成外部记忆来讨论）。
+搜索引擎比语言模型早数十年就面对独热问题：查询“car”应该找到关于“automobile”的文档。潜在语义分析计算词–文档矩阵的截断 SVD，并在得到的低维空间中比较文档（[Deerwester et al. 1990](/zh-cn/references/#deerwester-1990)）——把定理 2.1 当成表示学习器使用。现代的稠密检索以学习的编码器取代 SVD，但原则——映射到一个以内积衡量相关性的空间——没有改变（单元 05 把检索当成外部记忆来讨论）。
 
 ## 2.6.3 核方法与特征映射
 

@@ -93,7 +93,7 @@ $$
 
 **定理 2.1（Eckart–Young，[Eckart & Young 1936](/zh-cn/references/#eckart-1936)）。** 对每个 $d < r$，截断 $A_d = \sum_{i=1}^{d}\sigma_iu_iv_i^{\top}$ 在所有秩至多为 $d$ 的矩阵 $B$ 中使 $\lVert A - B\rVert_F$ 最小，最小值为 $\sqrt{\sum_{i>d}\sigma_i^2}$。
 
-（证明见 §2.5.5 ★。）如果共现统计矩阵的奇异值迅速衰减——少数强模式、许多弱模式——低秩表示就能捕捉大部分，而被舍弃的方向大多是有限计数造成的噪声。古典的*潜在语意分析（latent semantic analysis）*正是对词–文档矩阵计算这种截断（[Deerwester et al. 1990](/zh-cn/references/#deerwester-1990)）。学习的嵌入并不计算 SVD，但 [Levy & Goldberg (2014)](/zh-cn/references/#levy-2014) 证明，流行的 skip-gram 嵌入目标在最优点上，是对位移后的逐点互信息矩阵的隐式分解。嵌入学习与低秩分解，是从两个侧面看到的同一个想法。
+（证明见 §2.5.5 ★。）如果共现统计矩阵的奇异值迅速衰减——少数强模式、许多弱模式——低秩表示就能捕捉大部分，而被舍弃的方向大多是有限计数造成的噪声。古典的*潜在语义分析（latent semantic analysis）*正是对词–文档矩阵计算这种截断（[Deerwester et al. 1990](/zh-cn/references/#deerwester-1990)）。学习的嵌入并不计算 SVD，但 [Levy & Goldberg (2014)](/zh-cn/references/#levy-2014) 证明，流行的 skip-gram 嵌入目标在最优点上，是对位移后的逐点互信息矩阵的隐式分解。嵌入学习与低秩分解，是从两个侧面看到的同一个想法。
 
 ## 2.3.6 不变性与等变性
 

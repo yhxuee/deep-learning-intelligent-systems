@@ -56,7 +56,7 @@ unit:
 | [11.4 例题](/zh-cn/core/unit-11/worked-examples/) | 八个例题 | 75 分钟 |
 | [11.5 一般理论](/zh-cn/core/unit-11/theory/) | 因果模型、因果抽象、忠实性 | 75 分钟 |
 | [11.6 跨领域联系](/zh-cn/core/unit-11/connections/) | 神经科学、因果推断、科学哲学、软件逆向工程 | 30 分钟 |
-| [11.7 局限与反例](/zh-cn/core/unit-11/limitations/) | 错觉、分散式机制、严谨的代价 | 40 分钟 |
+| [11.7 局限与反例](/zh-cn/core/unit-11/limitations/) | 错觉、分布式机制、严谨的代价 | 40 分钟 |
 | [11.8 最新进展](/zh-cn/core/unit-11/modern/) | 稀疏字典、自动电路发现、世界模型 | 35 分钟 |
 | [11.9 实验](/zh-cn/core/unit-11/experiments/) | 六个实验 | 实验时间 |
 | [11.10 习题与延伸学习](/zh-cn/core/unit-11/problems/) | 分级习题与阅读 | — |
