@@ -106,7 +106,7 @@ $$
 
 均匀收敛研究训练损失与总体损失之间的落差。偏差–方差分解问的是另一个问题：*预测误差从哪里来？* 对平方损失，答案是一个精确的三项恒等式。
 
-想像我们反复从同一来源抽出新的训练集 $\mathcal D$，并重新执行整个学习程序。每次可能会得到不同的预测器 $\hat f_{\mathcal D}$。令观察到的目标为
+想象我们反复从同一来源抽出新的训练集 $\mathcal D$，并重新执行整个学习程序。每次可能会得到不同的预测器 $\hat f_{\mathcal D}$。令观察到的目标为
 
 $$
 y=f(x)+\varepsilon,qquad \mathbb E\varepsilon=0,qquad \mathrm{Var}\,\varepsilon=\sigma^2,
