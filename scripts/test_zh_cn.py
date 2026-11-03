@@ -25,6 +25,7 @@ def test_committed_edition_matches_a_fresh_conversion():
     ("把它們排成 $Q$ 的各行", "把它们排成 $Q$ 的各列"),           # Taiwan 行 = column
     ("$E$ 的每一列是獨熱向量", "$E$ 的每一行是独热向量"),           # Taiwan 列 = row
     ("字典的每個欄向量", "字典的每个列向量"),                     # Taiwan column terminology
+    ("每一列由樣本索引，每一欄由特徵索引", "每一行由样本索引，每一列由特征索引"),
     ("序列的排列與執行", "序列的排列与执行"),                     # not rows or columns
     ("只用一行線性代數", "只用一行线性代数"),                     # a line of text
     ("資料的變異數與共變異數", "数据的方差与协方差"),

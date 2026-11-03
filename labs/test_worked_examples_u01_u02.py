@@ -224,5 +224,6 @@ def test_unit02_cover_midpoint_is_half_not_shattering(p):
 
 def test_unit02_problem_answers():
     assert 256 * 32 + 8 * 32 * 512 + 512 + 512 * 256 + 256 == 271_104
-    assert math.ceil(8 * math.log(1e4) / 0.1 ** 2) == 7369
-    assert math.ceil(8 * math.log(1e4) / 0.01 ** 2) == 736_828
+    jl_dimension = lambda eps: math.floor(4 * math.log(1e4) / (eps ** 2 / 2 - eps ** 3 / 3)) + 1
+    assert jl_dimension(0.1) == 7_895
+    assert jl_dimension(0.01) == 741_773
