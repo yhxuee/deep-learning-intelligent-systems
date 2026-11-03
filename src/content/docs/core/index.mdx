@@ -29,7 +29,7 @@ Each step below is generated from the unit pages themselves, so the overview and
 ## Three threads through every unit
 
 1. **One object.** The [spine project](/spine/) is one small language model, carried through the whole book: counted (01), embedded (02), trained with your own gradients (03), given attention (04) and a cache (05), sized by a scaling fit (06), pretrained on deduplicated data (07), sampled (08), post-trained against a checkable reward (09), evaluated with honest uncertainty (10), dissected (11) and finally the subject of a reproduction study (12). Each stage has a verification target that does not depend on any AI.
-2. **One yardstick.** Held-out negative log-likelihood in nats per token, introduced in Unit 01 together with its uniform baseline $\ln V$, is the number every later unit reports, decomposes or tries to improve — and Units 10 and 12 ask when a change in it is real.
+2. **One yardstick.** Held-out negative log-likelihood is measured in nats per token. A **nat** is a natural-log unit of log-loss, and lower is better. Unit 01 introduces this yardstick together with its uniform baseline $\ln V$; every later unit reports, decomposes or tries to improve it — and Units 10 and 12 ask when a change in it is real.
 3. **One notation.** All units use the conventions in [Notation](/start/notation/): $\theta$ for parameters, $L(\theta)$ for the loss, $\eta$ for the step size, $h_t$ for a state, $\bar x$ for the adjoint $\partial L/\partial x$, and so on.
 
 ## Anchor exemplars and spine stages

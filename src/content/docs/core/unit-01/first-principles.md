@@ -38,7 +38,7 @@ $$
 \ell(q; x) = -\ln q(x),
 $$
 
-where $q(x)$ is the probability your prediction assigned to the outcome $x$ that actually occurred. Predicting $q(\text{tails}) = 0.3$ and seeing tails costs $-\ln 0.3 = 1.204$ nats; predicting $q(\text{tails}) = 0.001$ and seeing tails costs $6.91$ nats; predicting $q(\text{tails}) = 0$ costs $+\infty$ — a forecaster who rules out something that then happens is infinitely wrong.
+where $q(x)$ is the probability your prediction assigned to the outcome $x$ that actually occurred. Because the formula uses the natural logarithm $\ln$, the loss is measured in **nats** (short for *natural units of information*). Predicting $q(\text{tails}) = 0.3$ and seeing tails costs $-\ln 0.3 = 1.204$ nats; predicting $q(\text{tails}) = 0.001$ and seeing tails costs $6.91$ nats; predicting $q(\text{tails}) = 0$ costs $+\infty$ — a forecaster who rules out something that then happens is infinitely wrong.
 
 Three properties make the log-loss the right default:
 
@@ -46,7 +46,7 @@ Three properties make the log-loss the right default:
 - **It adds up over independent events.** The probability of a sequence of independent outcomes is a product, so its log-loss is the *sum* of the individual log-losses. Averages over many predictions are therefore meaningful.
 - **It measures information.** In base 2, $-\log_2 q(x)$ is the number of bits an optimal code built from $q$ uses to transmit $x$ (§1.6.1). A model with lower log-loss is literally a better compressor of the data.
 
-Because the formula uses the natural logarithm $\ln$, log-loss is measured in **nats** (short for *natural units of information*). The scale is easy to read: assigning the outcome probability $0.5$ costs $-\ln 0.5 = 0.693$ nats, while assigning it probability $0.1$ costs $2.303$ nats. Lower is better. Divide a value in nats by $\ln 2 \approx 0.693$ to convert it to bits.
+The scale is easy to read: assigning the outcome probability $0.5$ costs $-\ln 0.5 = 0.693$ nats, while assigning it probability $0.1$ costs $2.303$ nats. Lower is better. Divide a value in nats by $\ln 2 \approx 0.693$ to convert it to bits.
 
 ## 1.2.4 The first baseline: predicting uniformly
 
