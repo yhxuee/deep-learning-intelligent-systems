@@ -35,6 +35,30 @@ def decode(ids, vocab):
     return "".join(vocab[int(i)] for i in ids)
 
 
+def load_corpus_three_way(path=DEFAULT_DATA, validation_fraction=0.05, test_fraction=0.05):
+    """Return train, validation and test IDs plus vocabulary, splitting only between stories.
+
+    This is for examples that choose a hyperparameter: validation guides that choice and test remains
+    untouched until the final measurement.  The default 90/5/5 split has the same training stories as
+    ``load_corpus(..., val_fraction=0.1)`` so training-set-size comparisons remain unchanged.
+    """
+    if validation_fraction <= 0 or test_fraction <= 0 or validation_fraction + test_fraction >= 1:
+        raise ValueError("validation and test fractions must be positive and sum to less than one")
+    lines = load_lines(path)
+    n_validation = max(1, int(round(len(lines) * validation_fraction)))
+    n_test = max(1, int(round(len(lines) * test_fraction)))
+    if n_validation + n_test >= len(lines):
+        raise ValueError("validation and test splits leave no training stories")
+    train = lines[: -(n_validation + n_test)]
+    validation = lines[-(n_validation + n_test) : -n_test]
+    test = lines[-n_test:]
+    vocab = sorted(set("\n".join(lines) + "\n"))
+    def pack(part):
+        return encode("\n".join(part) + "\n", vocab)
+
+    return pack(train), pack(validation), pack(test), vocab
+
+
 def load_corpus(path=DEFAULT_DATA, val_fraction=0.1, train_lines=None):
     """Return (train_ids, val_ids, vocab). Split by line (story): the last val_fraction of lines is
     held out, so no story is cut in half.  `train_lines` may replace the training lines (e.g. after

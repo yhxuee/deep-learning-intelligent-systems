@@ -6,11 +6,12 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from common import load_corpus, nll  # noqa: E402
+from common import load_corpus, load_corpus_three_way, nll  # noqa: E402
 from stage01_bigram import fit_bigram  # noqa: E402
 from stage03_neural_bigram import loss_and_grad, train  # noqa: E402
 
 TRAIN, VAL, VOCAB = load_corpus()
+NGRAM_TRAIN, NGRAM_VALID, NGRAM_TEST, NGRAM_VOCAB = load_corpus_three_way()
 V = len(VOCAB)
 SMALL = TRAIN[:12_000]  # the full-batch neural bigram test runs on a prefix to stay fast
 
@@ -119,12 +120,20 @@ def test_stage02_neural_ngram_gradient_matches_finite_differences():
             assert (lp - lm) / 2e-6 == pytest.approx(g[k][i], rel=1e-5, abs=1e-10)
 
 
-def test_stage02_neural_ngram_beats_counts_when_data_is_scarce():
-    """Unit 02, Worked Example 2.6: with 5 000 training characters, sharing through embeddings wins."""
-    n = 5000
-    count = min(S2.count_ngram_nll(TRAIN[:n], VAL, V, 4, a)[0] for a in [0.003, 0.01, 0.03, 0.1, 0.3])
-    q = S2.train_ngram(TRAIN[:n], V, k=4, steps=2500)
-    assert S2.ngram_nll(q, VAL, 4) < count - 0.08
+def test_stage02_count_vs_neural_ngram_uses_untouched_test_stories():
+    """Unit 02, Worked Example 2.6: tune count smoothing on validation, report once on test."""
+    assert np.array_equal(TRAIN, NGRAM_TRAIN) and VOCAB == NGRAM_VOCAB
+    alphas = [0.003, 0.01, 0.03, 0.1, 0.3]
+    expected = [(5000, 0.003, 1.07, 0.94), (20000, 0.003, 0.67, 0.62),
+                (80000, 0.01, 0.56, 0.55), (len(TRAIN), 0.01, 0.51, 0.53)]
+    for n, expected_alpha, expected_count, expected_neural in expected:
+        alpha = min(alphas, key=lambda a: S2.count_ngram_nll(TRAIN[:n], NGRAM_VALID, V, 4, a)[0])
+        count = S2.count_ngram_nll(TRAIN[:n], NGRAM_TEST, V, 4, alpha)[0]
+        q = S2.train_ngram(TRAIN[:n], V, k=4, steps=2500)
+        neural = S2.ngram_nll(q, NGRAM_TEST, 4)
+        assert alpha == expected_alpha
+        assert count == pytest.approx(expected_count, abs=0.01)
+        assert neural == pytest.approx(expected_neural, abs=0.01)
 
 
 def test_stage02_interchangeable_symbols_get_the_same_embedding():

@@ -128,7 +128,7 @@ Concatenation is still a crude way to combine positions: it fixes the window siz
 |---|---|---|---|
 | one-hot + unrestricted table | nothing across contexts | up to $V^{k+1}$ logits | bigram 2.12 nats (Unit 01) |
 | embedding + factorized bigram | similar characters | $Vd + d^2 + V$ | 2.15 nats with $d = 16$ (1 106 parameters) |
-| embedding + neural n-gram | similar characters *and* similar contexts | $Vd + kdH + H + HV + V$ | 0.98 vs 1.11 for counts at 5 000 characters, $k = 4$ |
+| embedding + neural n-gram | similar characters *and* similar contexts | $Vd + kdH + H + HV + V$ | test NLL 0.94 vs 1.07 for counts at 5 000 characters, $k = 4$ |
 
 The common thread is now more precise: **a representation, together with the function that consumes it, determines which cases can share evidence and which distinctions remain available.** One-hot plus a free table shares nothing across contexts. A low-dimensional embedding plus a shared function can learn graded similarity. Unit 04's attention and Unit 05's recurrence add assumptions about *positions* as well.
 
