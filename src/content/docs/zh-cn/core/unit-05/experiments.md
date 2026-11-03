@@ -6,7 +6,7 @@ sidebar: { label: "5.9 实验", order: 9 }
 
 每个实验都在检验本单元的一个具体结果。**执行任何东西之前，先写下你的预测**——一个数字、一个正负号或一条曲线的形状，再加一句理由。所需的推导已标在每个项目中。
 
-代码在 [`labs/unit-05-memory`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/labs/unit-05-memory)（不使用 AI 的构建：`memory.py`，由 `test_memory.py` 测试），以及 [`figures/make_figures.py`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/figures)（重新产生本单元的每一张图）。实验 5–8 中的绘图、参数扫描与样板代码可以交给 AI；预测与诠释由你负责。[交互式图表](/zh-cn/labs/interactive/)页可以让你在写程序前先摸索实验 5.1、5.2、5.4 与 5.7。
+代码在 [`labs/unit-05-memory`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/labs/unit-05-memory)（不使用 AI 的构建：`memory.py`，由 `test_memory.py` 测试），以及 [`figures/make_figures.py`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/figures)（重新生成本单元的每一张图）。实验 5–8 中的绘图、参数扫描与样板代码可以交给 AI；预测与诠释由你负责。[交互式图表](/zh-cn/labs/interactive/)页可以让你在写程序前先摸索实验 5.1、5.2、5.4 与 5.7。
 
 ## 实验 5.1——噪声与延迟的取舍
 
