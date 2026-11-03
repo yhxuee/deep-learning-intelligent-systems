@@ -35,14 +35,14 @@ The rest of the unit turns these three sentences into mathematics.
 
 ### The spine result, read slowly
 
-[Unit 01](/core/unit-01/) ended with a count table. It treats every context as a separate address: evidence collected at one address does not automatically help a similar address. Consider predicting the next character of a children's story from the preceding **four** characters after reading only 5 000 training characters. Lower test loss is better:
+[Unit 01](/core/unit-01/) ended with a count table. It treats every context as a separate address: evidence collected at one address does not automatically help a similar address. Consider predicting the next character of a children's story from the preceding **four** characters after reading only 5 000 training characters. Lower test loss is better. Because this loss uses the natural logarithm, its unit is the **nat**: one nat equals $\log_2 e\approx1.44$ bits, and exponentiating an average loss in nats gives perplexity. You need only remember here that a smaller number means more probability assigned to the observed next characters.
 
 - A **count 4-gram**, with its smoothing parameter chosen on validation stories, obtains **1.07 nats per character** on separate test stories. There are $50^4=6.25$ million possible four-character contexts, and most were never observed. Under add-$\alpha$ smoothing, a completely unseen context receives the same probability for all 50 next characters.
 - A **neural 4-gram** uses the same four-character context, but first maps each character to a learned 16-number vector. A shared neural network then uses those vectors to predict the next character. With 15 570 parameters it obtains **0.94 nats per character** on the same test stories.
 
 This is not a magic property of the number 16. The learned coordinates and the shared prediction function allow evidence from many contexts to update common parameters. The data, context length and loss function are held fixed; the representation and the model's pattern of parameter sharing change together. The result therefore demonstrates the value of representation-induced sharing, not an isolated contest between two encodings.
 
-With about 385 000 training characters, the count model has enough direct evidence to catch up and slightly pass the neural model in this run (0.51 versus 0.53 nats). Representation is most valuable when the number of situations is large relative to the data available—which is the usual regime in interesting learning problems.
+With about 385 000 training characters, the count model has enough direct evidence to catch up and slightly pass the neural model in this run (0.51 versus 0.53 nats). In this comparison, learned sharing helps most when the number of possible situations is large relative to the data available. That sparse-data regime is common, but the crossover depends on the corpus, model, and training procedure.
 
 ### A four-point version: XOR
 
@@ -114,5 +114,5 @@ If matrix rank or the singular value decomposition is new, continue anyway when 
 | [2.6 Connections](/core/unit-02/connections/) | linguistics, retrieval, kernels, signal processing | 30 min |
 | [2.7 Limitations and counterexamples](/core/unit-02/limitations/) | lost information, bias, polysemy, fragile geometry | 40 min |
 | [2.8 Modern developments](/core/unit-02/modern/) | contextual and joint embeddings, linear representations, superposition | 35 min |
-| [2.9 Experiments](/core/unit-02/experiments/) | six experiments | lab time |
+| [2.9 Experiments](/core/unit-02/experiments/) | seven experiments | lab time |
 | [2.10 Problems and further study](/core/unit-02/problems/) | graded problems and reading | — |
