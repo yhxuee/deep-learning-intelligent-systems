@@ -120,10 +120,10 @@ $$
 
 若后验与先验属于同一族，先验就与似然**共轭**。
 
-- **Beta–伯努利。** 先验 $\mathrm{Beta}(a, b)$ 与 $n$ 次试验中 $k$ 次成功，给出后验 $\mathrm{Beta}(a + k, b + n - k)$，平均为 $(a + k)/(a + b + n)$。以均匀先验 $\mathrm{Beta}(1, 1)$ 与十中七，后验平均为 $8/12 = 0.667$——介于先验平均 0.5 与 MLE 0.7 之间（拉普拉斯接续法则）。
-- **Dirichlet–类别。** 先验 $\mathrm{Dirichlet}(\alpha, \dots, \alpha)$ 与计数 $c_k$，给出后验平均 $(c_k + \alpha)/(n + K\alpha)$——正是二元语法一行的加 $\alpha$ 平滑（单元 01，§1.3.4）。
+- **Beta–伯努利。** 先验 $\mathrm{Beta}(a, b)$ 与 $n$ 次试验中 $k$ 次成功，给出后验 $\mathrm{Beta}(a + k, b + n - k)$，平均为 $(a + k)/(a + b + n)$。以均匀先验 $\mathrm{Beta}(1, 1)$ 与十中七，后验均值为 $8/12 = 0.667$——介于先验均值 0.5 与 MLE 0.7 之间（拉普拉斯接续法则）。
+- **Dirichlet–类别。** 先验 $\mathrm{Dirichlet}(\alpha, \dots, \alpha)$ 与计数 $c_k$，给出后验均值 $(c_k + \alpha)/(n + K\alpha)$——正是二元语法一行的加 $\alpha$ 平滑（单元 01，§1.3.4）。
 
-后验平均是先验平均与数据的加权平均，先验的作用就像 $a + b$（或 $K\alpha$）个虚拟观测。随着 $n$ 增加，数据主导，而后验集中在 MLE 附近，宽度为 $1/\sqrt n$ 的量级（在正则条件下的 Bernstein–von Mises 定理）。
+后验均值是先验均值与数据的加权平均，先验的作用就像 $a + b$（或 $K\alpha$）个虚拟观测。随着 $n$ 增加，数据主导，而后验集中在 MLE 附近，宽度为 $1/\sqrt n$ 的量级（在正则条件下的 Bernstein–von Mises 定理）。
 
 ## 习题
 
