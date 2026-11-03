@@ -14,7 +14,7 @@ atlas:
 
 ## 一段话说明
 
-训练一族只在一项资源上不同的模型，量测保留集损失，并拟合如 $L(N) = E + A N^{-\alpha}$（$E$ 为不可约损失）或联合的 $L(N, D)$ 的形式。计算最优化分析接着问：如何把 FLOP 预算 $C\approx6ND$ 分配给参数 $N$ 与词元 $D$ [Kaplan et al. 2020](/zh-cn/references/#kaplan-2020)；[Hoffmann et al. 2022](/zh-cn/references/#hoffmann-2022)。
+训练一族只在一项资源上不同的模型，度量保留集损失，并拟合如 $L(N) = E + A N^{-\alpha}$（$E$ 为不可约损失）或联合的 $L(N, D)$ 的形式。计算最优化分析接着问：如何把 FLOP 预算 $C\approx6ND$ 分配给参数 $N$ 与词元 $D$ [Kaplan et al. 2020](/zh-cn/references/#kaplan-2020)；[Hoffmann et al. 2022](/zh-cn/references/#hoffmann-2022)。
 
 ## 不变量与良好实践
 

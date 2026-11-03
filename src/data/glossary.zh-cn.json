@@ -470,6 +470,9 @@
  "mutual-information": {
   "term": "互信息"
  },
+ "nat": {
+  "term": "nat（自然信息单位）"
+ },
  "network": {
   "term": "网络"
  },

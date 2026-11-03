@@ -63,7 +63,7 @@ $$
 
 ## 6.3.5 使用率
 
-实际的训练离峰值有多近？标准量度是**模型 FLOPs 使用率（model FLOPs utilization, MFU）**（[Chowdhery et al. 2023](/zh-cn/references/#chowdhery-2023)）：模型*需要*的 FLOPs（命题 6.1 的每词元 $6N + 12LTd$，不含重算）乘以每秒词元数，再除以峰值 FLOP/s。调校良好的大型训练回报的 MFU 约为 40–60% **[O]**；其余损失在内存受限的运算（归一化、softmax、逐元素运算）、设备之间的通信，以及流水线闲置时间。以 NumPy 在 CPU 上写成的主干模型，只达到其机器峰值的几个百分比——实验 6.2 量测它。
+实际的训练离峰值有多近？标准量度是**模型 FLOPs 使用率（model FLOPs utilization, MFU）**（[Chowdhery et al. 2023](/zh-cn/references/#chowdhery-2023)）：模型*需要*的 FLOPs（命题 6.1 的每词元 $6N + 12LTd$，不含重算）乘以每秒词元数，再除以峰值 FLOP/s。调校良好的大型训练回报的 MFU 约为 40–60% **[O]**；其余损失在内存受限的运算（归一化、softmax、逐元素运算）、设备之间的通信，以及流水线闲置时间。以 NumPy 在 CPU 上写成的主干模型，只达到其机器峰值的几个百分比——实验 6.2 度量它。
 
 ## 6.3.6 能源
 

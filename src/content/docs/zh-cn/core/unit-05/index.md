@@ -7,7 +7,7 @@ unit:
   part: 2
   question: 有限的状态能从任意长的历史中保留什么？
   anchor: "线性递推 h_t = A h_{t-1} + B x_t（由指数移动平均推导而来），并与作为未压缩记忆的 KV 缓存对照。"
-  spine: "阶段 05——为主干模型实现 KV 缓存解码；建立联想回忆压力测试，并量测它在哪里失败。"
+  spine: "阶段 05——为主干模型实现 KV 缓存解码；建立联想回忆压力测试，并度量它在哪里失败。"
   checkpoint: 不使用 AI，推导线性递推的封闭解，说明其特征值与记忆衰减、稳定性的关系，并设计一个记忆压力测试。
   status: draft
   atlas: [mech-linear-recurrence, mech-kv-cache, arch-selective-ssm, mech-attention]

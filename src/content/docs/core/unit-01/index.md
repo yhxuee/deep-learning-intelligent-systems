@@ -32,7 +32,7 @@ This unit asks the question underneath: **why can experience improve performance
 We will answer with the simplest learner that can be studied completely: a table that counts which character follows which in a body of text — the **bigram language model**. It is too simple to be useful by itself, but every idea in this unit — the loss, the assumption that makes learning possible, the gap between training and held-out performance, the baseline, the uncertainty of a measured number — is exactly visible in it, and every later unit reuses those ideas unchanged. The same table becomes the first stage of the [spine project](/spine/), the small language model you will build across the whole book.
 
 :::note[Predict before reading on]
-A bigram model is fitted to 2 000 characters of children's stories by counting, and evaluated on 43 000 characters of different stories from the same source. Its average loss on the training text is 2.06 nats per character. Will its loss on the new text be lower, about the same, or higher — and by roughly how much? What would change with 385 000 training characters? (Worked Example 1.4 and Experiment 1.2 give the answers.)
+A bigram model is fitted to 2 000 characters of children's stories by counting, and evaluated on 43 000 characters of different stories from the same source. Its average loss on the training text is 2.06 nats per character. A **nat** is one unit of log-loss measured with the natural logarithm; lower loss is better. Will the loss on the new text be lower, about the same, or higher — and by roughly how much? What would change with 385 000 training characters? (Worked Example 1.4 and Experiment 1.2 give the answers.)
 :::
 
 ## What this unit builds

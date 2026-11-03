@@ -10,7 +10,7 @@ sidebar: { label: "10.8 最新进展", order: 8 }
 
 **量：**一次评估回答哪些问题。
 
-语言模型的整体评估（holistic evaluation）在许多情境中，于准确率之外同时量测校准、稳健性、公平性、偏差、毒性与效率，并公开全部结果，而不是单一排行榜数字（[Liang et al. 2023](/zh-cn/references/#liang-2023)）**[E]/[O]**。其设计原则就是 §10.2.7 的评估工具放大版：每个指标回答不同的问题，没有任何汇总数字能取代它们。
+语言模型的整体评估（holistic evaluation）在许多情境中，于准确率之外同时度量校准、稳健性、公平性、偏差、毒性与效率，并公开全部结果，而不是单一排行榜数字（[Liang et al. 2023](/zh-cn/references/#liang-2023)）**[E]/[O]**。其设计原则就是 §10.2.7 的评估工具放大版：每个指标回答不同的问题，没有任何汇总数字能取代它们。
 
 ## 10.8.2 评估的误差棒
 
@@ -34,4 +34,4 @@ sidebar: { label: "10.8 最新进展", order: 8 }
 
 **量：**分布外不确定性估计的可靠性。
 
-独立训练之模型的集成（ensemble），比单一模型给出校准较好的不确定性，并在偏移下退化得较和缓（[Lakshminarayanan et al. 2017](/zh-cn/references/#lakshminarayanan-2017)；[Ovadia et al. 2019](/zh-cn/references/#ovadia-2019)）**[E]**。共形预测在可交换性成立时给出不依赖分布的覆盖率，并正以加权版本扩展到偏移情境（§10.5.3）**[D]**。以分类器自己的最大 softmax 概率检测分布外输入，是一个简单却难以稳定超越的基线（[Hendrycks & Gimpel 2017](/zh-cn/references/#hendrycks-2017)）**[E]**；合成损坏的基准测试则量测准确率在受控偏移下如何退化（[Hendrycks & Dietterich 2019](/zh-cn/references/#hendrycks-2019)）**[E]**。
+独立训练之模型的集成（ensemble），比单一模型给出校准较好的不确定性，并在偏移下退化得较和缓（[Lakshminarayanan et al. 2017](/zh-cn/references/#lakshminarayanan-2017)；[Ovadia et al. 2019](/zh-cn/references/#ovadia-2019)）**[E]**。共形预测在可交换性成立时给出不依赖分布的覆盖率，并正以加权版本扩展到偏移情境（§10.5.3）**[D]**。以分类器自己的最大 softmax 概率检测分布外输入，是一个简单却难以稳定超越的基线（[Hendrycks & Gimpel 2017](/zh-cn/references/#hendrycks-2017)）**[E]**；合成损坏的基准测试则度量准确率在受控偏移下如何退化（[Hendrycks & Dietterich 2019](/zh-cn/references/#hendrycks-2019)）**[E]**。

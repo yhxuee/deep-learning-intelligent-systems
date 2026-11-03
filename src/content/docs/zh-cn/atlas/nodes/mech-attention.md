@@ -39,7 +39,7 @@ atlas:
 <details>
 <summary>实验 04 调试挑战的解答——请先自己尝试</summary>
 
-由 `test_bug_hunt.py` 量测（每个植入错误会让哪些不变量失败）：
+由 `test_bug_hunt.py` 度量（每个植入错误会让哪些不变量失败）：
 
 | 错误 | 失败的项目 |
 |---|---|

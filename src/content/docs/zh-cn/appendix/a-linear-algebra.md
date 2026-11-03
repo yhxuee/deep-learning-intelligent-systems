@@ -105,7 +105,7 @@ $$
 
 **谱范数** $\lVert A\rVert = \sigma_1$ 是 $A$ 伸长向量的最大倍数；**Frobenius 范数** $\lVert A\rVert_F = \sqrt{\sum_{ij}A_{ij}^2} = \sqrt{\sum_i\sigma_i^2}$ 是各元素的欧几里得范数。两者都满足次乘性：$\lVert AB\rVert\le\lVert A\rVert\,\lVert B\rVert$。这个不等式是所有关于深层乘积之论证的骨干——$L$ 个层雅可比矩阵乘积的范数可能随 $L$ 呈几何增长或缩小（单元 03，§3.7.4）。
 
-可逆矩阵 $A$ 的**条件数（condition number）**为 $\kappa(A) = \sigma_1/\sigma_n$。它量测求解 $Ax = b$ 时相对误差被放大多少：若 $A(x + \delta x) = b + \delta b$，则
+可逆矩阵 $A$ 的**条件数（condition number）**为 $\kappa(A) = \sigma_1/\sigma_n$。它度量求解 $Ax = b$ 时相对误差被放大多少：若 $A(x + \delta x) = b + \delta b$，则
 $$
 \frac{\lVert\delta x\rVert}{\lVert x\rVert}\le\kappa(A)\,\frac{\lVert\delta b\rVert}{\lVert b\rVert},
 $$

@@ -16,11 +16,11 @@ $\mathrm{ReLU}(x) = \max(0,x)$、$|x|$ 与 $\max$ 在转折点没有导数。自
 
 ## 3.7.3 病态条件：进展由最差的方向决定
 
-§3.5.4 的二次分析给出约 $\frac\kappa2\ln\frac1\varepsilon$ 次迭代。Rosenbrock 函数 $L(x,y) = (1-x)^2 + 100(y-x^2)^2$ 是经典测试问题（[Rosenbrock 1960](/zh-cn/references/#rosenbrock-1960)），最小值在 $(1,1)$，位于一条弯曲而狭窄的山谷底部；它在最小值处的 Hessian 条件数约为 2,500，梯度下降法要数千步才能沿着谷底前进。条件数为 **[D]**；实验 3.2 量测步数。
+§3.5.4 的二次分析给出约 $\frac\kappa2\ln\frac1\varepsilon$ 次迭代。Rosenbrock 函数 $L(x,y) = (1-x)^2 + 100(y-x^2)^2$ 是经典测试问题（[Rosenbrock 1960](/zh-cn/references/#rosenbrock-1960)），最小值在 $(1,1)$，位于一条弯曲而狭窄的山谷底部；它在最小值处的 Hessian 条件数约为 2,500，梯度下降法要数千步才能沿着谷底前进。条件数为 **[D]**；实验 3.2 度量步数。
 
 ## 3.7.4 深度：梯度消失与梯度爆炸
 
-MLP 中的反向信号在每一层都乘上 $W_\ell^{\top}$ 与 $\mathrm{diag}(\varphi'(z_\ell))$（§3.3.6）。logistic sigmoid 的 $\varphi'\le\frac14$，所以即使权重范数为 1，信号每层也可能缩小 4 倍：10 层之后为 $0.25^{10}\approx9.5\times10^{-7}$。**[D]** 图 3.3 量测了宽度 256、50 层网络中，三组激活函数（activation function）与初始化搭配的梯度范数。
+MLP 中的反向信号在每一层都乘上 $W_\ell^{\top}$ 与 $\mathrm{diag}(\varphi'(z_\ell))$（§3.3.6）。logistic sigmoid 的 $\varphi'\le\frac14$，所以即使权重范数为 1，信号每层也可能缩小 4 倍：10 层之后为 $0.25^{10}\approx9.5\times10^{-7}$。**[D]** 图 3.3 度量了宽度 256、50 层网络中，三组激活函数（activation function）与初始化搭配的梯度范数。
 
 ![宽度 256 的 50 层 MLP 中，反向传播的梯度范数（log10）对“距离输出的层数”作图：以 N(0, 1/n) 初始化的 sigmoid 下降约 30 个数量级；以 Glorot 初始化的 tanh 维持在 1 附近并略为衰减；以 He 初始化的 ReLU 维持在 1 附近。](/figures/u03-vanishing-gradients.svg)
 

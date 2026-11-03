@@ -49,7 +49,7 @@ $$
 $$
 \mathrm{BS} = \frac1n\sum_i\sum_{k=1}^{K}\big(p_{ik} - \mathbb{1}[y_i = k]\big)^2 ,
 $$
-它对整个概率向量是严格适当的评分（[Gneiting & Raftery 2007](/zh-cn/references/#gneiting-2007)）；有些作者会再除以 $K$。另一个常以同样名称回报的量是**首选标签 Brier 分数（top-label Brier score）** $\frac1n\sum_i(c_i - \mathbb{1}[\text{correct}_i])^2$，其中 $c_i = \max_kp_{ik}$，也就是衍生事件“首选类别正确”的二元 Brier 分数。它只评估首选标签的置信度，这也是 ECE 所量测的；它对概率如何分布在其他类别上毫无说明。*例子：*真实类别为 1 时，$p = (0.6, 0.2, 0.2)$ 与 $p' = (0.6, 0.4, 0)$ 的首选标签 Brier 分数相同，都是 $0.16$，但多类别分数分别为 $0.24$ 与 $0.32$。两种版本都与 ECE 不同，也奖励*分辨力（resolution）*——对的时候有把握、错的时候不确定（§10.5.1，该处以二元结果陈述）。
+它对整个概率向量是严格适当的评分（[Gneiting & Raftery 2007](/zh-cn/references/#gneiting-2007)）；有些作者会再除以 $K$。另一个常以同样名称回报的量是**首选标签 Brier 分数（top-label Brier score）** $\frac1n\sum_i(c_i - \mathbb{1}[\text{correct}_i])^2$，其中 $c_i = \max_kp_{ik}$，也就是衍生事件“首选类别正确”的二元 Brier 分数。它只评估首选标签的置信度，这也是 ECE 所度量的；它对概率如何分布在其他类别上毫无说明。*例子：*真实类别为 1 时，$p = (0.6, 0.2, 0.2)$ 与 $p' = (0.6, 0.4, 0)$ 的首选标签 Brier 分数相同，都是 $0.16$，但多类别分数分别为 $0.24$ 与 $0.32$。两种版本都与 ECE 不同，也奖励*分辨力（resolution）*——对的时候有把握、错的时候不确定（§10.5.1，该处以二元结果陈述）。
 
 **温度缩放（temperature scaling）。** 把所有 logits 除以一个在验证数据上以最小化 NLL 拟合的 $\tau$，不会改变任何预测的 argmax——准确率不变——但能修正系统性的过度或不足自信；对现代网络而言它是一个强基线（[Guo et al. 2017](/zh-cn/references/#guo-2017)）。它无法修正对不同输入朝不同方向出错的置信度。
 
