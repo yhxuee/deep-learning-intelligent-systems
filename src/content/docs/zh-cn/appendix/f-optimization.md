@@ -26,7 +26,7 @@ $$
 
 *(i)⇒(ii) 的证明。* 由凸性，$f(x + \lambda(y - x))\le f(x) + \lambda(f(y) - f(x))$。减去 $f(x)$、除以 $\lambda$ 并令 $\lambda\to0$：$\nabla f(x)^{\top}(y - x)\le f(y) - f(x)$。其他蕴含关系类似（[Boyd & Vandenberghe 2004](/zh-cn/references/#boyd-2004)，§3.1）。$\blacksquare$
 
-(ii) 最有用的推断：**凸函数的每个驻点都是全域极小**，因为 $\nabla f(x^\star) = 0$ 给出对所有 $y$ 都有 $f(y)\ge f(x^\star)$。
+(ii) 最有用的推断：**凸函数的每个驻点都是全局极小**，因为 $\nabla f(x^\star) = 0$ 给出对所有 $y$ 都有 $f(y)\ge f(x^\star)$。
 
 **保持凸性的运算。** 非负和；与仿射映射的合成 $f(Ax + b)$；凸函数的逐点最大值；以及 $\mathrm{LSE}(z) = \ln\sum_je^{z_j}$（附录 B，命题 B.3）。所以线性 softmax 模型的交叉熵在其权重上是凸的，而二元语法的最大似然问题（单元 01，§1.3.3）是有唯一解的凸问题。深层网络在其参数上不是凸的：凸损失与非线性网络的合成破坏了凸性，这就是为什么单元 03 在没有凸性时的保证比较弱。
 
@@ -81,7 +81,7 @@ $$
 
 *例子：最大似然类别分布。* 在 $\sum_kp_k = 1$ 的限制下最大化 $\sum_kc_k\ln p_k$。驻点条件给出 $c_k/p_k = \lambda$，所以 $p_k\propto c_k$，而限制确定 $p_k = c_k/n$——即单元 01 命题 1.1。
 
-**不等式限制（KKT）。** 要在 $g_i(x)\le0$ 与 $h_j(x) = 0$ 的限制下最小化 $f(x)$，**Karush–Kuhn–Tucker 条件**为：驻点条件 $\nabla f + \sum_i\lambda_i\nabla g_i + \sum_j\nu_j\nabla h_j = 0$；原始可行性；对偶可行性 $\lambda_i\ge0$；以及**互补松弛** $\lambda_ig_i(x) = 0$——不紧的限制其乘子为零。对满足某个限制条件资格（例如存在严格可行点——Slater 条件）的凸问题，KKT 条件是全域极小的必要且充分条件。
+**不等式限制（KKT）。** 要在 $g_i(x)\le0$ 与 $h_j(x) = 0$ 的限制下最小化 $f(x)$，**Karush–Kuhn–Tucker 条件**为：驻点条件 $\nabla f + \sum_i\lambda_i\nabla g_i + \sum_j\nu_j\nabla h_j = 0$；原始可行性；对偶可行性 $\lambda_i\ge0$；以及**互补松弛** $\lambda_ig_i(x) = 0$——不紧的限制其乘子为零。对满足某个限制条件资格（例如存在严格可行点——Slater 条件）的凸问题，KKT 条件是全局极小的必要且充分条件。
 
 **对偶。** **对偶函数** $q(\lambda, \nu) = \inf_x\mathcal L(x, \lambda, \nu)$ 是凹的，而且对每个 $\lambda\ge0$，它都是最优值的下界（**弱对偶**）：对可行的 $x$，$\mathcal L(x, \lambda, \nu)\le f(x)$。在 Slater 条件下，最优下界是紧的（**强对偶**）。对偶把单元 06 的计算最优分配——在 $6ND = C$ 的限制下最小化损失 $L(N, D)$——变成一行计算：在最优点，参数与数据每 FLOP 的边际损失下降相等（单元 06，命题 6.2）。
 
