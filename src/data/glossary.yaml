@@ -257,3 +257,20 @@ pre-registration: { en: "pre-registration", zh: "預先登記", area: book, cn: 
 replication: { en: "replication", zh: "重現", area: book, cn: "復現" }
 statistical-power: { en: "statistical power", zh: "檢定力", area: statistics, cn: "統計功效" }
 forking-paths: { en: "garden of forking paths", zh: "分岔小徑花園", area: statistics }
+
+# --- Mathematical appendices (v2.1)
+singular-value-decomposition: { en: "singular value decomposition (SVD)", zh: "奇異值分解", area: general }
+positive-definite: { en: "positive definite", zh: "正定", area: general }
+pole: { en: "pole (of a transfer function)", zh: "極點", area: memory }
+controllability: { en: "controllability", zh: "可控性", area: memory, cn: "能控性" }
+observability: { en: "observability", zh: "可觀測性", area: memory, cn: "能觀性" }
+minimal-realization: { en: "minimal realization", zh: "最小實現", area: memory }
+bibo-stability: { en: "BIBO (input–output) stability", zh: "有界輸入有界輸出穩定", area: memory }
+fisher-information: { en: "Fisher information", zh: "費雪資訊", area: statistics, cn: "費舍爾信息" }
+conjugate-prior: { en: "conjugate prior", zh: "共軛先驗", area: statistics }
+kkt-conditions: { en: "Karush–Kuhn–Tucker (KKT) conditions", zh: "KKT 條件", area: optimization }
+duality: { en: "(Lagrangian) duality", zh: "（拉格朗日）對偶", area: optimization }
+mutual-information: { en: "mutual information", zh: "互資訊", area: statistics, cn: "互信息" }
+stationary-distribution: { en: "stationary distribution", zh: "平穩分布", area: statistics, cn: "平穩分佈" }
+value-iteration: { en: "value iteration", zh: "價值迭代", area: optimization }
+leave-one-out-baseline: { en: "leave-one-out baseline", zh: "留一法基準", area: statistics }

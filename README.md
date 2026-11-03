@@ -16,7 +16,7 @@ This book covers fewer topics than a survey and treats each one completely — d
 | **Mentor** | model-agnostic prompt packs + `llms.txt`, `atlas.json` and a zero-dependency **MCP server** | `prompts/`, `mcp/` |
 | **Labs** | laptop-scale AI-off construction tasks with invariant tests | `labs/` |
 
-## Status (v2.0 — all twelve units, one argument)
+## Status (v2.1 — audit corrections and mathematical appendices)
 
 - **All twelve units are full drafts** in a ten-part structure (problem → first principles → construction → worked examples → theory → connections → limitations → modern developments → experiments → problems): about 100 000 words in English, 99 worked examples, 78 experiments and 240 graded problems. They await subject and pedagogical review.
 - **One argument.** Each unit records its answer, the limitation it leaves open and what it builds on; the build checks the chain, and [the argument of the book](https://yhxuee.github.io/deep-learning-intelligent-systems/core/) shows it — Unit 12's limitation returns to Unit 01's question.
@@ -24,7 +24,9 @@ This book covers fewer topics than a survey and treats each one completely — d
 - **Reproducible numbers.** Every worked-example number is recomputed by `labs/test_worked_examples*.py` or asserted by `spine/test_*.py`; the full suite runs in CI in about a minute.
 - 24 Atlas verification kits; labs for Units 03–05; ten interactive figures; a link checker and a CJK-in-math checker in CI.
 - **Traditional Chinese (Taiwan) edition** of every page, with English terms at first use and a [bilingual glossary](https://yhxuee.github.io/deep-learning-intelligent-systems/zh-tw/start/glossary/). Chinese Mentor prompts in `prompts/zh-tw/`.
-- Target scale: 600–750 pages plus 100–200 pages of appendices (appendices not yet written). **Feature freeze** on agent tooling until the Core has been reviewed.
+- **Mathematical appendices** (v2.1): eight appendices — linear algebra, calculus, probability, information theory, statistics, optimization, linear systems, Markov decision processes — about 17 000 words, with proofs, exercises and every example number checked by `labs/test_appendices.py`.
+- **Audit corrections** (v2.1): all sixteen findings of an independent scientific audit corrected in both languages, with regression tests; see the [errata](https://yhxuee.github.io/deep-learning-intelligent-systems/start/errata/). No unit has yet had named scientific editorial review.
+- Target scale: 600–750 pages for the units. **Feature freeze** on agent tooling until the Core has been reviewed.
 
 ## Quick start
 

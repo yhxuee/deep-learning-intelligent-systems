@@ -71,6 +71,7 @@ export default defineConfig({
           { label: 'III · Prediction, Generation, Decision', translations: { 'zh-TW': '第三部 · 預測、生成與決策' }, items: [7, 8, 9].map(unitItem) },
           { label: 'IV · Evidence, Reliability, Discovery', translations: { 'zh-TW': '第四部 · 證據、可靠性與發現' }, items: [10, 11, 12].map(unitItem) },
         ] },
+        { label: 'Mathematical appendices', translations: { 'zh-TW': '數學附錄' }, items: [{ autogenerate: { directory: 'appendix' } }] },
         { label: 'Spine project', translations: { 'zh-TW': '主幹專案' }, items: [{ slug: 'spine' }] },
         { label: 'The Atlas', translations: { 'zh-TW': '知識圖譜 Atlas' }, items: [{ slug: 'atlas' }, { label: 'Nodes', translations: { 'zh-TW': '節點' }, items: [{ autogenerate: { directory: 'atlas/nodes' } }] }] },
         { label: 'The Mentor', translations: { 'zh-TW': 'AI 導師（Mentor）' }, items: [

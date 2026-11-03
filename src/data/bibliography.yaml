@@ -366,3 +366,4 @@ vershynin-2018: { authors: "Vershynin, R.", year: 2018, title: "High-Dimensional
 puterman-1994: { authors: "Puterman, M. L.", year: 1994, title: "Markov Decision Processes: Discrete Stochastic Dynamic Programming", venue: "Wiley", url: "https://doi.org/10.1002/9780470316887", kind: book }
 levin-2017: { authors: "Levin, D. A., and Peres, Y.", year: 2017, title: "Markov Chains and Mixing Times (2nd ed.)", venue: "American Mathematical Society", url: "https://pages.uoregon.edu/dlevin/MARKOV/", kind: book }
 higham-2002: { authors: "Higham, N. J.", year: 2002, title: "Accuracy and Stability of Numerical Algorithms (2nd ed.)", venue: "SIAM", url: "https://doi.org/10.1137/1.9780898718027", kind: book }
+mackay-2003: { authors: "MacKay, D. J. C.", year: 2003, title: "Information Theory, Inference, and Learning Algorithms", venue: "Cambridge University Press", url: "https://www.inference.org.uk/itila/book.html", kind: book }

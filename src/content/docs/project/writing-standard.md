@@ -43,7 +43,7 @@ The structure is a contract with the reader: the same kind of content is always 
 
 ## Scale
 
-The Core's target is **600–750 pages** for twelve units (about 40–70 pages each), plus **100–200 pages** of mathematical and theoretical appendices. Page count is not a goal; it is the space that complete treatment of fewer topics requires. The 280-page target of blueprint v1.0 is retracted (see the [changelog](/start/changelog/)).
+The Core's target is **600–750 pages** for twelve units (about 40–70 pages each), plus mathematical appendices. Page count is not a goal; it is the space that complete treatment of fewer topics requires. The appendices were first estimated at 100–200 pages; as written for v2.1 they are eight appendices of about 17 000 words (roughly 50 pages), because they state and point to — rather than repeat — the proofs the units already give. Their target is coverage: every mathematical result a unit relies on is stated in an appendix or proved in a unit. The 280-page target of blueprint v1.0 is retracted (see the [changelog](/start/changelog/)).
 
 ## Status levels
 

@@ -24,7 +24,7 @@ Version 1.0 of the blueprint confused two different goals: covering fewer **topi
 2. **The textbook educates; the AI augments.** A student who never touches an AI tool must be able to learn from the text alone. The [Mentor](/mentor/) adapts pace, offers alternative derivations, generates practice and critiques experiments — it never carries the main explanation.
 3. **Foundational synthesis over API literacy.** The measure of success is whether a student can derive, implement, stress-test and analyse a mechanism from first principles.
 
-Consequently the Core targets **600–750 pages** for twelve units, plus 100–200 pages of appendices, and every unit follows a ten-part structure defined in the [writing standard](/project/writing-standard/).
+Consequently the Core targets **600–750 pages** for twelve units, plus [mathematical appendices](/appendix/), and every unit follows a ten-part structure defined in the [writing standard](/project/writing-standard/).
 
 ## Three outcomes
 

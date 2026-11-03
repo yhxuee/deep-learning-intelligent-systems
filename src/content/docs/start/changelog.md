@@ -4,6 +4,14 @@ description: What changed between blueprint v1.0 and each edition published here
 sidebar: { order: 3 }
 ---
 
+## v2.1 — 3 November 2026: audit corrections and mathematical appendices
+
+1. **Scientific audit corrected.** An independent audit of v2.0 reported sixteen findings, from a missing discount factor in the policy-gradient theorem to an over-strong claim about the Landauer limit. All sixteen are corrected in English and Traditional Chinese in the same change; ten have regression tests that fail if the error returns (`labs/test_audit_regressions.py`, `spine/test_spine.py`). The full list, with what changed, is on the new [errata and review status](/start/errata/) page.
+2. **Spine Stage 09 re-run.** Its REINFORCE baseline now leaves the gradient unbiased (leave-one-out instead of the batch mean). The corrected run scores 0.79 instead of 0.82; Units 09, 10 and 11 quote the new numbers and use the change itself as an example of run-to-run variation.
+3. **Mathematical appendices** — eight of them, [A–H](/appendix/): linear algebra, multivariable and matrix calculus, probability, information theory, statistical inference and concentration, optimization, linear dynamical systems and signals, Markov chains and decision processes. About 17 000 words, with proofs, 29 worked examples and 48 exercises; every example number is checked by `labs/test_appendices.py`. They point to, rather than repeat, proofs given in the units, so they are shorter than the 100–200 pages first estimated.
+4. **Two review signals** are now kept apart: executed validation (tests and build, which every unit has) and scientific editorial review (which no unit has yet completed).
+5. The argument chain of the Core is described as an editorial order, not a logical necessity; each unit's "builds on" list gives its mathematical dependencies.
+
 ## v2.0 — 2 November 2026: all twelve units, one argument
 
 1. **Every unit is a full draft.** Units 01, 02 and 06–12 were written from scratch to the [writing standard](/project/writing-standard/), joining Units 03–05: twelve ten-part chapters, about 100 000 words in English, 99 worked examples, 78 experiments and 240 graded problems with selected answers. Every worked-example number is recomputed by `labs/test_worked_examples*.py` or asserted by the spine tests.
