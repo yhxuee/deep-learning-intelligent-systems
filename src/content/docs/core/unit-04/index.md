@@ -20,9 +20,11 @@ unit:
 
 ## 4.1 The problem
 
-Units 01–03 treated each prediction as a function of one input. Language, code, images, molecules and social networks are not like that: the meaning of each element depends on **other** elements. The word "it" in a sentence refers back to some noun; a closing bracket must match an opening one; an atom's chemistry depends on its neighbours. A model that processes a sequence must decide, for each position, **which other positions to draw information from, and how much**.
+Units 01–03 mostly asked how one represented example produces one prediction. But an example may itself contain many interacting parts. In language, “it” refers to another phrase; in code, a closing bracket belongs to an earlier opening bracket; in a molecule, an atom's behavior depends on nearby atoms. A useful representation at one position may therefore require information stored somewhere else.
 
-Here is the smallest task that makes the difficulty sharp. A sequence lists key–value pairs and ends with a query key; the correct output is the value stored under that key:
+This unit asks one design question repeatedly: for each receiving position, **which other positions should contribute, and by how much?** Convolution, pooling, graph aggregation, and attention can all be written as weighted mixing. Their difference lies in how those weights are chosen.
+
+Here is a small task that isolates the difficulty. A **key** names a slot, a **value** is stored there, and a **query** asks for the value under one key. The sequence lists key–value pairs and ends with a query:
 
 $$
 \underbrace{a\ 3}_{\text{pair}}\quad \underbrace{b\ 7}_{\text{pair}}\quad \underbrace{c\ 1}_{\text{pair}}\quad \underbrace{?\,b}_{\text{query}} \;\longrightarrow\; 7 .
@@ -30,7 +32,7 @@ $$
 
 Shuffle the pairs and the answer stays 7, but its **position** changes. Change the query to $?a$ and the answer becomes 3, although the pairs are identical. The information the output needs is always present — but *where* it is depends on the **content** of the sequence.
 
-This is not an artificial puzzle. A language model completing "The capital of France is Paris. The capital of Japan is Tokyo. The capital of France is …" solves exactly this lookup; so does a programmer's assistant resolving which variable a name refers to. In Unit 11 you will find a circuit inside the spine model that performs it.
+The task is simplified, but the operation is common. Completing “The capital of France is Paris. The capital of Japan is Tokyo. The capital of France is …” requires retrieving the value associated with the repeated key. Resolving which declaration a variable name refers to has the same key–value flavor. Real language and code also require composition, order, and reasoning, so lookup is a building block rather than a complete account of understanding.
 
 :::note[Predict before reading on]
 Which of these could solve the lookup task for *any* arrangement of pairs, with a fixed number of layers?
@@ -46,9 +48,9 @@ Write one sentence for each. §4.2 proves the answers.
 ## What this unit builds
 
 1. **Mixing as weighted sums** (§4.2). Almost every layer that combines positions computes $y_i = \sum_jw_{ij}v_j$. The design question is where the weights $w_{ij}$ come from.
-2. **Why fixed weights fail** (§4.2). A short linearity argument proves that no fixed mixing — uniform, learned-by-position, or convolutional — can solve key–value lookup. Content must multiply content.
-3. **Inventing attention** (§4.2–§4.3). Requiring weights that are content-dependent, non-negative, normalized and differentiable leads to the softmax of similarity scores. Separating three roles — what a position looks for, what it can be found by, and what it hands over — yields queries, keys and values. Scaling by $\sqrt{d}$ follows from a variance calculation.
-4. **The Transformer block** (§4.3). Causal masks, positional information, multiple heads, the backward pass, the position-wise MLP, residual connections and normalization, assembled into the block used by current language models.
+2. **What fixed affine mixing cannot do** (§4.2). A short linearity argument proves that uniform, learned-by-position, or other fixed affine mixing cannot solve every key–value lookup. Nonlinear convolutional stacks have a separate receptive-field limitation.
+3. **Constructing attention** (§4.2–§4.3). Content-dependent similarity scores provide the missing multiplicative interaction. Softmax is one convenient differentiable way—not the only mathematical possibility—to turn scores into normalized non-negative weights. Queries, keys, and values separate what is requested, how an item is addressed, and what it contributes.
+4. **The Transformer block** (§4.3). Causal masks, positional information, multiple heads, the backward pass, the position-wise MLP, residual connections, and normalization are assembled into the pre-LayerNorm block studied throughout the book.
 5. **Theory and limits** (§4.5, §4.7). Attention as kernel regression and as message passing on a complete graph; the symmetry view that makes convolution and attention two instances of one idea; quadratic cost; what attention weights do *not* tell you.
 
 ## Prerequisites
@@ -60,7 +62,9 @@ Write one sentence for each. §4.2 proves the answers.
 
 ## How to read this unit
 
-The text is complete without an AI tutor; every number is recomputed by `labs/test_worked_examples.py` and `labs/unit-04-attention` (run in CI), and every figure by `figures/make_figures.py`. **★ Advanced** sections can be skipped on a first reading. Where the text derives attention by a logical route rather than its historical one, a *Pedagogical reconstruction* note says so.
+The text is complete without an AI tutor; every quoted number is recomputed by `labs/test_worked_examples.py` or `labs/unit-04-attention`, and figures come from `figures/make_figures.py`. **★ Advanced** sections can be skipped on a first reading. “Pedagogical reconstruction” notes distinguish a useful logical derivation from the historical path by which the method was developed.
+
+For a first pass, keep only three shapes in view: $X$ has one row per position; $QK^\top$ has one row per receiver and one column per possible source; multiplying by $V$ returns one output row per receiver. On a second pass, follow masks, positions, and heads. Study the full backward pass only after the forward shapes are comfortable.
 
 | Section | Content | Approx. reading time |
 |---|---|---|
