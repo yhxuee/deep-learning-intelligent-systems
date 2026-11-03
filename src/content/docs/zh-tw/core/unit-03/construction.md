@@ -194,7 +194,7 @@ $$
 \mathrm{Cov}(g_B) = \frac{\Sigma}{B},\qquad \mathbb E\|g_B - \nabla L\|^2 = \frac{\mathrm{tr}\,\Sigma}{B}.
 $$
 
-把 $B$ 增為四倍，這項均方根抽樣誤差減半，算術工作則增為四倍；平行硬體可能改變實際耗時的比例。**隨機梯度下降法（stochastic gradient descent, SGD）**在更新中以 $g_B$ 取代 $\nabla L$。每次更新都比全資料梯度便宜，卻帶有雜訊。在 §3.5.6 明確列出的假設下，這種雜訊會為固定步長造成誤差底限，而遞減步長可以移除它（[Robbins & Monro 1951](/zh-tw/references/#robbins-1951)；[Bottou et al. 2018](/zh-tw/references/#bottou-2018)）。
+把 $B$ 增為四倍，這項均方根抽樣誤差減半，算術工作則增為四倍；平行硬體可能改變實際耗時的比例。**隨機梯度下降法（stochastic gradient descent, SGD）**在更新中以 $g_B$ 取代 $\nabla L$。每次更新都比全資料梯度便宜，卻帶有雜訊。在 §3.5.6 明確列出的假設下，固定步長的收斂界限會保留一個雜訊項；持續存在的非零雜訊通常使疊代在一個鄰域內波動，而遞減排程可讓界限趨向駐點（[Robbins & Monro 1951](/zh-tw/references/#robbins-1951)；[Bottou et al. 2018](/zh-tw/references/#bottou-2018)）。
 
 實際的資料載入器常在每個**訓練輪次（epoch）**打亂一次，再以不放回方式取用樣本。若固定 $\theta$，完整一輪的平均就是全資料梯度；但訓練時，相鄰小批次彼此相依，而且參數不斷改變。因此，上面的 $\Sigma/B$ 證明精確適用於彼此獨立的放回抽樣，不能原封不動套到每一種資料載入實作。
 

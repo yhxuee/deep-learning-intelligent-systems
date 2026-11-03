@@ -194,7 +194,7 @@ $$
 \mathrm{Cov}(g_B) = \frac{\Sigma}{B},\qquad \mathbb E\|g_B - \nabla L\|^2 = \frac{\mathrm{tr}\,\Sigma}{B}.
 $$
 
-把 $B$ 增为四倍，这项均方根抽样误差减半，算术工作则增为四倍；并行硬件可能改变实际耗时的比例。**随机梯度下降法（stochastic gradient descent, SGD）**在更新中以 $g_B$ 取代 $\nabla L$。每次更新都比全数据梯度便宜，却带有噪声。在 §3.5.6 明确列出的假设下，这种噪声会为固定步长造成误差底限，而递减步长可以移除它（[Robbins & Monro 1951](/zh-cn/references/#robbins-1951)；[Bottou et al. 2018](/zh-cn/references/#bottou-2018)）。
+把 $B$ 增为四倍，这项均方根抽样误差减半，算术工作则增为四倍；并行硬件可能改变实际耗时的比例。**随机梯度下降法（stochastic gradient descent, SGD）**在更新中以 $g_B$ 取代 $\nabla L$。每次更新都比全数据梯度便宜，却带有噪声。在 §3.5.6 明确列出的假设下，固定步长的收敛界限会保留一个噪声项；持续存在的非零噪声通常使迭代在一个邻域内波动，而递减调度可让界限趋向驻点（[Robbins & Monro 1951](/zh-cn/references/#robbins-1951)；[Bottou et al. 2018](/zh-cn/references/#bottou-2018)）。
 
 实际的数据加载器常在每个**训练轮次（epoch）**打乱一次，再以不放回方式取用样本。若固定 $\theta$，完整一轮的平均就是全数据梯度；但训练时，相邻小批量彼此依赖，而且参数不断改变。因此，上面的 $\Sigma/B$ 证明精确适用于彼此独立的放回抽样，不能原封不动套到每一种数据加载实现。
 

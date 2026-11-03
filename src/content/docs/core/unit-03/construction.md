@@ -194,7 +194,7 @@ $$
 \mathrm{Cov}(g_B) = \frac{\Sigma}{B},\qquad \mathbb E\|g_B - \nabla L\|^2 = \frac{\mathrm{tr}\,\Sigma}{B}.
 $$
 
-Quadrupling $B$ halves this root-mean-square sampling error while multiplying the arithmetic work by four; parallel hardware may change wall-clock scaling. **Stochastic gradient descent** (SGD) replaces $\nabla L$ by $g_B$ in the update. Each update is cheaper than a full-data gradient and is noisy. Under assumptions made explicit in §3.5.6, that noise creates an error floor for a constant step size, while decreasing step sizes can remove the floor ([Robbins & Monro 1951](/references/#robbins-1951); [Bottou et al. 2018](/references/#bottou-2018)).
+Quadrupling $B$ halves this root-mean-square sampling error while multiplying the arithmetic work by four; parallel hardware may change wall-clock scaling. **Stochastic gradient descent** (SGD) replaces $\nabla L$ by $g_B$ in the update. Each update is cheaper than a full-data gradient and is noisy. Under the assumptions made explicit in §3.5.6, the convergence bound for a constant step retains a noise term; persistent nonzero noise commonly produces a neighborhood of fluctuation, while a decreasing schedule can drive the bound toward stationarity ([Robbins & Monro 1951](/references/#robbins-1951); [Bottou et al. 2018](/references/#bottou-2018)).
 
 Practical loaders often shuffle once per **epoch** and consume examples without replacement. The complete epoch average is the full gradient at a fixed $\theta$, but successive minibatches within training are dependent and are evaluated at changing parameters. The simple $\Sigma/B$ proof above therefore applies exactly to independent with-replacement sampling, not literally to every data-loader implementation.
 
