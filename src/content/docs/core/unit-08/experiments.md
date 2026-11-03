@@ -53,3 +53,12 @@ Write the prediction first. Code: [`spine/stage08_sampling.py`](https://github.c
 **Procedure.** `cd spine && python -m pytest test_spine.py -k stage08 -v`.
 
 **Look for:** samplers reduce to each other in their limits; the exact Gaussian field transports noise onto the target; the flow-matching gradient matches finite differences.
+
+
+## Experiment 8.7 — Beyond language: a density from physics
+
+**Tests:** §8.3.5, Worked Example 8.8. **Predict:** whether a flow-matching model trained on samples of the double-well Boltzmann density $p\propto e^{-\beta U}$, $U = (x^2 - 1)^2 + y^2/2$, $\beta = 3$, puts half of its samples in each well, and how that changes with 10 versus 100 integration steps.
+
+**Procedure.** Draw training samples with `double_well_samples`; reuse the ring experiment's MLP and training loop; compare the fraction of generated samples with $x > 0$ and the mass near the barrier $|x| < 0.2$ with the data (about 50% and under 5%).
+
+**Look for:** correct mode weights with enough steps, mass leaking onto the barrier with few — the "wrong in a predictable direction" of §8.7.3 in a scientific setting where the weights of the modes are the quantity of interest (the populations of two states). A generator that drops or reweights a mode is wrong here in a way an image's visual quality would hide.

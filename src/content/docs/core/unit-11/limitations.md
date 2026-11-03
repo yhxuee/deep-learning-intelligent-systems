@@ -20,7 +20,7 @@ Setting an activation to zero can push downstream activations far outside anythi
 
 ## 11.7.4 Units are not concepts
 
-Individual neurons and heads often respond to several unrelated features — **polysemanticity** — consistent with the superposition hypothesis (Unit 02, §2.5.3) **[E]**. Explanations at the level of individual components can then be incomplete by construction; the useful variables may be directions in activation space, which is what sparse dictionary methods seek (§11.8.1) **[H]**.
+Individual neurons and heads often respond to several unrelated features — **polysemanticity** — consistent with the superposition hypothesis (Unit 02, §2.5.3; [Elhage et al. 2022](/references/#elhage-2022); [Bricken et al. 2023](/references/#bricken-2023)) **[E]**. Explanations at the level of individual components can then be incomplete by construction; the useful variables may be directions in activation space, which is what sparse dictionary methods seek (§11.8.1) **[H]**.
 
 ## 11.7.5 Rigour does not yet scale
 
@@ -28,4 +28,4 @@ The hand-built circuit is understood completely; a 2-layer trained toy already r
 
 ## 11.7.6 The limitation that motivates Unit 12: findings are experiments
 
-Every result in this unit is an experiment: a choice of inputs, a choice of metric, a choice of ablation, a choice of which heads to examine — made by someone who expected something. Worked Example 11.5 could have been reported as "no induction head found" or as "induction in a distributed form", depending on which analysis was run first and which was believed. Interpretability findings are known to be sensitive to such choices **[E]**, and the field is young enough that few have been independently replicated. The same is true of most claims in deep learning — about architectures, optimizers, scaling, data. **How does a plausible idea become a reproducible finding?** That is the question of [Unit 12](/core/unit-12/).
+Every result in this unit is an experiment: a choice of inputs, a choice of metric, a choice of ablation, a choice of which heads to examine — made by someone who expected something. Worked Example 11.5 could have been reported as "no induction head found" or as "induction in a distributed form", depending on which analysis was run first and which was believed. Interpretability findings are known to be sensitive to such choices ([Zhang & Nanda 2024](/references/#zhang-nanda-2024)) **[E]**, and the field is young enough that few have been independently replicated. The same is true of most claims in deep learning — about architectures, optimizers, scaling, data. **How does a plausible idea become a reproducible finding?** That is the question of [Unit 12](/core/unit-12/).

@@ -1,0 +1,773 @@
+{
+ "ablation": {
+  "term": "消融"
+ },
+ "activation-function": {
+  "term": "激活函数"
+ },
+ "activation-patching": {
+  "term": "激活修补 / 激活替换"
+ },
+ "adjoint": {
+  "term": "伴随值"
+ },
+ "advantage": {
+  "term": "优势"
+ },
+ "ai-off": {
+  "term": "不使用 AI"
+ },
+ "algorithm": {
+  "term": "算法"
+ },
+ "ancestral-sampling": {
+  "term": "祖先采样"
+ },
+ "anchor-exemplar": {
+  "term": "锚定范例"
+ },
+ "arithmetic-intensity": {
+  "term": "算术强度"
+ },
+ "associative-memory": {
+  "term": "联想记忆"
+ },
+ "atlas": {
+  "term": "知识图谱 Atlas（验证层）"
+ },
+ "attention": {
+  "term": "注意力机制"
+ },
+ "attention-sink": {
+  "term": "注意力汇聚点"
+ },
+ "autodiff": {
+  "term": "自动微分"
+ },
+ "backpropagation": {
+  "term": "反向传播"
+ },
+ "backward-euler": {
+  "term": "后向（隐式）欧拉法"
+ },
+ "baseline-rl": {
+  "term": "基线"
+ },
+ "batch-size": {
+  "term": "批量大小"
+ },
+ "benchmark": {
+  "term": "基准测试"
+ },
+ "bias-correction": {
+  "term": "偏差校正"
+ },
+ "bibo-stability": {
+  "term": "有界输入有界输出稳定"
+ },
+ "bit": {
+  "term": "比特"
+ },
+ "bootstrap": {
+  "term": "自助法"
+ },
+ "bptt": {
+  "term": "随时间反向传播"
+ },
+ "cache": {
+  "term": "缓存"
+ },
+ "calibration": {
+  "term": "校准"
+ },
+ "capacity": {
+  "term": "（记忆）容量"
+ },
+ "causal-abstraction": {
+  "term": "因果抽象"
+ },
+ "causal-mask": {
+  "term": "因果掩码"
+ },
+ "cell-state": {
+  "term": "细胞状态"
+ },
+ "central-difference": {
+  "term": "中心差分"
+ },
+ "chain-rule": {
+  "term": "链式法则"
+ },
+ "checkpointing": {
+  "term": "检查点重算"
+ },
+ "code": {
+  "term": "代码"
+ },
+ "computation-graph": {
+  "term": "计算图"
+ },
+ "compute-optimal": {
+  "term": "计算最优"
+ },
+ "condition-number": {
+  "term": "条件数"
+ },
+ "conformal-prediction": {
+  "term": "共形预测"
+ },
+ "conjugate-prior": {
+  "term": "共轭先验"
+ },
+ "contamination": {
+  "term": "（测试集）污染"
+ },
+ "controllability": {
+  "term": "能控性"
+ },
+ "convergence": {
+  "term": "收敛"
+ },
+ "convex": {
+  "term": "凸"
+ },
+ "convolution": {
+  "term": "卷积"
+ },
+ "corollary": {
+  "term": "推论"
+ },
+ "covariance": {
+  "term": "协方差"
+ },
+ "cross-attention": {
+  "term": "交叉注意力"
+ },
+ "cross-entropy": {
+  "term": "交叉熵"
+ },
+ "cross-talk": {
+  "term": "串扰（干扰）"
+ },
+ "data": {
+  "term": "数据"
+ },
+ "decoder-only": {
+  "term": "仅解码器（模型）"
+ },
+ "deduplication": {
+  "term": "去重"
+ },
+ "default": {
+  "term": "默认"
+ },
+ "delta-rule": {
+  "term": "delta 规则"
+ },
+ "derivation": {
+  "term": "推导"
+ },
+ "derivative": {
+  "term": "导数"
+ },
+ "descent-lemma": {
+  "term": "下降引理"
+ },
+ "directional-derivative": {
+  "term": "方向导数"
+ },
+ "discretization": {
+  "term": "离散化"
+ },
+ "distribution": {
+  "term": "分布"
+ },
+ "distribution-shift": {
+  "term": "分布偏移"
+ },
+ "divergence-opt": {
+  "term": "发散"
+ },
+ "dot-product": {
+  "term": "点积"
+ },
+ "dpo": {
+  "term": "直接偏好优化"
+ },
+ "duality": {
+  "term": "（拉格朗日）对偶"
+ },
+ "ece": {
+  "term": "期望校准误差"
+ },
+ "edge-of-stability": {
+  "term": "稳定性边缘"
+ },
+ "eigenvalue": {
+  "term": "特征值"
+ },
+ "eigenvector": {
+  "term": "特征向量"
+ },
+ "elbo": {
+  "term": "证据下界"
+ },
+ "ema": {
+  "term": "指数移动平均（EMA）"
+ },
+ "embedding": {
+  "term": "嵌入（向量）"
+ },
+ "embedding-lookup": {
+  "term": "嵌入查找"
+ },
+ "engineering-observation": {
+  "term": "工程观察"
+ },
+ "entropy": {
+  "term": "熵"
+ },
+ "epoch": {
+  "term": "训练轮次（epoch）"
+ },
+ "equivariance": {
+  "term": "等变性"
+ },
+ "estimator": {
+  "term": "估计量"
+ },
+ "evaluation-trace": {
+  "term": "求值轨迹"
+ },
+ "expectation": {
+  "term": "期望值"
+ },
+ "experimental-evidence": {
+  "term": "实验证据"
+ },
+ "exploding-gradient": {
+  "term": "梯度爆炸"
+ },
+ "false-discovery-rate": {
+  "term": "错误发现率"
+ },
+ "feed-forward": {
+  "term": "前馈网络"
+ },
+ "file": {
+  "term": "文件"
+ },
+ "finite-difference": {
+  "term": "有限差分"
+ },
+ "fisher-information": {
+  "term": "费舍尔信息"
+ },
+ "floating-point": {
+  "term": "浮点数"
+ },
+ "flops": {
+  "term": "浮点运算次数（FLOPs）"
+ },
+ "flow-matching": {
+  "term": "流匹配"
+ },
+ "forget-gate": {
+  "term": "遗忘门"
+ },
+ "forking-paths": {
+  "term": "分岔小径花园"
+ },
+ "forward-euler": {
+  "term": "前向欧拉法"
+ },
+ "forward-mode": {
+  "term": "前向模式"
+ },
+ "frequency-response": {
+  "term": "频率响应"
+ },
+ "function-programming": {
+  "term": "函数"
+ },
+ "gate": {
+  "term": "门"
+ },
+ "generalization": {
+  "term": "泛化"
+ },
+ "gqa": {
+  "term": "分组查询注意力（GQA）"
+ },
+ "gradient": {
+  "term": "梯度"
+ },
+ "gradient-check": {
+  "term": "梯度检查"
+ },
+ "gradient-clipping": {
+  "term": "梯度裁剪"
+ },
+ "gradient-descent": {
+  "term": "梯度下降法"
+ },
+ "gru": {
+  "term": "门控循环单元"
+ },
+ "half-life": {
+  "term": "半衰期"
+ },
+ "hardware": {
+  "term": "硬件"
+ },
+ "head": {
+  "term": "注意力头"
+ },
+ "held-out-data": {
+  "term": "留出数据 / 保留集"
+ },
+ "hessian": {
+  "term": "海森矩阵"
+ },
+ "implementation": {
+  "term": "实现"
+ },
+ "impulse-response": {
+  "term": "脉冲响应"
+ },
+ "induction-head": {
+  "term": "归纳头"
+ },
+ "inductive-bias": {
+  "term": "归纳偏置"
+ },
+ "inference": {
+  "term": "推理"
+ },
+ "information": {
+  "term": "信息"
+ },
+ "initialization": {
+  "term": "初始化"
+ },
+ "interface": {
+  "term": "接口"
+ },
+ "invariance": {
+  "term": "不变性"
+ },
+ "invariant": {
+  "term": "不变量（测试）"
+ },
+ "jacobian": {
+  "term": "雅可比矩阵"
+ },
+ "kalman": {
+  "term": "卡尔曼滤波器"
+ },
+ "kernel-regression": {
+  "term": "核回归"
+ },
+ "key": {
+  "term": "键"
+ },
+ "kkt-conditions": {
+  "term": "KKT 条件"
+ },
+ "known-value": {
+  "term": "已知数值"
+ },
+ "kv-cache": {
+  "term": "KV 缓存"
+ },
+ "language-model": {
+  "term": "语言模型"
+ },
+ "layer-norm": {
+  "term": "层归一化"
+ },
+ "leakage": {
+  "term": "数据泄露"
+ },
+ "learning-rate": {
+  "term": "学习率（步长）"
+ },
+ "learning-rate-schedule": {
+  "term": "学习率调度（预热、衰减）"
+ },
+ "leave-one-out-baseline": {
+  "term": "留一法基线"
+ },
+ "lemma": {
+  "term": "引理"
+ },
+ "library": {
+  "term": "库"
+ },
+ "likelihood": {
+  "term": "似然"
+ },
+ "linear-attention": {
+  "term": "线性注意力"
+ },
+ "linear-separability": {
+  "term": "线性可分性"
+ },
+ "local-minimum": {
+  "term": "局部极小值"
+ },
+ "loss-function": {
+  "term": "损失函数"
+ },
+ "low-pass": {
+  "term": "低通滤波器"
+ },
+ "lstm": {
+  "term": "长短期记忆（LSTM）"
+ },
+ "max-likelihood": {
+  "term": "最大似然估计"
+ },
+ "memory-bound": {
+  "term": "访存受限"
+ },
+ "memory-hw": {
+  "term": "内存 / 显存"
+ },
+ "memory-model": {
+  "term": "记忆"
+ },
+ "mentor": {
+  "term": "AI 导师（Mentor）"
+ },
+ "message-passing": {
+  "term": "消息传递"
+ },
+ "minibatch": {
+  "term": "小批量"
+ },
+ "minimal-realization": {
+  "term": "最小实现"
+ },
+ "mixed-precision": {
+  "term": "混合精度"
+ },
+ "mixing-matrix": {
+  "term": "混合矩阵"
+ },
+ "model": {
+  "term": "模型"
+ },
+ "moe": {
+  "term": "混合专家"
+ },
+ "momentum": {
+  "term": "动量（重球法）"
+ },
+ "multi-head": {
+  "term": "多头注意力"
+ },
+ "mutual-information": {
+  "term": "互信息"
+ },
+ "network": {
+  "term": "网络"
+ },
+ "noise": {
+  "term": "噪声"
+ },
+ "noise-floor": {
+  "term": "噪声底"
+ },
+ "non-normal": {
+  "term": "非正规矩阵"
+ },
+ "normal-distribution": {
+  "term": "正态分布"
+ },
+ "normalization": {
+  "term": "归一化"
+ },
+ "nucleus-sampling": {
+  "term": "核采样"
+ },
+ "observability": {
+  "term": "能观性"
+ },
+ "one-hot": {
+  "term": "独热编码"
+ },
+ "online-softmax": {
+  "term": "在线 softmax"
+ },
+ "open-hypothesis": {
+  "term": "开放假说"
+ },
+ "optimization": {
+  "term": "优化"
+ },
+ "optimizer": {
+  "term": "优化器"
+ },
+ "parallel": {
+  "term": "并行"
+ },
+ "parallel-scan": {
+  "term": "并行扫描"
+ },
+ "parameter": {
+  "term": "参数"
+ },
+ "partial-derivative": {
+  "term": "偏导数"
+ },
+ "pedagogical-reconstruction": {
+  "term": "教学重构"
+ },
+ "permutation": {
+  "term": "置换（矩阵）"
+ },
+ "perplexity": {
+  "term": "困惑度"
+ },
+ "pole": {
+  "term": "极点"
+ },
+ "policy": {
+  "term": "策略"
+ },
+ "positional-encoding": {
+  "term": "位置编码"
+ },
+ "positive-definite": {
+  "term": "正定"
+ },
+ "post-training": {
+  "term": "后训练"
+ },
+ "pre-registration": {
+  "term": "预注册"
+ },
+ "preconditioning": {
+  "term": "预处理"
+ },
+ "prediction": {
+  "term": "预测（执行前）"
+ },
+ "pretraining": {
+  "term": "预训练"
+ },
+ "probability": {
+  "term": "概率"
+ },
+ "probe": {
+  "term": "（线性）探针"
+ },
+ "problem-set": {
+  "term": "习题"
+ },
+ "program": {
+  "term": "程序"
+ },
+ "project": {
+  "term": "项目"
+ },
+ "proof": {
+  "term": "证明"
+ },
+ "proposition": {
+  "term": "命题"
+ },
+ "quality": {
+  "term": "质量"
+ },
+ "query": {
+  "term": "查询"
+ },
+ "rank-collapse": {
+  "term": "秩崩塌"
+ },
+ "receptive-field": {
+  "term": "感受野"
+ },
+ "recurrence": {
+  "term": "递推（关系）"
+ },
+ "regularization": {
+  "term": "正则化"
+ },
+ "replication": {
+  "term": "复现"
+ },
+ "residual-connection": {
+  "term": "残差连接"
+ },
+ "residual-stream": {
+  "term": "残差流"
+ },
+ "reverse-mode": {
+  "term": "反向模式"
+ },
+ "reward": {
+  "term": "奖励 / 回报"
+ },
+ "reward-hacking": {
+  "term": "奖励破解 / 奖励黑客"
+ },
+ "rnn": {
+  "term": "循环神经网络"
+ },
+ "rope": {
+  "term": "旋转位置编码"
+ },
+ "rounding-error": {
+  "term": "舍入误差"
+ },
+ "saddle-point": {
+  "term": "鞍点"
+ },
+ "sampling": {
+  "term": "采样"
+ },
+ "scaling-law": {
+  "term": "缩放定律"
+ },
+ "score": {
+  "term": "（注意力）分数"
+ },
+ "selectivity": {
+  "term": "选择性（选择性 SSM）"
+ },
+ "self-attention": {
+  "term": "自注意力"
+ },
+ "self-supervised": {
+  "term": "自监督学习"
+ },
+ "sgd": {
+  "term": "随机梯度下降法（SGD）"
+ },
+ "signal": {
+  "term": "信号"
+ },
+ "singular-value-decomposition": {
+  "term": "奇异值分解"
+ },
+ "smoothing": {
+  "term": "（加 α）平滑"
+ },
+ "smoothness": {
+  "term": "β-光滑性"
+ },
+ "snr": {
+  "term": "信噪比"
+ },
+ "softmax": {
+  "term": "softmax 函数"
+ },
+ "software": {
+  "term": "软件"
+ },
+ "spectral-radius": {
+  "term": "谱半径"
+ },
+ "spine-project": {
+  "term": "主干项目"
+ },
+ "ssm": {
+  "term": "状态空间模型（SSM）"
+ },
+ "stability": {
+  "term": "稳定性"
+ },
+ "standard-deviation": {
+  "term": "标准差"
+ },
+ "standard-error": {
+  "term": "标准误差"
+ },
+ "state": {
+  "term": "状态"
+ },
+ "stationary-distribution": {
+  "term": "平稳分布"
+ },
+ "stationary-point": {
+  "term": "驻点"
+ },
+ "statistical-power": {
+  "term": "统计功效"
+ },
+ "strongly-convex": {
+  "term": "强凸"
+ },
+ "sufficient-statistic": {
+  "term": "充分统计量"
+ },
+ "tangent": {
+  "term": "切向量（前向导数）"
+ },
+ "temperature": {
+  "term": "温度"
+ },
+ "theorem": {
+  "term": "定理"
+ },
+ "time-constant": {
+  "term": "时间常数"
+ },
+ "token": {
+  "term": "词元 / 令牌"
+ },
+ "topological-order": {
+  "term": "拓扑排序"
+ },
+ "training-loss": {
+  "term": "训练损失"
+ },
+ "transfer-function": {
+  "term": "传递函数"
+ },
+ "transformer-block": {
+  "term": "Transformer 块"
+ },
+ "transient-growth": {
+  "term": "瞬态增长"
+ },
+ "truncation-error": {
+  "term": "截断误差"
+ },
+ "unbiased": {
+  "term": "无偏"
+ },
+ "unit-roundoff": {
+  "term": "单位舍入误差"
+ },
+ "value": {
+  "term": "值"
+ },
+ "value-iteration": {
+  "term": "价值迭代"
+ },
+ "vanishing-gradient": {
+  "term": "梯度消失"
+ },
+ "variance": {
+  "term": "方差"
+ },
+ "verification-kit": {
+  "term": "验证工具包"
+ },
+ "vjp": {
+  "term": "向量–雅可比乘积（VJP）"
+ },
+ "weight-decay": {
+  "term": "权重衰减"
+ },
+ "worked-example": {
+  "term": "例题 / 示例"
+ },
+ "zoh": {
+  "term": "零阶保持（ZOH）"
+ }
+}

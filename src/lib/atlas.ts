@@ -5,7 +5,7 @@ export type RefEntry = CollectionEntry<'references'>;
 
 const REPO = (import.meta.env.REPO_URL as string | undefined) ?? 'https://github.com/yhxuee/deep-learning-intelligent-systems';
 
-export const LOCALES = ['zh-tw'] as const;
+export const LOCALES = ['zh-tw', 'zh-cn'] as const;
 export type Locale = (typeof LOCALES)[number] | undefined;
 
 /** Join the configured base path with a site-relative path, e.g. url('core/unit-03/'), optionally under a locale. */
@@ -140,8 +140,13 @@ export const MASTERY_LABEL_ZH: Record<string, string> = {
   'understand-and-verify': '理解與驗證（Understand & verify）',
   'access-on-demand': '按需查閱（Access on demand）',
 };
+export const MASTERY_LABEL_CN: Record<string, string> = {
+  internalize: '内化（Internalize）',
+  'understand-and-verify': '理解与验证（Understand & verify）',
+  'access-on-demand': '按需查阅（Access on demand）',
+};
 export function masteryLabel(m: string, locale?: string): string {
-  return locale === 'zh-tw' ? MASTERY_LABEL_ZH[m] : MASTERY_LABEL[m];
+  return locale === 'zh-tw' ? MASTERY_LABEL_ZH[m] : locale === 'zh-cn' ? MASTERY_LABEL_CN[m] : MASTERY_LABEL[m];
 }
 export const MASTERY_CLASS: Record<string, string> = {
   internalize: 'tier tier-internalize',
@@ -150,15 +155,16 @@ export const MASTERY_CLASS: Record<string, string> = {
 };
 
 /** Short names of the twelve units, used in diagrams. */
-export const UNIT_SHORT: Record<number, [string, string]> = {
-  1: ['Learning', '學習'], 2: ['Representation', '表示'], 3: ['Optimization', '最佳化'],
-  4: ['Interaction', '交互作用'], 5: ['Memory', '記憶'], 6: ['Compute', '計算'],
-  7: ['Self-supervision', '自監督'], 8: ['Generation', '生成'], 9: ['Decision', '決策'],
-  10: ['Failure', '失效'], 11: ['Interpretation', '詮釋'], 12: ['Discovery', '發現'],
+/** Short names of the twelve units, used in diagrams: [English, zh-TW, zh-CN]. */
+export const UNIT_SHORT: Record<number, [string, string, string]> = {
+  1: ['Learning', '學習', '学习'], 2: ['Representation', '表示', '表示'], 3: ['Optimization', '最佳化', '优化'],
+  4: ['Interaction', '交互作用', '交互'], 5: ['Memory', '記憶', '记忆'], 6: ['Compute', '計算', '计算'],
+  7: ['Self-supervision', '自監督', '自监督'], 8: ['Generation', '生成', '生成'], 9: ['Decision', '決策', '决策'],
+  10: ['Failure', '失效', '失效'], 11: ['Interpretation', '詮釋', '解释'], 12: ['Discovery', '發現', '发现'],
 };
-export const PART_NAME: Record<number, [string, string]> = {
-  1: ['Part I · The nature of learning', '第一部 · 學習的本質'],
-  2: ['Part II · Representation, memory and computation', '第二部 · 表示、記憶與計算'],
-  3: ['Part III · Prediction, generation and decision', '第三部 · 預測、生成與決策'],
-  4: ['Part IV · Evidence, reliability and discovery', '第四部 · 證據、可靠性與發現'],
+export const PART_NAME: Record<number, [string, string, string]> = {
+  1: ['Part I · The nature of learning', '第一部 · 學習的本質', '第一部分 · 学习的本质'],
+  2: ['Part II · Representation, memory and computation', '第二部 · 表示、記憶與計算', '第二部分 · 表示、记忆与计算'],
+  3: ['Part III · Prediction, generation and decision', '第三部 · 預測、生成與決策', '第三部分 · 预测、生成与决策'],
+  4: ['Part IV · Evidence, reliability and discovery', '第四部 · 證據、可靠性與發現', '第四部分 · 证据、可靠性与发现'],
 };

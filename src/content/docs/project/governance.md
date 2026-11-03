@@ -13,6 +13,7 @@ sidebar: { order: 2 }
 | Lab maintainers | reproducibility, dependencies, tests |
 | Reference reviewers | citation validity, dates, claims supported by sources |
 | Student reviewers | clarity, accessibility, completing tasks on realistic hardware |
+| Translation reviewers (Chinese editions) | Taiwan academic terminology in zh-TW, mainland academic terminology in zh-CN, English terms at first use, and the *mathematical* meaning — assumptions, quantifiers, scope — not only fluency |
 
 ## Claim classification
 
@@ -31,6 +32,7 @@ Mentor prompts instruct AI tools to label their output with the same categories.
 - Every Atlas node cites at least one primary source by bibliography key; the build fails on unknown keys or dangling links.
 - Known values in the text must be reproduced by a test or a documented calculation.
 - The Atlas is capped at ~150 nodes; additions should usually merge or retire existing nodes.
+- A correction is made in English and Traditional Chinese in the same change. The Simplified Chinese edition is generated from the Traditional Chinese one by `scripts/zh_cn.py` (a reviewed table of mainland terms, the row/column swap of 行 and 列, and punctuation) and is never edited by hand; CI fails if the two are out of sync or if Taiwan usage appears in the mainland edition.
 
 ## Licensing
 

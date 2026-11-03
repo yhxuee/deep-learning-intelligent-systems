@@ -1,0 +1,27 @@
+---
+title: 基础政策与模式
+description: AI 导师四种模式的可复制、有版本的提示词全文（简体中文版）。
+sidebar: { label: 基础政策与模式, order: 1 }
+---
+
+import { Code, Tabs, TabItem } from '@astrojs/starlight/components';
+import base from '../../../../../prompts/zh-cn/base-policy.md?raw';
+import tutor from '../../../../../prompts/zh-cn/tutor.md?raw';
+import critic from '../../../../../prompts/zh-cn/critic.md?raw';
+import collaborator from '../../../../../prompts/zh-cn/collaborator.md?raw';
+import practice from '../../../../../prompts/zh-cn/practice.md?raw';
+
+先粘贴**基础政策**，再粘贴一种模式，最后粘贴单元页面（或它的链接）。每个区块右上角都有复制按钮。源文件位于 [`prompts/zh-cn/`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/prompts/zh-tw)，与本书一起做版本管理；英文版位于 [`prompts/`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/prompts)。中文版提示词会要求 AI 以台湾用语回复，并在关键术语首次出现时附上英文原文。
+
+## 基础政策
+
+<Code code={base} lang="text" title="prompts/zh-cn/base-policy.md" />
+
+## 模式
+
+<Tabs>
+  <TabItem label="家教"><Code code={tutor} lang="text" title="prompts/zh-cn/tutor.md" /></TabItem>
+  <TabItem label="评论者"><Code code={critic} lang="text" title="prompts/zh-cn/critic.md" /></TabItem>
+  <TabItem label="协作者"><Code code={collaborator} lang="text" title="prompts/zh-cn/collaborator.md" /></TabItem>
+  <TabItem label="练习"><Code code={practice} lang="text" title="prompts/zh-cn/practice.md" /></TabItem>
+</Tabs>

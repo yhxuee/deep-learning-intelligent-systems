@@ -1,0 +1,58 @@
+---
+title: 深度学习与智能系统
+description: 为 2027–2037 年撰写的深度学习教科书：原理、实验与发现。
+template: splash
+hero:
+  tagline: 一本能独立教会你的深度学习教科书——主题较少，但每个都完整推导；AI 只是学习伙伴；一个小型语言模型贯穿全部十二个单元；外加一层验证工具，让你能检查 AI 说的话。
+  actions:
+    - text: 从核心教材开始
+      link: core/
+      icon: right-arrow
+    - text: 如何搭配 AI 学习
+      link: start/how-to-study/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+> **核心主张。** 教科书不该再试图把学生可能需要知道的一切压缩进来。它应该建立耐久的心智模型与独立判断力，培养与 AI 协作时创造与验证知识的能力。
+> **你只能把你验证得了的事交给 AI；而你只验证得了你已经内化的东西。**
+
+<CardGrid>
+  <Card title="核心教材（Core）" icon="open-book">
+    十二个单元，每个都是一章完整的教材，分成十个部分——问题、第一原理、完整推导、例题、一般理论、跨领域联系、限制、最新进展、实验、习题——并围绕**一个你必须彻底掌握的锚定范例（anchor exemplar）**。
+  </Card>
+  <Card title="主干项目（Spine project）" icon="rocket">
+    一个小型语言模型贯穿十二个单元：二元语法基线 → 自己写的自动微分 → 注意力机制 → KV 缓存 → 缩放定律拟合 → 后训练 → 在自己的模型里找出归纳头（induction head）。
+  </Card>
+  <Card title="知识图谱 Atlas" icon="puzzle">
+    不是百科全书，而是一组有上限的**验证工具包（verification kit）**：参考实现、不变量测试、已知数值与常见错误——这些正是 AI 无法可靠提供的“标准答案”。
+  </Card>
+  <Card title="AI 导师（Mentor）" icon="comment-alt">
+    教科书负责教，AI 负责辅助。与模型无关的提示词：先讲解、后提问，提供替代推导与练习变化题；另有 `llms.txt`、`atlas.json` 与 MCP 服务器，让你自己的 AI 智能体直接读这本书。
+  </Card>
+</CardGrid>
+
+## 知识掌握的三个层次
+
+| 层次 | 你要做到 | 例子 | 如何证明已掌握 |
+|---|---|---|---|
+| <span class="tier tier-internalize">内化（Internalize）</span> | 不靠 AI 也能重建并推理 | 链式法则、似然、注意力机制、梯度下降法、泛化 | 独立推导、迁移、找出反例 |
+| <span class="tier tier-verify">理解与验证（Understand & verify）</span> | 说明机制与失效方式；检查外部答案 | 各种优化器、扩散模型目标函数、并行化策略 | 评论 AI 产生的解答，并设计检验方法 |
+| <span class="tier tier-access">按需查阅（Access on demand）</span> | 找到、理解背景并正确应用 | API、模型配置、基准测试版本 | 找到权威来源并加上防护措施 |
+
+## 下一步
+
+<CardGrid>
+  <LinkCard title="教育理念" href="start/philosophy/" description="为什么“涵盖一切”是错误目标，而“在范例上做深”才是对的。" />
+  <LinkCard title="本书的论证" href="core/" description="十二个单元，一个论证：每个答案都暴露出成为下一个问题的限制——而单元 12 回到单元 01。" />
+  <LinkCard title="单元 01 · 学习" href="core/unit-01/" description="为什么经验能改善在从未见过之情况上的表现？从这里开始。" />
+  <LinkCard title="单元 12 · 发现" href="core/unit-12/" description="在主干模型上做一次预注册的消融与复现，以及为什么诚实的答案是“无法定论”。" />
+  <LinkCard title="主干项目" href="spine/" description="以 NumPy 贯穿十二个单元打造的一个小型语言模型，每个阶段都有验证目标。" />
+  <LinkCard title="交互式图表" href="labs/interactive/" description="十个可直接在浏览器操作的探索工具：步长、动量、反向传播、注意力、滤波、特征值……" />
+  <LinkCard title="繁體中文版 · 繁体中文" href="../zh-tw/" description="全书台湾用语版，内容与简体版同步。" />
+  <LinkCard title="中英术语对照表" href="start/glossary/" description="本书关键术语的简体中文译名、英文原文，以及台湾常用译法。" />
+</CardGrid>
+
+<small>状态：v2.2。十二个单元皆已依十部分章节结构完成英文、繁体中文与简体中文（由繁体中文版产生）的完整初稿，另有八篇数学附录，并串成一个论证，等待学科与教学审查；见[审查记录](/zh-cn/start/errata/#审查记录)。本书的设计是不靠 AI 也能完整学习，AI 导师只负责辅助。内容 © 贡献者，采用 CC BY 4.0 许可；代码采 MIT 许可。</small>

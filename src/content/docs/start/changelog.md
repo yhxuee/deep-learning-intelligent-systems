@@ -4,6 +4,17 @@ description: What changed between blueprint v1.0 and each edition published here
 sidebar: { order: 3 }
 ---
 
+## v2.2 — 3 November 2026: Simplified Chinese edition, consistency checks and reading paths
+
+1. **Simplified Chinese (mainland) edition** at [/zh-cn/](/zh-cn/): every page, the Mentor prompts (`prompts/zh-cn/`, also `get_prompt(name, lang="zh-cn")`), the glossary, the interactive figures and the unit navigation. It is generated from the Traditional Chinese edition by `scripts/zh_cn.py`: a reviewed table of mainland academic terms (`最佳化` → `优化`, `資訊` → `信息`, `演算法` → `算法`, `變異數` → `方差`, …), the opposite meanings of 行 and 列 in Taiwan and the mainland, and per-page overrides, applied before character conversion. The build fails if the generated edition is out of date or if a listed Taiwan usage survives. It is not a hand translation and has no named reviewer yet.
+2. **Two consistency checks in CI.** `scripts/check-bilingual.mjs` compares the display mathematics and the numbered results of every English page with its Traditional Chinese counterpart; on its first run it found a wrong worked-example reference in Unit 04. `scripts/check-evidence.mjs` fails on an **[E]** label that names no source; the [E] labels it flagged now cite their publications (four new bibliography entries) or the book's own experiment.
+3. **Scope of claims.** An overstatement pass on "exactly", "optimal", "always" and "never" in both languages; the writing standard now asks every **[E]** to say whose experiment it is, and treats the book's own toy-scale experiments as demonstrations, not general findings.
+4. **[Reading paths](/pathways/reading-paths/):** a first-pass and a deep-pass order within a unit; the dependencies between units, taken from each unit's metadata, as distinct from the reading order; which appendices to keep at hand for each unit; four paths through the book.
+5. **Claim checks.** Unit 01 introduces a four-line template — claim, assumptions, test, limitation — and Units 03, 04, 06, 07, 09 and 10 each fill it in for one of their central claims.
+6. **Beyond language.** Four experiments test whether a unit's conclusion depends on text: sets of points (Experiment 2.7), a noisy sensor and the Kalman filter (5.9), a two-mode density from physics (8.7) and a multi-site shortcut (10.7), with generators in `labs/beyond_language.py` whose properties are tested.
+7. **Review ledger** on the [errata page](/start/errata/#review-ledger): what kind of review each part of the book has had, at which revision. Governance names translation reviewers for both Chinese editions.
+8. **Appendices in the machine-readable endpoints**: `llms.txt`, `llms-full.txt`, `atlas.json` (schema `dlis-atlas/1.3`) and the MCP server (`search_atlas` covers them; `get_appendix(letter)` returns one). This extends what the existing tools serve; the feature freeze on new agent tooling stands.
+
 ## v2.1 — 3 November 2026: audit corrections and mathematical appendices
 
 1. **Scientific audit corrected.** An independent audit of v2.0 reported sixteen findings, from a missing discount factor in the policy-gradient theorem to an over-strong claim about the Landauer limit. All sixteen are corrected in English and Traditional Chinese in the same change; ten have regression tests that fail if the error returns (`labs/test_audit_regressions.py`, `spine/test_spine.py`). The full list, with what changed, is on the new [errata and review status](/start/errata/) page.

@@ -1,11 +1,13 @@
 ---
 import { loadGraph, url, titleIn, masteryLabel, MASTERY_CLASS } from '../lib/atlas';
 const locale = Astro.locals.starlightRoute.locale;
-const zh = locale === 'zh-tw';
+import { pick, isZh } from '../lib/i18n';
+const zh = isZh(locale);
 const g = await loadGraph();
 const rows = [...g.nodes.values()].sort((a, b) => a.data.atlas!.id.localeCompare(b.data.atlas!.id));
 const TYPE_ZH: Record<string, string> = { mathematics: '數學', mechanism: '機制', architecture: '架構', method: '方法', optimizer: '最佳化器', paradigm: '範式' };
-const H = zh ? ['節點', '類型', '層次', '單元', '先備知識', '工具組'] : ['Node', 'Type', 'Tier', 'Units', 'Prerequisites', 'Kit'];
+const TYPE_CN: Record<string, string> = { mathematics: '数学', mechanism: '机制', architecture: '架构', method: '方法', optimizer: '优化器', paradigm: '范式' };
+const H = pick(locale, ['Node', 'Type', 'Tier', 'Units', 'Prerequisites', 'Kit'], ['節點', '類型', '層次', '單元', '先備知識', '工具組'], ['节点', '类型', '层级', '单元', '先修知识', '工具包']);
 ---
 
 <table class="dlis-atlas-table">
@@ -19,11 +21,11 @@ const H = zh ? ['節點', '類型', '層次', '單元', '先備知識', '工具�
         return (
           <tr>
             <td><a href={url(n.id + '/', locale)}>{titleIn(g, n, locale)}</a><br /><code>{a.id}</code></td>
-            <td>{zh ? TYPE_ZH[a.type] : a.type}</td>
+            <td>{pick(locale, a.type, TYPE_ZH[a.type], TYPE_CN[a.type])}</td>
             <td><span class={MASTERY_CLASS[a.mastery]}>{masteryLabel(a.mastery, locale)}</span></td>
             <td>{a.core_units.map((u) => String(u).padStart(2, '0')).join(', ')}</td>
             <td>{a.prerequisites.map((p) => <code>{p}</code>)}</td>
-            <td>{a.lab ? (zh ? '實驗＋測試' : 'lab + tests') : '—'}</td>
+            <td>{a.lab ? pick(locale, 'lab + tests', '實驗＋測試', '实验＋测试') : '—'}</td>
           </tr>
         );
       })

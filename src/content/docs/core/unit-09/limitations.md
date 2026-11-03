@@ -20,7 +20,7 @@ People prefer responses that agree with them, flatter them, or sound confident. 
 
 ## 9.7.4 Preferences are noisy, inconsistent and plural
 
-Bradley–Terry assumes a single latent utility with independent noise. Real annotators disagree with each other, are inconsistent across time, make intransitive choices, and represent particular populations and instructions **[E]**. A reward model fitted to their pooled labels averages over these disagreements in ways that are rarely documented. What counts as "better" is a value judgement that the method inherits but does not resolve **[H]**.
+Bradley–Terry assumes a single latent utility with independent noise. Real annotators disagree with each other, are inconsistent across time, make intransitive choices, and represent particular populations and instructions ([Aroyo & Welty 2015](/references/#aroyo-2015)) **[E]**. A reward model fitted to their pooled labels averages over these disagreements in ways that are rarely documented. What counts as "better" is a value judgement that the method inherits but does not resolve **[H]**.
 
 ## 9.7.5 Credit assignment and sample efficiency
 

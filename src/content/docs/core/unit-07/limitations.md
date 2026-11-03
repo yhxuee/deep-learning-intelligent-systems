@@ -8,7 +8,7 @@ Labels: **[D]** derivation, **[E]** experimental evidence, **[O]** engineering o
 
 ## 7.7.1 The model learns what the data says, not what is true
 
-The optimum of next-token prediction is the data distribution (§7.5.1) **[D]**. The spine corpus writes the wrong sum in 30% of its arithmetic sentences, and the pretrained spine model accordingly puts only a minority of its probability on the correct answer (Unit 09 measures it). At web scale the same mechanism reproduces common misconceptions, outdated facts and the style of whatever sources dominate the mixture **[E]**. Self-supervision cannot distinguish a frequent error from a truth; that requires a different signal — feedback on behaviour — which is Unit 09's subject.
+The optimum of next-token prediction is the data distribution (§7.5.1) **[D]**. The spine corpus writes the wrong sum in 30% of its arithmetic sentences, and the pretrained spine model accordingly puts only a minority of its probability on the correct answer (Unit 09 measures it). At web scale the same mechanism reproduces common misconceptions, outdated facts and the style of whatever sources dominate the mixture; on questions where human misconceptions are common, larger pretrained models were *less* truthful ([Lin et al. 2022](/references/#lin-2022)) **[E]**. Self-supervision cannot distinguish a frequent error from a truth; that requires a different signal — feedback on behaviour — which is Unit 09's subject.
 
 ## 7.7.2 Memorization
 
@@ -24,7 +24,7 @@ A next-token objective rewards predicting text; users want answers, actions and 
 
 ## 7.7.5 Quality is not a solved problem
 
-Every filtering rule — keep pages with few typos, remove pages a classifier scores as low-quality, prefer text resembling reference sources — is itself an inductive bias, and can remove dialects, topics or communities systematically **[O]**. What "high quality" means is relative to what the model is for, and reported gains from filtering are specific to the evaluations used **[E]**.
+Every filtering rule — keep pages with few typos, remove pages a classifier scores as low-quality, prefer text resembling reference sources — is itself an inductive bias, and can remove dialects, topics or communities systematically **[O]**. What "high quality" means is relative to what the model is for, and reported gains from filtering are specific to the evaluations used **[O]**.
 
 ## 7.7.6 The limitation that motivates Unit 08: a distribution is not yet a behaviour
 

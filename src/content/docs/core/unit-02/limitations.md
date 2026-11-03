@@ -12,7 +12,7 @@ No learner can recover information its input representation has discarded **[D]*
 
 ## 2.7.2 One vector per symbol cannot capture context-dependent meaning
 
-A static embedding gives "bank" one vector whether the sentence is about rivers or money **[D]**. Character embeddings face the same problem in miniature: `.` ends sentences and appears in numbers in other corpora. Any representation that is a function of the symbol alone must average over its uses. The fix is a representation that depends on the surrounding context — **contextual** representations, computed by the attention and recurrence of Units 04–05 **[E]**.
+A static embedding gives "bank" one vector whether the sentence is about rivers or money **[D]**. Character embeddings face the same problem in miniature: `.` ends sentences and appears in numbers in other corpora. Any representation that is a function of the symbol alone must average over its uses. The fix is a representation that depends on the surrounding context — **contextual** representations, computed by the attention and recurrence of Units 04–05 ([Devlin et al. 2019](/references/#devlin-2019)) **[E]**.
 
 ## 2.7.3 Embeddings learn the regularities of their data, including the unwanted ones
 

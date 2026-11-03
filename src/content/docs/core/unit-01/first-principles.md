@@ -124,3 +124,15 @@ One more rule: **split by the unit that is independent.** The spine corpus is a 
 | risk | overconfidence on 10 tosses | zero counts; fitting accidents of a small corpus |
 
 The next section makes each row precise.
+
+:::tip[Claim check — a template used throughout the book]
+Every major claim in this book can be stated in four lines. Applied to this section's central claim:
+
+- **Claim.** The bigram's held-out NLL estimates its loss on new stories from the same source.
+- **Assumptions.** Held-out stories are drawn independently from the same source as the training stories, and nothing was chosen by looking at them (§1.2.8).
+- **Test.** Compute the standard error over stories (Worked Example 1.7), then score a fresh set of held-out stories: the two estimates should agree within that error.
+- **Limitation.** It says nothing about text from another source (§1.7.1), and it becomes optimistic once the held-out set has been used to make choices (§1.7.3).
+
+Units 03, 04, 06, 07, 09 and 10 each fill in the template once for a claim of their own. When you meet a claim anywhere else, fill it in yourself; a claim whose test you cannot state is not yet a finding (Unit 12).
+:::
+

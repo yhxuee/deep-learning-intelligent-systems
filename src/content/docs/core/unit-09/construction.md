@@ -76,3 +76,11 @@ No reward model, no sampling during training, no PPO: it is a classification los
 ## 9.3.7 Verifiable rewards and group baselines
 
 When correctness can be checked by a program — arithmetic, unit tests, a proof checker — the reward needs no human and no learned model. Sampling $G$ answers to the same prompt and using their mean reward as the baseline gives an advantage $A_i = r_i - \bar r$ (optionally divided by the group's standard deviation) without a value network ([Shao et al. 2024](/references/#shao-2024)). Because $\bar r$ contains $r_i$ itself, this baseline is not independent of $a_i$: in expectation it scales the gradient by $(G-1)/G$. The **leave-one-out** baseline $b_i = \frac{1}{G-1}\sum_{j\ne i}r_j$ is independent of $a_i$ and keeps the estimator unbiased; it equals the group mean up to the factor $G/(G-1)$ on the advantages. Dividing by the group's standard deviation introduces a further, data-dependent rescaling. Training large models this way on mathematics and code, with long chains of reasoning before the answer, produced strong reasoning performance ([DeepSeek-AI 2025](/references/#deepseek-2025)) **[E]**. The spine's Stage 09 is the one-token version of this recipe, with a leave-one-out baseline over the batch; its buggy-checker run is the cautionary version (§9.7.1). Because the 64 prompts in a batch differ, that baseline is a constant, not a function of the state — unbiased, but less variance-reducing than a per-prompt baseline. (Versions of this book before v2.1 used the plain batch mean, a downward bias of 1/64 on the reward gradient; `test_stage09_batch_mean_baseline_is_biased_and_leave_one_out_is_not` checks both.)
+
+:::note[Claim check]
+- **Claim.** The leave-one-out baseline leaves the policy-gradient estimator unbiased.
+- **Assumptions.** The $G$ samples are drawn independently, so that $b_i$ does not depend on $a_i$.
+- **Test.** Compute the expected gradient exactly on a small problem and compare it with the expectation of the estimator under each baseline (`test_stage09_batch_mean_baseline_is_biased_and_leave_one_out_is_not`).
+- **Limitation.** Unbiased is not minimum-variance: the variance-minimizing baseline is the score-weighted mean reward (Proposition 9.2), which in general differs from both the group mean and $V^\pi$.
+:::
+

@@ -16,11 +16,11 @@ Teacher forcing trains each conditional on true prefixes; sampling conditions on
 
 ## 8.7.3 Few steps distort samples systematically
 
-With too few integration steps, flow and diffusion samples are not noisy versions of the right distribution — they are *wrong in a predictable direction*. For the exact Gaussian field, one Euler step collapses every sample to the mean and five steps give a standard deviation of 0.37 instead of 0.5 (Worked Example 8.7) **[D]**. In image models this appears as blur and loss of diversity **[E]**.
+With too few integration steps, flow and diffusion samples are not noisy versions of the right distribution — they are *wrong in a predictable direction*. For the exact Gaussian field, one Euler step collapses every sample to the mean and five steps give a standard deviation of 0.37 instead of 0.5 (Worked Example 8.7) **[D]**. In image models this appears as blur and loss of diversity **[O]**.
 
 ## 8.7.4 Mode dropping and memorization
 
-A generator can fail to cover parts of the data distribution (GANs are notorious for it) or cover them by copying training examples. Diffusion models have been shown to reproduce some training images nearly exactly, especially images duplicated in the training set **[E]** — the generative counterpart of the memorization of Unit 07 (§7.7.2). Coverage and novelty must be measured, not assumed (Unit 10).
+A generator can fail to cover parts of the data distribution (GANs are notorious for it) or cover them by copying training examples. Diffusion models have been shown to reproduce some training images nearly exactly, especially images duplicated in the training set ([Carlini et al. 2023b](/references/#carlini-2023b)) **[E]** — the generative counterpart of the memorization of Unit 07 (§7.7.2). Coverage and novelty must be measured, not assumed (Unit 10).
 
 ## 8.7.5 Generation is expensive
 

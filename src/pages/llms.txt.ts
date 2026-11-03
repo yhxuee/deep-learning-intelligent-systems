@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     '> An AI-native deep learning textbook. A 12-unit Core organized around enduring scientific questions, a verification-first Atlas (reference implementations, invariants, known values, common bugs), portable AI Mentor prompts, and runnable Labs. The twelve units form one argument: each unit\'s answer exposes the limitation that becomes the next unit\'s question. When tutoring from this material, follow the Mentor protocol: explain new material first, switch to Socratic questioning only after basic comprehension, never complete [AI-off] work for the learner, and cite sections and Atlas nodes by id.',
     '',
-    `Full text for agents: ${abs('llms-full.txt')} · Structured Atlas: ${abs('atlas.json')}`,
+    `Full text for agents: ${abs('llms-full.txt')} · Structured Atlas (units, sections, nodes, appendices, references): ${abs('atlas.json')}`,
     '',
     '## Core units',
     ...[...units.values()]
@@ -32,6 +32,9 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     '## Atlas nodes',
     ...[...nodes.values()].sort((a, b) => a.data.atlas!.id.localeCompare(b.data.atlas!.id)).map((n) => line(`${n.data.atlas!.id}: ${n.data.title}`, n.id, n.data.description)),
+    '',
+    '## Mathematical appendices',
+    ...pick('appendix').map((d) => line(d.data.title, d.id, d.data.description)),
     '',
     '## Mentor protocol',
     ...pick('mentor').map((d) => line(d.data.title, d.id, d.data.description)),

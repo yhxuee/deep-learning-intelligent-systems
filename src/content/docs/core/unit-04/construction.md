@@ -46,6 +46,14 @@ Causality is what lets a decoder-only model train on **all positions of a sequen
 
 Two pitfalls: applying the mask **after** the softmax (setting weights to zero without renormalizing) breaks normalization *and* causality, because the normalizing sum included future scores; and an off-by-one mask ($j < i$ instead of $j\le i$) either hides the current token or, shifted the other way, reveals the next one.
 
+:::note[Claim check]
+- **Claim.** With the causal mask, output $y_i$ depends only on $x_1,\dots,x_i$ (Proposition 4.1).
+- **Assumptions.** The mask is added to the scores before the softmax; queries, keys and values are computed position by position; nothing else in the model mixes positions.
+- **Test.** Perturb a future input and check that every earlier output is unchanged to floating-point precision — the invariant the lab tests (Experiment 4.4).
+- **Limitation.** The proof covers attention as written. Any other operation that mixes positions — a normalization over the sequence, a misaligned cache — can break causality in code that runs and trains, and reading the code may not reveal it (§4.7.7).
+:::
+
+
 ## 4.3.3 Attention treats its input as a set
 
 A **permutation matrix** $P\in\{0,1\}^{T\times T}$ has exactly one 1 in each row and column; $PX$ reorders the rows of $X$. Permutation matrices are orthogonal: $P^{\top}P = I$.
@@ -127,7 +135,7 @@ $$
 \bar Q = \frac{\bar SK}{\sqrt{d_k}},\qquad \bar K = \frac{\bar S^{\top}Q}{\sqrt{d_k}} .
 $$
 
-Worked Example 4.3 carries out every step on a three-token example and checks one entry against finite differences. Two observations matter later. The backward pass needs $A$ (or the ability to recompute it), a $T\times T$ matrix — the memory problem that IO-aware kernels solve (§4.8.1). And when a row of $A$ is nearly one-hot, $\bar S$ for that row is nearly zero — the vanishing gradient that motivated the $\sqrt{d_k}$ scaling.
+Worked Example 4.4 carries out every step on a three-token example and checks one entry against finite differences. Two observations matter later. The backward pass needs $A$ (or the ability to recompute it), a $T\times T$ matrix — the memory problem that IO-aware kernels solve (§4.8.1). And when a row of $A$ is nearly one-hot, $\bar S$ for that row is nearly zero — the vanishing gradient that motivated the $\sqrt{d_k}$ scaling.
 
 ## 4.3.7 Why a position-wise MLP is needed
 

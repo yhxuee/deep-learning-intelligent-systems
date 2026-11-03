@@ -28,6 +28,14 @@ Fitting $L = E + AN^{-\alpha}$ to a handful of measurements is a small nonlinear
 
 A scaling law earns its keep by **prediction**: fit on small models, predict a larger one *before* training it, then compare. The procedure is the pre-registration of Unit 12 in miniature: the prediction is written to disk with the fit, so it cannot be adjusted after seeing the result. Worked Example 6.6 does this for the spine model; when the prediction misses, the size and direction of the miss is information about where the law's assumptions fail.
 
+:::note[Claim check]
+- **Claim.** A power law fitted on small models predicts the held-out loss of a larger one.
+- **Assumptions.** The same data distribution and an equally well-tuned recipe at every size, and no change of regime between the fitted range and the target (§6.7.2).
+- **Test.** Write the prediction to disk before training the larger model, then compare (Worked Example 6.6; Experiment 6.4).
+- **Limitation.** In Worked Example 6.6 the registered prediction missed by 0.12 nats because the fitted points straddled a capacity threshold; and the constants belong to one recipe and one dataset (§6.7.5).
+:::
+
+
 ## 6.5.3 The compute-optimal allocation
 
 Given a budget of $C$ FLOPs and the cost $C = 6ND$ (§6.2.3), which $N$ minimizes $L(N, D)$?
@@ -39,7 +47,7 @@ $$
 
 *Proof.* Substitute $D = C/(6N)$: minimize $f(N) = AN^{-\alpha} + B(C/6)^{-\beta}N^{\beta}$. Then $f'(N) = -\alpha AN^{-\alpha-1} + \beta B(C/6)^{-\beta}N^{\beta-1} = 0$ gives $N^{\alpha+\beta} = \frac{\alpha A}{\beta B}(C/6)^{\beta}$. $f$ is convex in $\ln N$, so this is the minimum. $\blacksquare$
 
-The exponents tell the story. With $\alpha = 0.34$ and $\beta = 0.28$, $N^\star\propto C^{0.45}$ and $D^\star\propto C^{0.55}$: **parameters and data should grow at nearly the same rate**, so the number of tokens per parameter changes slowly with the budget. Hoffmann et al.'s other two estimation approaches gave exponents close to 0.5 each and the widely used rule of thumb of about 20 tokens per parameter at their scale **[E]**. Kaplan et al.'s earlier fits had implied $N^\star\propto C^{0.73}$ — spend most of a larger budget on parameters; the difference was traced largely to learning-rate schedules not adjusted to each run's length and to counting non-embedding parameters at small scale.
+The exponents tell the story. With $\alpha = 0.34$ and $\beta = 0.28$, $N^\star\propto C^{0.45}$ and $D^\star\propto C^{0.55}$: **parameters and data should grow at nearly the same rate**, so the number of tokens per parameter changes slowly with the budget. Hoffmann et al.'s other two estimation approaches gave exponents close to 0.5 each and the widely used rule of thumb of about 20 tokens per parameter at their scale ([Hoffmann et al. 2022](/references/#hoffmann-2022)) **[E]**. Kaplan et al.'s earlier fits had implied $N^\star\propto C^{0.73}$ — spend most of a larger budget on parameters; the difference was traced largely to learning-rate schedules not adjusted to each run's length and to counting non-embedding parameters at small scale.
 
 **The optimum is flat.** Near the minimum, $f$ changes slowly: with the approach-3 constants and Chinchilla's budget $C = 5.76\times10^{23}$, Proposition 6.2 gives $N^\star\approx3.2\times10^{10}$ and $D^\star\approx3.0\times10^{12}$, a predicted loss of 1.931 — while the 70-billion-parameter, 1.4-trillion-token model actually trained is predicted at 1.937 (Worked Example 6.7). A factor of two in $N$ costs 0.006 nats. Two consequences: the "optimal" allocation is poorly determined by noisy fits — a replication found the published approach-3 fit inconsistent with the other two approaches and refitted it ([Besiroglu et al. 2024](/references/#besiroglu-2024)) **[E]** — and practical choices can depart from it cheaply in exchange for other benefits. The commonest departure is to train a *smaller* model on *more* tokens than compute-optimal, because a smaller model is cheaper every time it is used afterwards (§6.7.4).
 

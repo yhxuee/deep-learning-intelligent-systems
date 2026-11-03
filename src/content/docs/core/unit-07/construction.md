@@ -88,3 +88,11 @@ A held-out item is **contaminated** if (a near copy of) it occurs in the trainin
 - **What counts as a copy.** Paraphrases, translations and reformatted answers evade exact $n$-gram matching. Detection from the model's side — for example, testing whether a model assigns systematically higher likelihood to a benchmark's canonical ordering than to shuffled orderings ([Oren et al. 2024](/references/#oren-2024)) — catches some of these.
 
 Stage 07 removes the training copies of contaminated stories and leaves the held-out set untouched, so that held-out numbers stay comparable across stages.
+
+:::note[Claim check]
+- **Claim.** An evaluation item that shares few $n$-grams with the training data was not trained on.
+- **Assumptions.** Copies are near-verbatim, and $n$ and the threshold were set on items known to be clean and items known to be copied (Worked Example 7.5).
+- **Test.** Plant known copies in the training data and measure how many the check flags, and how many clean items it flags (Worked Example 7.5; Experiment 7.1).
+- **Limitation.** Paraphrases, translations and reformatted answers evade it (§7.7.3): a low overlap is evidence against verbatim copies only.
+:::
+

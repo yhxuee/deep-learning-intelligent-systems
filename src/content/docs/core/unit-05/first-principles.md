@@ -25,7 +25,7 @@ The size of the state is the size of the memory. Some questions about a stream c
 | mean and variance so far | 3 numbers | Welford's update ([Welford 1962](/references/#welford-1962)) |
 | the reading exactly 1000 s ago | 1000 numbers | a shift register: drop the oldest, append $x_t$ |
 
-The first three summaries are *compressions*: a fixed number of values answers the question exactly, no matter how long the stream. The fourth is not compressible at all; §5.5.2 proves that no state smaller than the window can answer it for arbitrary inputs.
+The first three summaries are *compressions*: a fixed number of values answers the question exactly, no matter how long the stream. The fourth is not compressible at all; §5.5.2 proves that no state with fewer distinguishable values than there are possible windows — in bits, fewer than the window's own information content — can answer it for arbitrary inputs. (With infinitely precise real numbers the count is unbounded; the statement is about states of finite precision, which is what every real device has.)
 
 **The task defines what memory is needed.** "Remember the past" is not a well-posed goal; "remember what is needed to answer *this* question about the past" is. This sentence will return at the end of the unit, when we compare recurrent models with attention.
 

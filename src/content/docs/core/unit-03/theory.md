@@ -43,6 +43,14 @@ $$
 
 Every step with $0 < \eta < 2/\beta$ decreases the loss (unless the gradient is zero). The guaranteed decrease is largest at $\eta = 1/\beta$, where it equals $\|\nabla L\|^2/(2\beta)$. This is the multivariate, worst-case version of the parabola result $\eta < 2/a$.
 
+:::note[Claim check]
+- **Claim.** Every gradient-descent step with $0 < \eta < 2/\beta$ decreases the loss.
+- **Assumptions.** $L$ is $\beta$-smooth along the whole path, the gradient is exact (full batch), and $\beta$ is known.
+- **Test.** On a quadratic with known largest eigenvalue, run step sizes just below and just above $2/\lambda_{\max}$ (Experiment 3.1).
+- **Limitation.** ReLU networks are not smooth everywhere (§3.7.1), minibatch gradients add noise (§3.5.6), and curvature changes during training, so the bound guides the choice of rate rather than setting it (§3.7.8).
+:::
+
+
 ## 3.5.3 What is guaranteed without convexity
 
 Neural-network losses are not convex. What can still be proved?

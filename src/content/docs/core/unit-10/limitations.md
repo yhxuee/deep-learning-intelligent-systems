@@ -16,7 +16,7 @@ The unseen-names test set (Worked Example 10.4) found one failure because someon
 
 ## 10.7.3 Judges are biased
 
-When outputs are open-ended, evaluation relies on human raters or on a model as judge. Human ratings vary between raters and prefer confident, fluent, agreeable answers (Unit 09, §9.7.3) **[E]**; model judges show systematic preferences, for example for longer answers or for their own outputs **[E]**. A judge is a measurement instrument whose calibration must itself be measured — against expert labels, across orderings of the compared answers, and with agreement statistics reported **[O]**.
+When outputs are open-ended, evaluation relies on human raters or on a model as judge. Human ratings vary between raters and prefer confident, fluent, agreeable answers (Unit 09, §9.7.3) **[E]**; model judges show systematic preferences, for example for longer answers or for their own outputs ([Zheng et al. 2023](/references/#zheng-2023)) **[E]**. A judge is a measurement instrument whose calibration must itself be measured — against expert labels, across orderings of the compared answers, and with agreement statistics reported **[O]**.
 
 ## 10.7.4 Averages hide failures
 

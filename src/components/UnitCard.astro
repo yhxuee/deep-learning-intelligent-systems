@@ -1,18 +1,20 @@
 ---
 import { loadGraph, url, titleIn, masteryLabel, MASTERY_CLASS, unitIn, prevUnit, nextUnit } from '../lib/atlas';
 const { unit } = Astro.props;
+import { pick, idx, isZh } from '../lib/i18n';
 const locale = Astro.locals.starlightRoute.locale;
-const zh = locale === 'zh-tw';
+const zh = isZh(locale);
 const g = await loadGraph();
-const L = zh
-  ? { q: '核心問題', anchor: '錨定範例', internal: '（須內化）', spine: '主幹專案進度', check: '不使用 AI 的檢核點', atlas: 'Atlas 節點', part: '第', partUnit: '部 · 單元', status: '狀態', from: '承接', loop: '（循環回到起點）', builds: '用到的先前結果', leads: '留下的問題', next: '由此進入', unitW: '單元' }
-  : { q: 'Question', anchor: 'Anchor exemplar', internal: '(internalize)', spine: 'Spine-project increment', check: 'AI-off checkpoint', atlas: 'Atlas nodes', part: 'Part', partUnit: '· Unit', status: 'Status', from: 'Arrives from', loop: '(the argument closes its loop)', builds: 'Builds on', leads: 'Leaves open', next: 'which leads to', unitW: 'Unit' };
-const STATUS: Record<string, [string, string]> = {
-  complete: ['Complete — reviewed against the writing standard', '完成：已依撰寫標準審查'],
-  draft: ['Full draft — awaiting subject and pedagogical review', '完整初稿：等待學科與教學審查'],
-  outline: ['Planning outline — not yet textbook text', '規劃大綱：尚非教科書正文'],
+const L = pick(locale,
+  { q: 'Question', anchor: 'Anchor exemplar', internal: '(internalize)', spine: 'Spine-project increment', check: 'AI-off checkpoint', atlas: 'Atlas nodes', part: 'Part', partUnit: '· Unit', status: 'Status', from: 'Arrives from', loop: '(the argument closes its loop)', builds: 'Builds on', leads: 'Leaves open', next: 'which leads to', unitW: 'Unit' },
+  { q: '核心問題', anchor: '錨定範例', internal: '（須內化）', spine: '主幹專案進度', check: '不使用 AI 的檢核點', atlas: 'Atlas 節點', part: '第', partUnit: '部 · 單元', status: '狀態', from: '承接', loop: '（循環回到起點）', builds: '用到的先前結果', leads: '留下的問題', next: '由此進入', unitW: '單元' },
+  { q: '核心问题', anchor: '锚定范例', internal: '（须内化）', spine: '主干项目进度', check: '不使用 AI 的检查点', atlas: 'Atlas 节点', part: '第', partUnit: '部分 · 单元', status: '状态', from: '承接', loop: '（回到起点，形成闭环）', builds: '用到的先前结果', leads: '留下的问题', next: '由此进入', unitW: '单元' });
+const STATUS: Record<string, [string, string, string]> = {
+  complete: ['Complete — reviewed against the writing standard', '完成：已依撰寫標準審查', '完成：已按写作规范审定'],
+  draft: ['Full draft — awaiting subject and pedagogical review', '完整初稿：等待學科與教學審查', '完整初稿：等待学科与教学评审'],
+  outline: ['Planning outline — not yet textbook text', '規劃大綱：尚非教科書正文', '规划大纲：尚非教材正文'],
 };
-const status = STATUS[unit.status][zh ? 1 : 0];
+const status = STATUS[unit.status][idx(locale)];
 const meta = zh && Astro.props.zh ? { ...unit, ...Astro.props.zh } : unit;
 const pad = (n: number) => String(n).padStart(2, '0');
 const prev = unitIn(g, prevUnit(unit.number), locale);
@@ -20,7 +22,7 @@ const next = unitIn(g, nextUnit(unit.number), locale);
 const link = (n: number) => url(`core/unit-${pad(n)}/`, locale);
 ---
 
-<aside class="unit-card" aria-label={zh ? '單元摘要' : 'Unit summary'}>
+<aside class="unit-card" aria-label={pick(locale, 'Unit summary', '單元摘要', '单元摘要')}>
   <p class="unit-from">
     <span class="unit-label">{L.from} <a href={link(prev.data.unit!.number)}>{prev.data.title}</a>{unit.number === 1 && ' ' + L.loop}</span>
     {prev.data.unit!.leaves}
@@ -72,7 +74,7 @@ const link = (n: number) => url(`core/unit-${pad(n)}/`, locale);
     {unit.leaves} <span class="unit-next">→ {L.next} <a href={link(next.data.unit!.number)}>{next.data.title}</a></span>
   </p>
   <p class="unit-status">
-    {zh ? `第 ${unit.part} 部 · 單元 ${String(unit.number).padStart(2, '0')}` : `Part ${unit.part} · Unit ${String(unit.number).padStart(2, '0')}`} · {L.status}: <strong>{status}</strong>
+    {pick(locale, `Part ${unit.part} · Unit ${pad(unit.number)}`, `第 ${unit.part} 部 · 單元 ${pad(unit.number)}`, `第 ${unit.part} 部分 · 单元 ${pad(unit.number)}`)} · {L.status}: <strong>{status}</strong>
   </p>
 </aside>
 

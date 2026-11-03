@@ -5,7 +5,8 @@
  */
 import { loadGraph, url, unitIn, UNIT_SHORT } from '../lib/atlas';
 const locale = Astro.locals.starlightRoute.locale;
-const zh = locale === 'zh-tw';
+import { pick, idx } from '../lib/i18n';
+const k = idx(locale);
 const g = await loadGraph();
 const pad = (n: number) => String(n).padStart(2, '0');
 const ROW = 40, TOP = 16, BOX_X = 40, BOX_W = 190, BOX_H = 28, ARC_X = BOX_X + BOX_W;
@@ -14,10 +15,11 @@ const units = [...Array(12).keys()].map((i) => unitIn(g, i + 1, locale).data.uni
 const arcs = units.flatMap((u) => u.builds_on.map((b) => ({ from: b.unit, to: u.number })));
 const W = ARC_X + 12 + 11 * 20 + 20;
 const H = y(12) + BOX_H + TOP + 30;
-const title = zh ? '十二個單元的論證鏈與依賴關係' : 'The chain of twelve units and their dependencies';
-const desc = zh
-  ? '左側箭頭是主要論證鏈：每個單元留下的問題由下一個單元承接，單元 12 再回到單元 01。右側弧線表示單元用到哪些先前單元的結果。'
-  : 'Arrows on the left are the main chain: each unit leaves an open problem the next one takes up, and Unit 12 loops back to Unit 01. Arcs on the right show which earlier results each unit builds on.';
+const title = pick(locale, 'The chain of twelve units and their dependencies', '十二個單元的論證鏈與依賴關係', '十二个单元的论证链与依赖关系');
+const desc = pick(locale,
+  'Arrows on the left are the main chain: each unit leaves an open problem the next one takes up, and Unit 12 loops back to Unit 01. Arcs on the right show which earlier results each unit builds on.',
+  '左側箭頭是主要論證鏈：每個單元留下的問題由下一個單元承接，單元 12 再回到單元 01。右側弧線表示單元用到哪些先前單元的結果。',
+  '左侧箭头是主要论证链：每个单元留下的问题由下一个单元承接，单元 12 再回到单元 01。右侧弧线表示单元用到了哪些先前单元的结果。');
 ---
 
 <figure class="dlis-figure unit-graph">
@@ -47,7 +49,7 @@ const desc = zh
         <a href={url(`core/unit-${pad(u.number)}/`, locale)}>
           <rect class={`ug-box ug-${u.status}`} x={BOX_X} y={y(u.number)} width={BOX_W} height={BOX_H} rx="6" />
           <text class="ug-label" x={BOX_X + 10} y={y(u.number) + BOX_H / 2 + 5}>
-            {pad(u.number)} · {UNIT_SHORT[u.number][zh ? 1 : 0]}
+            {pad(u.number)} · {UNIT_SHORT[u.number][k]}
           </text>
         </a>
       ))

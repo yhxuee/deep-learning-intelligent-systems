@@ -53,3 +53,16 @@ Write the prediction first. Code: [`spine/stage10_eval.py`](https://github.com/y
 **Procedure.** Train a Stage 04 model on training + 70 held-out stories. Evaluate on all 140 held-out stories; then split the evaluation into the 70 leaked and 70 clean stories; then run the contamination check.
 
 **Look for:** the aggregate score improves modestly and looks like progress; the split by leaked/clean and the contamination check both reveal the cause. Write down which of the harness's measurements you would have needed to catch it without knowing.
+
+
+## Experiment 10.7 — Beyond language: a new site
+
+**Tests:** §10.2.2, §10.3.1, §10.6.1. **Predict:** whether adding a site artefact feature improves held-out loss (a) on new patients from the *training* sites and (b) at a *new* site.
+
+**Procedure.** `multisite` simulates three training sites with different prevalence and a fourth held-out site; a third feature — think of the scanner model — tracks each site's prevalence but carries no information about the individual patient. Fit logistic regression with and without it (`logistic_regression`). Report cross-entropy with intervals on both evaluations, and a classifier two-sample test between training and held-out sites (§10.3.2).
+
+**Look for:** the artefact model winning on the training sites and losing at the new site — the radiograph-scanner shortcut of [Zech et al. 2018](/references/#zech-2018) in miniature. The lab's test checks both directions.
+
+:::caution
+These data are synthetic and the exercise is about evaluation method. A real clinical model needs prospective, multi-site external validation and clinical oversight before it informs any decision about patients.
+:::

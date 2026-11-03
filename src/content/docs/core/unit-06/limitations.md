@@ -12,7 +12,7 @@ Two models with the same FLOP count can differ several-fold in wall-clock time *
 
 ## 6.7.2 Extrapolation is fragile
 
-A power law fitted over two orders of magnitude and used to predict a third assumes nothing changes in between **[D]**: the same data distribution, a recipe tuned equally well at every size, no new bottleneck. In practice each assumption fails somewhere. Small models are often trained with recipes tuned for large ones (or vice versa); the effective exponent depends on the learning-rate schedule — a cause of the disagreement between Kaplan et al. and Hoffmann et al. (§6.5.3) **[E]**; and the data can run out (§6.7.6). Report the range a law was fitted on, and treat predictions outside it as hypotheses (Unit 12).
+A power law fitted over two orders of magnitude and used to predict a third assumes nothing changes in between **[D]**: the same data distribution, a recipe tuned equally well at every size, no new bottleneck. In practice each assumption fails somewhere. Small models are often trained with recipes tuned for large ones (or vice versa); the effective exponent depends on the learning-rate schedule — a cause of the disagreement between Kaplan et al. and Hoffmann et al. (§6.5.3; [Kaplan et al. 2020](/references/#kaplan-2020); [Hoffmann et al. 2022](/references/#hoffmann-2022)) **[E]**; and the data can run out (§6.7.6). Report the range a law was fitted on, and treat predictions outside it as hypotheses (Unit 12).
 
 ## 6.7.3 Loss is not capability
 
@@ -24,7 +24,7 @@ Proposition 6.2 minimizes training loss per training FLOP. A model served to mil
 
 ## 6.7.5 The constants belong to the recipe and the data
 
-$E$, $A$, $B$, $\alpha$, $\beta$ depend on the dataset, the tokenizer, the architecture family and the optimizer **[E]**. A fit on one corpus does not predict another: the spine corpus, being synthetic and highly regular, has a small irreducible loss, and its fitted constants say nothing about natural text. Comparisons of losses across tokenizers are meaningless without converting to a tokenizer-independent unit such as bits per byte (Atlas: [cross-entropy](/atlas/nodes/mech-cross-entropy/)).
+$E$, $A$, $B$, $\alpha$, $\beta$ depend on the dataset, the tokenizer, the architecture family and the optimizer ([Kaplan et al. 2020](/references/#kaplan-2020); [Hoffmann et al. 2022](/references/#hoffmann-2022)) **[E]**. A fit on one corpus does not predict another: the spine corpus, being synthetic and highly regular, has a small irreducible loss, and its fitted constants say nothing about natural text. Comparisons of losses across tokenizers are meaningless without converting to a tokenizer-independent unit such as bits per byte (Atlas: [cross-entropy](/atlas/nodes/mech-cross-entropy/)).
 
 ## 6.7.6 The limitation that motivates Unit 07: the data wall
 

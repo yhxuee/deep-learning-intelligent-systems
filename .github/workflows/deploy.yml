@@ -51,7 +51,11 @@ jobs:
       - name: Check internal links
         run: node scripts/check-links.mjs dist "$BASE"
       - name: Check zh-TW math for bare CJK characters
-        run: node scripts/check-math-cjk.mjs src/content/docs/zh-tw
+        run: node scripts/check-math-cjk.mjs src/content/docs/zh-tw && node scripts/check-math-cjk.mjs src/content/docs/zh-cn
+      - name: Check English and Chinese state the same mathematics
+        run: node scripts/check-bilingual.mjs
+      - name: Check every [E] label names its source
+        run: node scripts/check-evidence.mjs
       - name: MCP server self-test against the built atlas.json
         run: python mcp/atlas_server.py --source dist/atlas.json --self-test
       - uses: actions/upload-pages-artifact@v3

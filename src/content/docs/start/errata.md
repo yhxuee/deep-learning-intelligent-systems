@@ -13,7 +13,7 @@ A textbook that asks readers to verify claims must make its own corrections visi
 | **Executed validation** — the test suite and the build pass in CI | every quoted number is reproduced by code; gradients agree with finite differences; links and citations resolve | that a theorem's hypotheses and quantifiers are right, that a proof is complete, that prose states the scope of a claim correctly |
 | **Scientific editorial review** — a named, dated reading by a subject expert | that statements, proofs and scope are correct | that the code reproduces the numbers |
 
-Neither implies the other. As of v2.1, every unit has executed validation; **no unit has completed scientific editorial review**. The external audit below is a partial review: it read the general-theory pages of all twelve units and selected other sections, and did not check every worked example or problem.
+Neither implies the other. As of v2.2, every unit has executed validation; **no unit has completed scientific editorial review**. The external audit below is a partial review: it read the general-theory pages of all twelve units and selected other sections, and did not check every worked example or problem.
 
 ## Corrections in v2.1 (audit of 3 November 2026)
 
@@ -37,6 +37,32 @@ An independent scientific audit of v2.0 (revision `24928ea`) reported sixteen fi
 | K14 | minor | [Unit 10 §10.5.3](/core/unit-10/theory/) | conformal quantile undefined when its index exceeds $n$ | $\hat q = +\infty$; ties; marginal coverage | `…::test_k14_…` |
 | K15 | editorial | [Unit 05 §5.7.6](/core/unit-05/limitations/) | "the KV cache never forgets" | retention distinguished from recall | — |
 | K16 | editorial | [Unit 09 §9.5.3](/core/unit-09/theory/) | zero gradient "if the model never produces a correct answer" | zero support vs zero successes in a finite sample | — |
+
+## Corrections in v2.2
+
+Found by the checks added in v2.2 rather than by a reader. Each is corrected in both Chinese editions as well.
+
+| Where | Was | Now | Found by |
+|---|---|---|---|
+| [Unit 04 §4.3.6](/core/unit-04/construction/) | English cited Worked Example 4.3 for the backward pass through attention | Worked Example 4.4, as the Chinese text already did | `scripts/check-bilingual.mjs` |
+| [Unit 05 §5.2.1](/core/unit-05/first-principles/) | "no state smaller than the window" can answer a sliding-window query | no state with fewer distinguishable values than there are possible windows (§5.5.2) | overstatement pass |
+| Units 02, 06, 07, 08, 09, 10, 11 (limitations) | **[E]** labels with no named source | each names its publication (four new bibliography entries) or the book's own experiment | `scripts/check-evidence.mjs` |
+| [Unit 08 Experiment 8.7](/core/unit-08/experiments/) (new in v2.2, before release) | cited §8.7.2 for few-step bias | §8.7.3 | proofreading |
+
+## Review ledger
+
+Each row records what kind of review a part of the book has had, at which revision, and with what outcome. A named scientific review is added here when it happens, with the reviewer's name, the date, the revision read, the pages covered and the issues it opened.
+
+| Part | Executed validation (every commit, in CI) | Audit | Named scientific review |
+|---|---|---|---|
+| Units 01–12 | tests for every quoted number and gradient; links; citations; math typesetting; English–Chinese agreement of display mathematics and result numbers (from v2.2); **[E]** sources (from v2.2) | 3 November 2026, revision `24928ea`: general-theory pages of all units and selected other sections; K01–K16, all corrected in v2.1 | none yet |
+| Appendices A–H | every example recomputed by `labs/test_appendices.py` | none (written after the audit) | none yet |
+| Spine project | `spine/test_spine.py`, including the Stage 09 baseline and discount regressions | Stage 09 baseline (K03) | none yet |
+| Traditional Chinese edition | the same checks; display mathematics and result numbers compared with English | — | no named translation reviewer yet |
+| Simplified Chinese edition | generated from Traditional Chinese by `scripts/zh_cn.py`; build fails if it is out of date or if a listed Taiwan-usage term survives | — | no named translation reviewer yet |
+| Labs and experiments | `labs/` test suites, including the beyond-language generators (from v2.2) | — | no learner pilot yet |
+
+"None yet" is a statement of fact, not a judgment of quality: executed validation can show that the numbers are reproduced, not that the theorems are stated correctly.
 
 ## How to report an error
 

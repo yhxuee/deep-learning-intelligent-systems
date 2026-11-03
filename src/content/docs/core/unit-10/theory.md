@@ -20,6 +20,14 @@ The bootstrap replaces the unknown population distribution $F$ by the empirical 
 
 It fails when its assumptions do: for dependent units resampled as if independent (characters within stories), for statistics determined by extremes (the maximum), and for very small $n$. And it measures only the uncertainty it resamples — test items, not training seeds (§10.3.5).
 
+:::note[Claim check]
+- **Claim.** A 95% bootstrap interval for a held-out mean covers the true expected value about 95% of the time.
+- **Assumptions.** The resampled units are independent (stories, not characters), the statistic is smooth, and $n$ is large enough for the asymptotics.
+- **Test.** Simulate data with a known truth and count how often the interval covers it (the spine test above; Experiment 10.1).
+- **Limitation.** It covers test-item sampling only — not seeds (§10.3.5), and not a deployment distribution that differs from the held-out one (§10.7.2).
+:::
+
+
 ## 10.5.3 Conformal prediction: coverage without a model of the data
 
 Can a model's uncertainty be made *guaranteed*? **Split conformal prediction** does it under one assumption: calibration and test points are exchangeable ([Angelopoulos & Bates 2023](/references/#angelopoulos-2023)).

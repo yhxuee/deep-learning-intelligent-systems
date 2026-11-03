@@ -19,7 +19,7 @@ import urllib.request
 DEFAULT_SOURCE = "https://yhxuee.github.io/deep-learning-intelligent-systems/atlas.json"
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 PROMPTS_DIR = REPO_ROOT / "prompts"
-SERVER_INFO = {"name": "dlis-atlas", "version": "1.2.0"}
+SERVER_INFO = {"name": "dlis-atlas", "version": "1.3.0"}
 SUPPORTED_PROTOCOLS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
 INSTRUCTIONS = (
     "Read-only access to the Deep Learning and Intelligent Systems textbook. Cite Atlas node ids and "
@@ -54,6 +54,7 @@ class Atlas:
         self.nodes = {n["id"]: n for n in data.get("nodes", [])}
         self.units = {u["number"]: u for u in data.get("units", [])}
         self.refs = data.get("references", {})
+        self.appendices = {a["id"].upper(): a for a in data.get("appendices", [])}
 
     # tools ------------------------------------------------------------------------
     def search(self, query, limit=8):
@@ -63,6 +64,7 @@ class Atlas:
         docs = [("node", n["id"], n["title"], n.get("description", ""), n.get("markdown", ""), n["url"]) for n in self.nodes.values()]
         docs += [("unit", f"unit-{u['number']:02d}", u["title"], u.get("question", ""), u.get("markdown", ""), u["url"]) for u in self.units.values()]
         docs += [("section", f"unit-{u['number']:02d}", s_["title"], "", s_.get("markdown", ""), s_["url"]) for u in self.units.values() for s_ in u.get("sections", [])]
+        docs += [("appendix", f"appendix-{a['id']}", a["title"], a.get("description", ""), a.get("markdown", ""), a["url"]) for a in self.appendices.values()]
         scored = []
         for kind, ident, title, desc, body, url in docs:
             t, d, b = _tokens(title + " " + ident), _tokens(desc), _tokens(body)
@@ -85,6 +87,13 @@ class Atlas:
             raise KeyError(f"unknown unit {number}; units are 1-12")
         return self.units[number]
 
+    def get_appendix(self, letter):
+        letter = str(letter).strip().upper()[:1]
+        if letter not in self.appendices:
+            known = ", ".join(sorted(self.appendices)) or "none in this atlas.json"
+            raise KeyError(f"unknown appendix '{letter}'. Known: {known}")
+        return self.appendices[letter]
+
     def prerequisites(self, node_id):
         if node_id not in self.nodes:
             raise KeyError(f"unknown Atlas node '{node_id}'")
@@ -102,7 +111,7 @@ class Atlas:
         return [{"id": i, "title": self.nodes[i]["title"], "mastery": self.nodes[i]["mastery"]} for i in order]
 
 
-PROMPT_LANGS = {"en": PROMPTS_DIR, "zh-tw": PROMPTS_DIR / "zh-tw"}
+PROMPT_LANGS = {"en": PROMPTS_DIR, "zh-tw": PROMPTS_DIR / "zh-tw", "zh-cn": PROMPTS_DIR / "zh-cn"}
 
 
 def get_prompt(name, lang="en"):
@@ -120,7 +129,7 @@ def get_prompt(name, lang="en"):
 TOOLS = [
     {
         "name": "search_atlas",
-        "description": "Keyword search over Core units, their section pages, and Atlas nodes (titles, summaries, text). Returns ids, titles and URLs.",
+        "description": "Keyword search over Core units, their section pages, the mathematical appendices and Atlas nodes (titles, summaries, text). Returns ids, titles and URLs.",
         "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 25}}, "required": ["query"]},
     },
     {
@@ -134,9 +143,14 @@ TOOLS = [
         "inputSchema": {"type": "object", "properties": {"number": {"type": "integer", "minimum": 1, "maximum": 12}}, "required": ["number"]},
     },
     {
+        "name": "get_appendix",
+        "description": "A mathematical appendix by letter: A linear algebra, B calculus, C probability, D information theory, E statistics, F optimization, G linear systems, H Markov decision processes. Returns its full text.",
+        "inputSchema": {"type": "object", "properties": {"letter": {"type": "string", "pattern": "^[A-Ha-h]$"}}, "required": ["letter"]},
+    },
+    {
         "name": "get_prompt",
-        "description": "A Mentor prompt: base-policy, tutor, critic, collaborator, practice, or a unit prompt such as unit-05-tutor. lang='zh-tw' returns the Traditional Chinese (Taiwan) version.",
-        "inputSchema": {"type": "object", "properties": {"name": {"type": "string"}, "lang": {"type": "string", "enum": ["en", "zh-tw"]}}, "required": ["name"]},
+        "description": "A Mentor prompt: base-policy, tutor, critic, collaborator, practice, or a unit prompt such as unit-05-tutor. lang='zh-tw' returns the Traditional Chinese (Taiwan) version, lang='zh-cn' the Simplified Chinese (mainland) version.",
+        "inputSchema": {"type": "object", "properties": {"name": {"type": "string"}, "lang": {"type": "string", "enum": ["en", "zh-tw", "zh-cn"]}}, "required": ["name"]},
     },
     {
         "name": "list_prerequisites",
@@ -153,6 +167,8 @@ def call_tool(atlas, name, args):
         return atlas.get_node(args.get("id", ""))
     if name == "get_unit":
         return atlas.get_unit(args.get("number", 0))
+    if name == "get_appendix":
+        return atlas.get_appendix(args.get("letter", ""))
     if name == "get_prompt":
         return get_prompt(args.get("name", ""), args.get("lang", "en"))
     if name == "list_prerequisites":
@@ -207,6 +223,7 @@ def self_test(atlas):
         ("search_atlas", {"query": "attention causal mask"}),
         ("get_node", {"id": "mech-attention"}),
         ("get_unit", {"number": 4}),
+        ("get_appendix", {"letter": "H"}),
         ("get_prompt", {"name": "base-policy"}),
         ("list_prerequisites", {"id": "arch-transformer-block"}),
     ]
@@ -219,7 +236,7 @@ def self_test(atlas):
         except Exception as exc:
             ok = False
             print(f"  ✗ {name}({args}) → {exc}")
-    print(f"{len(atlas.units)} units, {len(atlas.nodes)} nodes, {len(atlas.refs)} references")
+    print(f"{len(atlas.units)} units, {len(atlas.appendices)} appendices, {len(atlas.nodes)} nodes, {len(atlas.refs)} references")
     return ok
 
 

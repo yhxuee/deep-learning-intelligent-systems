@@ -1,0 +1,39 @@
+---
+title: 知识图谱 Atlas
+description: 一组有上限、有版本的验证工具包——参考实现、不变量、已知数值与常见错误——以带类型的关系相连。
+sidebar: { label: 总览, order: 0 }
+---
+
+import AtlasTable from '../../../../components/AtlasTable.astro';
+
+Atlas **不是百科全书**。AI 系统已经很会解释；它们无法可靠提供的，是*可以拿来检查它们的标准答案*。所以每个节点都是一个简短的**验证工具包（verification kit）**：
+
+- 一段附关键方程的定义；
+- 任何正确实现都必须满足的**不变量（invariant）**；
+- 你可以手算复现的**已知数值（known value）**；
+- **参考实现**与测试（若有对应的实验）；
+- **常见错误**，以及每个错误由哪个不变量抓到；
+- 以稳定的文献键引用的原始文献。
+
+节点以带类型的联系相连——*先修知识*、*相关*、*历史前身*、*替代机制*——只要任何链接、单元编号或引用键不存在，网站构建就会**失败**。Atlas 的上限约为 150 个节点；新增一个节点，通常意味着合并或淘汰另一个。
+
+<AtlasTable />
+
+## 节点格式
+
+```yaml
+atlas:
+  id: mech-attention            # (math|mech|arch|method|opt|para)-slug
+  type: mechanism
+  mastery: internalize          # internalize | understand-and-verify | access-on-demand
+  core_units: [4, 5, 11]
+  prerequisites: [math-softmax]
+  related: [arch-transformer-block]
+  predecessors: []
+  alternatives: [mech-linear-recurrence]
+  lab: labs/unit-04-attention   # 库中选用的验证工具包
+  references: [vaswani-2017]    # src/data/bibliography.yaml 中的键
+  last_reviewed: 2026-11-02
+```
+
+同样的数据也以 [`atlas.json`](/atlas.json) 的形式发布，供 AI 智能体与工具使用——见[机器可读的书](/zh-cn/mentor/machine-readable/)。节点的字段名称与 `id` 保持英文，以便与代码及英文版对应。

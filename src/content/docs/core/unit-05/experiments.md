@@ -83,3 +83,12 @@ for n in [4, 16, 32, 64]:
 **Procedure.** Implement cached decoding for the spine model. Verify that cached logits equal full recomputation at every prefix (the invariant tested in `labs/unit-04-attention`). Then build sequences "`… key value … key`" with the distance between the two occurrences varied from 4 to the context length, and measure accuracy on the value.
 
 **Look for:** exact equality of logits (to float tolerance) — if not, check the position index (the classic bug, [KV cache](/atlas/nodes/mech-kv-cache/)); a recall curve that stays high within the trained context and collapses beyond it (§5.7.6). Include the control "same sequence with the first occurrence removed" (§5.7.9).
+
+
+## Experiment 5.9 — Beyond language: a noisy sensor
+
+**Tests:** §5.2.6, §5.6.2 (the EMA is a Kalman filter). **Predict:** the EMA coefficient $\alpha$ that minimizes the mean squared error between estimate and true temperature, for a random-walk temperature with step variance $q = 0.01$ read with noise variance $r = 0.25$.
+
+**Procedure.** Generate 5 000 steps with `sensor_stream`; compute `steady_state_kalman_alpha(q, r)`; sweep $\alpha$ and plot the error. Then make the temperature *unstable* — multiply it by 1.01 each step — and see what happens to every fixed-$\alpha$ filter.
+
+**Look for:** the minimum at $\alpha\approx0.819$, the steady-state Kalman value, with error far below the raw sensor noise; the noise-versus-lag trade-off of §5.2.6 on both sides of it; and the failure of all fixed filters on the unstable system — a model that assumes the wrong dynamics cannot be fixed by tuning one constant.

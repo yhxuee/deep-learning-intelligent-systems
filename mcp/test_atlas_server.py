@@ -19,6 +19,7 @@ FIXTURE = {
         {"id": "mech-attention", "title": "Attention", "description": "content-dependent aggregation", "mastery": "internalize", "prerequisites": ["math-softmax"], "references": ["r1"], "markdown": "causal mask attention", "url": "n2"},
         {"id": "arch-transformer-block", "title": "Transformer block", "description": "pre-LN block", "mastery": "internalize", "prerequisites": ["mech-attention", "math-softmax"], "references": [], "markdown": "", "url": "n3"},
     ],
+    "appendices": [{"id": "H", "title": "H · Markov chains and decision processes", "description": "Bellman equations", "markdown": "policy gradient theorem baseline", "url": "aH"}],
     "references": {"r1": {"authors": "A", "year": 2017, "title": "T", "venue": "V"}},
 }
 
@@ -46,7 +47,7 @@ def test_unknown_method_is_an_error(atlas):
 
 def test_tools_list_has_schemas(atlas):
     tools = srv.handle(atlas, {"jsonrpc": "2.0", "id": 4, "method": "tools/list"})["result"]["tools"]
-    assert {t["name"] for t in tools} == {"search_atlas", "get_node", "get_unit", "get_prompt", "list_prerequisites"}
+    assert {t["name"] for t in tools} == {"search_atlas", "get_node", "get_unit", "get_appendix", "get_prompt", "list_prerequisites"}
     assert all(t["inputSchema"]["type"] == "object" for t in tools)
 
 
@@ -85,6 +86,9 @@ def test_get_prompt_reads_repo_prompts(atlas):
     assert call(atlas, "get_prompt", name="unit-05-tutor")["isError"] is False
     zh = call(atlas, "get_prompt", name="tutor", lang="zh-tw")
     assert zh["isError"] is False and "家教" in zh["content"][0]["text"]
+    cn = call(atlas, "get_prompt", name="unit-09-tutor", lang="zh-cn")
+    text = cn["content"][0]["text"]
+    assert cn["isError"] is False and "单元 09" in text and "單元" not in text
     assert call(atlas, "get_prompt", name="tutor", lang="fr")["isError"] is True
 
 
@@ -100,3 +104,12 @@ def test_stdio_round_trip(tmp_path):
     lines = [json.loads(l) for l in proc.stdout.splitlines()]
     assert [l["id"] for l in lines] == [1, 2]
     assert json.loads(lines[1]["result"]["content"][0]["text"])["number"] == 4
+
+
+def test_appendices_are_searchable_and_retrievable(atlas):
+    res = json.loads(call(atlas, "search_atlas", query="bellman baseline")["content"][0]["text"])
+    assert res[0]["id"] == "appendix-H"
+    out = json.loads(call(atlas, "get_appendix", letter="h")["content"][0]["text"])
+    assert out["title"].startswith("H ·")
+    err = call(atlas, "get_appendix", letter="Z")
+    assert err["isError"] and "Known: H" in err["content"][0]["text"]

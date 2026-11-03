@@ -53,3 +53,12 @@ Write your prediction first. Code: [`spine/stage02_embeddings.py`](https://githu
 **Procedure.** `cd spine && python -m pytest test_spine.py -k stage02 -v`.
 
 **Look for:** initial loss exactly $\ln V$; lookup gradient equal to the one-hot product gradient; training loss never below the count optimum; interchangeable symbols merged; neural 4-gram beating counts at 5 000 characters. Keep the embedding table in mind: in Stage 04 it becomes the first and last layer of a Transformer.
+
+
+## Experiment 2.7 — Beyond language: sets of points
+
+**Tests:** §2.5.4 (invariance by design). **Predict:** the held-out accuracy of logistic regression that reads (a) the twelve concatenated coordinates of a six-point cloud and (b) three rotation- and permutation-invariant summaries of it, on the task "circle or square?".
+
+**Procedure.** `point_clouds` in [`labs/beyond_language.py`](https://github.com/yhxuee/deep-learning-intelligent-systems/blob/main/labs/beyond_language.py) generates randomly rotated, scaled and shuffled clouds; `radial_features` computes invariant summaries. Train both models on 2 000 clouds and test on fresh ones. Then train a small MLP on the raw coordinates with ten times more data.
+
+**Look for:** near-chance accuracy from raw coordinates and high accuracy from the invariant representation (the lab's test checks below 0.6 and above 0.8); the MLP closing part of the gap only with much more data. Which conclusion of Unit 02 transfers unchanged from characters to geometry, and which (the role of co-occurrence) has no counterpart here?

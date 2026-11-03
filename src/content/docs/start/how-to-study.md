@@ -17,7 +17,7 @@ Everything required for mastery works **without** an AI service: the Core text c
 
 ## How a unit is organized
 
-Each Core unit has ten parts, always in the same order: **the problem → first principles → mathematical construction → worked examples → general theory → connections → limitations and counterexamples → modern developments → experiments → problems and further study.** Read parts 1–4 in order on a first pass; parts 5–8 deepen and widen; parts 9–10 are where you check that you can do it yourself. Sections marked ★ Advanced can be skipped on a first reading. The [writing standard](/project/writing-standard/) defines each part.
+Each Core unit has ten parts, always in the same order: **the problem → first principles → mathematical construction → worked examples → general theory → connections → limitations and counterexamples → modern developments → experiments → problems and further study.** Read parts 1–4 in order on a first pass; parts 5–8 deepen and widen; parts 9–10 are where you check that you can do it yourself. Sections marked ★ Advanced can be skipped on a first reading. The [writing standard](/project/writing-standard/) defines each part. [Reading paths](/pathways/reading-paths/) gives a first-pass and a deep-pass order within a unit, and the dependencies that allow units to be reordered.
 
 ## Six stages per unit
 
