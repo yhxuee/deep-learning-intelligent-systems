@@ -86,7 +86,7 @@ sidebar: { label: "2.4 例题", order: 4 }
 
 **设定。** $V = 3$、$d = 2$，索引 $x = (0, 2, 0)$，上游梯度 $G = \begin{pmatrix}1&2\\3&4\\5&6\end{pmatrix}$（每个被查找的位置一行）。
 
-**散射加总**（命题 2.1）：第 0 行收到 $G$ 的第 1 与第 3 行，第 2 行收到第 2 行：
+**散射加法**（命题 2.1）：第 0 行收到 $G$ 的第 1 与第 3 行，第 2 行收到第 2 行：
 
 $$
 \frac{\partial L}{\partial E} = \begin{pmatrix}1+5 & 2+6\\ 0 & 0\\ 3 & 4\end{pmatrix} = \begin{pmatrix}6&8\\0&0\\3&4\end{pmatrix} = U^{\top}G,\quad U = \begin{pmatrix}1&0&0\\0&0&1\\1&0&0\end{pmatrix}.
