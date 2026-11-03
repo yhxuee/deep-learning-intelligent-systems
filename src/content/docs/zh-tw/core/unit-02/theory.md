@@ -45,7 +45,7 @@ $$
 
 把詞嵌入加總成「詞袋（bag of words）」就是置換群的平均構造：結果對詞序不變。這對主題分類是好的表示，對「狗咬人」與「人咬狗」則是災難（§2.7.1）。
 
-若對所有 $g$ 都有 $F(g\cdot x) = g\cdot F(x)$，線性映射 $F$ 就是**等變的**。等變線性映射構成的空間比所有線性映射小得多，這就是它們樣本效率的來源。書中兩種情況一再出現。對長度 $T$ 訊號的循環位移，等變線性映射恰好是循環卷積——$T$ 個參數而不是 $T^2$ 個（單元 04，定理 4.2）。對 $T$ 個位置的置換，它們恰好是 $X\mapsto \lambda X + \gamma\mathbf 1\mathbf 1^{\top}X$——兩個參數（單元 04，定理 4.3）。注意力就是擺脫這種兩參數貧乏的非線性出路。由對稱性建構網路的一般理論是幾何深度學習的主題（[Bronstein et al. 2021](/zh-tw/references/#bronstein-2021)）。
+若對所有 $g$ 都有 $F(g\cdot x) = g\cdot F(x)$，線性映射 $F$ 就是**等變的**。等變線性映射構成的空間比所有線性映射小得多，這就是它們樣本效率的來源。書中兩種情況一再出現。對長度 $T$ 訊號的循環位移，等變線性映射恰好是循環卷積——$T$ 個參數而不是 $T^2$ 個（單元 04，定理 4.2）。對單一通道（$X\in\mathbb{R}^{T}$）時 $T$ 個位置的置換，它們恰好是 $X\mapsto \lambda X + \gamma\mathbf 1\mathbf 1^{\top}X$——兩個參數（單元 04，定理 4.3）。有 $d_{\text{in}}$ 個輸入通道與 $d_{\text{out}}$ 個輸出通道（$X\in\mathbb{R}^{T\times d_{\text{in}}}$）時，它們恰好是 $X\mapsto XA + \mathbf 1\mathbf 1^{\top}XB$，其中 $A, B\in\mathbb{R}^{d_{\text{in}}\times d_{\text{out}}}$（等價地可用 $\frac1T\mathbf 1\mathbf 1^{\top}$，即平均而非總和）——共 $2d_{\text{in}}d_{\text{out}}$ 個參數，可以任意混合通道（[Zaheer et al. 2017](/zh-tw/references/#zaheer-2017)）。仍然貧乏的是*位置*結構：每個位置只看到它自己與所有位置的彙總，透過兩種彙總方式。注意力就是擺脫這種貧乏的非線性出路。由對稱性建構網路的一般理論是幾何深度學習的主題（[Bronstein et al. 2021](/zh-tw/references/#bronstein-2021)）。
 
 ## 2.5.5 ★ 進階：Eckart–Young 定理的證明
 

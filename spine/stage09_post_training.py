@@ -6,14 +6,20 @@ data/make_tales.py).  A maximum-likelihood model therefore *imitates the noise*.
 asks the model to answer and rewards it only when a program confirms the answer: r = 1[answer = a+b].
 
 Methods (all act on the single answer character):
-  * REINFORCE with a batch-mean baseline and a KL penalty to the pretrained (reference) model:
+  * REINFORCE with a leave-one-out baseline and a KL penalty to the pretrained (reference) model:
+        A_i = r_i - mean_{j != i} r_j          (independent of a_i, so the estimator is unbiased)
         dlogits = (A_i / B) (pi - e_{a_i})  +  (beta / B) pi * (log pi - log pi_ref - KL)
+    The plain batch mean, A_i = r_i - mean_j r_j, includes the sample's own reward and scales the
+    expected reward gradient by (B - 1) / B (Unit 09, Section 9.3.2; audit finding K03).  The prompts in
+    a batch differ, so neither baseline is state-conditioned; both are constants across actions.
   * DPO on (correct, incorrect) pairs (Rafailov et al. 2023):
         loss = -log sigmoid(beta [(log pi(y_w) - log ref(y_w)) - (log pi(y_l) - log ref(y_l))])
   * Reward-hacking audit: the same REINFORCE run with a buggy checker (answer >= a+b instead of ==).
 
 Verification targets (test_spine.py):
-  * the policy-gradient estimator is unbiased (Monte-Carlo mean = exact gradient on a bandit)
+  * the policy-gradient estimator is unbiased (Monte-Carlo mean = exact gradient on a bandit),
+    with the leave-one-out baseline; the batch-mean baseline is biased by the factor (B - 1) / B
+  * the discounted policy-gradient theorem carries the factor gamma^t (two-step MDP)
   * the KL-regularized optimum is pi* proportional to pi_ref * exp(r / beta)
   * the DPO and KL gradients pushed through the spine model match finite differences
 """
@@ -57,12 +63,26 @@ def grad_from_last(p, cfg, cache, logits, dlast):
     return M.backward(p, cfg, cache, d)
 
 
-def reinforce_grad(p, cfg, X, actions, rewards, ref_logp, beta):
+def advantages(rewards, baseline="loo"):
+    """Reward minus a baseline that does not depend on the sample's own action.
+
+    "loo":  b_i = mean of the other B - 1 rewards (unbiased);
+    "mean": b_i = mean of all B rewards, including r_i (biased by the factor (B - 1) / B)."""
+    rewards = np.asarray(rewards, float)
+    B = len(rewards)
+    if baseline == "mean":
+        return rewards - rewards.mean()
+    if baseline == "loo":
+        return rewards - (rewards.sum() - rewards) / (B - 1)
+    raise ValueError(baseline)
+
+
+def reinforce_grad(p, cfg, X, actions, rewards, ref_logp, beta, baseline="loo"):
     """Gradient of  -(1/B) sum_i A_i log pi(a_i)  +  beta * mean KL(pi || pi_ref)  (to be minimized)."""
     logp, logits, cache = last_logprobs(p, cfg, X)
     pi = np.exp(logp)
     B, V = pi.shape
-    A = rewards - rewards.mean()
+    A = advantages(rewards, baseline)
     d = pi * A[:, None]
     d[np.arange(B), actions] -= A
     kl = (pi * (logp - ref_logp)).sum(-1)

@@ -25,7 +25,7 @@ By the end of Unit 07 the spine model's report card looks excellent. Held-out lo
 
 Now give it 140 new stories that are identical in every respect except that the children are called Omar, Elif, Rafa, Nils, Ines, Bram, Sora and Mateo — names it has never seen. Its loss on them is **1.506 nats per character**: six and a half times worse. Nothing in the report card predicted this. Every number in it was computed correctly, on a correctly held-out set. They answered a question — *how well does the model do on more stories like the training stories?* — that was not the question that mattered for this test set.
 
-Unit 09 ended with a sharper version of the same lesson: a post-training run whose reward reached 0.98 while the skill it was meant to measure fell to 0.06. A score is a measurement, and a measurement is evidence only about the population it was taken on, of the quantity it actually measures, up to the noise it actually has.
+Unit 09 ended with a sharper version of the same lesson: a post-training run whose reward reached 0.99 while the skill it was meant to measure fell to 0.09. A score is a measurement, and a measurement is evidence only about the population it was taken on, of the quantity it actually measures, up to the noise it actually has.
 
 This unit asks **why a benchmark score is insufficient evidence of reliability** and builds the tools to measure what a single number hides: uncertainty intervals, paired comparisons, calibration, contamination checks, and test sets designed to break the assumptions of the standard split.
 

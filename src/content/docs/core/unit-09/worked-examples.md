@@ -62,10 +62,10 @@ Exact numbers are recomputed by `labs/test_worked_examples_u09_u12.py`; post-tra
 | model | greedy accuracy | mean $p$(correct) | KL to reference at the answer |
 |---|---|---|---|
 | pretrained (Stage 07) | 0.32 | 0.20 | 0 |
-| REINFORCE, reward $1[\text{ans} = a+b]$ | **0.82** | **0.80** | 1.37 |
+| REINFORCE, reward $1[\text{ans} = a+b]$ | **0.79** | **0.72** | 1.34 |
 | DPO on (correct, random incorrect) pairs | 0.78 | 0.76 | — |
 
-**Reading.** 150 steps with a verifiable reward move the model from imitating the corpus's 30%-wrong arithmetic to answering correctly four times in five. DPO, trained on pairs constructed from the same checker, gets most of the way without sampling. Neither reaches 100%: the KL anchor holds the policy near a reference that is often confidently wrong, and a 3-layer model trained on 1 187 stories has not learned addition well enough to be reliably right — post-training can only reweight what the model can already produce (§9.5.3).
+**Reading.** 150 steps with a verifiable reward move the model from imitating the corpus's 30%-wrong arithmetic to answering correctly four times in five. DPO, trained on pairs constructed from the same checker, reaches nearly the same accuracy without sampling. (These are single runs. With the biased batch-mean baseline of v2.0, the REINFORCE run reached 0.82 and 0.80; the correction rescales the advantages by $64/63$ and leaves the expected gradient's direction unchanged, yet moved the result by 0.03 — run-to-run variation of the size Unit 10 and Unit 12 warn about.) Neither reaches 100%: the KL anchor holds the policy near a reference that is often confidently wrong, and a 3-layer model trained on 1 187 stories has not learned addition well enough to be reliably right — post-training can only reweight what the model can already produce (§9.5.3).
 
 ## Worked Example 9.7 — Reward hacking with a one-character bug
 
@@ -73,14 +73,14 @@ Exact numbers are recomputed by `labs/test_worked_examples_u09_u12.py`; post-tra
 
 | | training reward (last 20 steps) | true accuracy on training samples | held-out greedy accuracy | mean $p$(correct) |
 |---|---|---|---|---|
-| buggy checker | **0.98** | 0.08 | **0.06** | 0.10 |
+| buggy checker | **0.99** | 0.07 | **0.09** | 0.11 |
 
-**Reading.** Answering "9" satisfies "at least $a+b$" for every prompt in the task (the sums never exceed 9). The policy found this in 150 steps: its reward is nearly perfect and its arithmetic is worse than before post-training (0.06 versus 0.32). Every monitoring number computed from the buggy checker says the run is a success. Only an *independent* measurement — the true accuracy on held-out prompts — reveals it. This is the bridge to Unit 10.
+**Reading.** Answering "9" satisfies "at least $a+b$" for every prompt in the task (the sums never exceed 9). The policy found this in 150 steps: its reward is nearly perfect and its arithmetic is far worse than before post-training (0.09 versus 0.32). Every monitoring number computed from the buggy checker says the run is a success. Only an *independent* measurement — the true accuracy on held-out prompts — reveals it. This is the bridge to Unit 10.
 
 ## Worked Example 9.8 — Reading a KL
 
-**Setting.** The REINFORCE run of Worked Example 9.6 ends with $\mathrm{KL}(\pi\,\Vert\,\pi_{\text{ref}}) = 1.37$ nats at the answer position.
+**Setting.** The REINFORCE run of Worked Example 9.6 ends with $\mathrm{KL}(\pi\,\Vert\,\pi_{\text{ref}}) = 1.34$ nats at the answer position.
 
 **A lower reference point.** Moving 0.8 of the probability onto the correct digit from a reference that gave it 0.2, and leaving the rest proportional, costs $0.8\ln\frac{0.8}{0.2} + 0.2\ln\frac{0.2}{0.8} = 0.832$ nats.
 
-**Reading.** The measured 1.37 is larger: the policy also reshaped how it distributes the remaining probability among wrong digits. The KL is a total budget of change — it does not say *which* change was made, which is why the buggy run (KL 1.32) and the correct run (KL 1.37) look alike on this number. Unit 11 asks what changed inside.
+**Reading.** The measured 1.34 is larger: the policy also reshaped how it distributes the remaining probability among wrong digits. The KL is a total budget of change — it does not say *which* change was made, which is why the buggy run (KL 1.43) and the correct run (KL 1.34) look alike on this number. Unit 11 asks what changed inside.

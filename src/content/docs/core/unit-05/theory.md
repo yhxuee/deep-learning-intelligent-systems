@@ -22,7 +22,11 @@ $$
 G(z) = C\,(I - Az^{-1})^{-1}B = C\,z\,(zI - A)^{-1}B .
 $$
 
-$G$ is the **transfer function**. It is a ratio of polynomials in $z$ whose denominator is $\det(zI - A)$: its **poles** are exactly the eigenvalues of $A$. The stability condition of Theorem 5.1, $\rho(A) < 1$, says that all poles lie inside the unit circle — the classical criterion from signal processing ([Oppenheim & Schafer 2010](/references/#oppenheim-2010)).
+$G$ is the **transfer function**. It is a ratio of polynomials in $z$, and since $(zI - A)^{-1} = \mathrm{adj}(zI - A)/\det(zI - A)$, every **pole** of $G$ is an eigenvalue of $A$. The converse holds only for a **minimal** realization — one in which every mode can be excited by the input (controllable) and seen in the output (observable). Otherwise factors of $\det(zI - A)$ cancel and some eigenvalues are invisible from input to output ([Kailath 1980](/references/#kailath-1980)).
+
+*Counterexample.* $A = \mathrm{diag}(0.5, 1.2)$, $B = (1, 0)^{\top}$, $C = (1, 0)$. Then $G(z) = 1/(1 - 0.5z^{-1})$, with the single pole 0.5. The eigenvalue 1.2 belongs to a mode the input never reaches and the output never reads: started from $h_0 = 0$, the system is input–output stable, yet any nonzero initial value of the second state component grows as $1.2^t$.
+
+So two notions of stability must be kept apart. **Internal (asymptotic) stability**, $\rho(A) < 1$ — the condition of Theorem 5.1 — says every mode decays, whatever the initial state. **Input–output (BIBO) stability** says bounded inputs give bounded outputs from a zero initial state; it requires only that the *poles of $G$* lie inside the unit circle. The two coincide for minimal realizations, which is the classical criterion of signal processing ([Oppenheim & Schafer 2010](/references/#oppenheim-2010)). For a learned memory, internal stability is the one that matters: the state is carried across arbitrarily many steps, and a hidden unstable mode excited by rounding error or a nonzero initial state will eventually dominate.
 
 **Frequency response.** Feed a complex sinusoid $x_t = e^{i\omega t}$ to a stable system. After transients die out, the output is $G(e^{i\omega})\,e^{i\omega t}$: the same frequency, scaled by $|G(e^{i\omega})|$ and phase-shifted. So $|G(e^{i\omega})|$ says how strongly the memory passes each frequency $\omega \in [0, \pi]$ (in radians per step; $\omega = \pi$ is the fastest possible alternation $+1, -1, +1, \dots$).
 
@@ -105,12 +109,13 @@ The designs differ only in the **structure of $M$** ([Dao & Gu 2024](/references
 
 | Layer | $M_{ts}$ | Structure of $M$ | Cost to apply |
 |---|---|---|---|
-| LTI recurrence / SSM | $C\bar A^{\,t-s}\bar B$ | Toeplitz (depends only on $t-s$) | $O(T\log T)$ by FFT, or $O(TN)$ by recurrence |
-| Selective SSM | $C_t\bigl(\prod_{r=s+1}^{t}\bar A_r\bigr)\bar B_s$ | semiseparable, data-dependent | $O(TN)$ by scan |
+| LTI recurrence / SSM, dense $\bar A$ | $C\bar A^{\,t-s}\bar B$ | Toeplitz (depends only on $t-s$) | $O(TN^2)$ by recurrence |
+| LTI SSM, diagonal (or diagonalized) $\bar A$ | same | Toeplitz | $O(TN)$ by recurrence; or form the length-$T$ kernel, then $O(T\log T)$ by FFT |
+| Selective SSM, diagonal $\bar A_t$ | $C_t\bigl(\prod_{r=s+1}^{t}\bar A_r\bigr)\bar B_s$ | semiseparable, data-dependent | $O(TN)$ by scan |
 | Linear attention (unnormalized) | $q_t^{\top}k_s$ | lower triangle of a rank-$d_k$ matrix | $O(Td_kd_v)$ by recurrence |
 | Softmax attention | $\mathrm{softmax}_s(q_t^{\top}k_s/\sqrt d)$ | dense, data-dependent | $O(T^2d)$ |
 
-(For attention, $M$ depends on the inputs through $q$ and $k$; it is "linear in $x$" only in its action on the values.)
+Costs are for one input and one output channel with the state size $N$ and head sizes held fixed. A dense $N\times N$ transition costs $O(N^2)$ per step to apply; the $O(TN)$ entries assume a diagonal or otherwise structured transition, which is why practical SSMs use them. The FFT route requires first computing the $T$ kernel values $C\bar A^{k}\bar B$ (itself $O(TN)$ for diagonal $\bar A$) and applies only when $M$ is Toeplitz, that is, for time-invariant layers. (For attention, $M$ depends on the inputs through $q$ and $k$; it is "linear in $x$" only in its action on the values.)
 
 **The rank bound — why a fixed state limits recall, in linear-algebra form.** Pick a cut time $c$ and look at the block of $M$ that maps *past* inputs ($s\le c$) to *future* outputs ($t > c$). For any recurrence with an $N$-dimensional state, everything the future knows about the past passes through $h_c\in\mathbb{R}^N$:
 

@@ -24,9 +24,9 @@ It fails when its assumptions do: for dependent units resampled as if independen
 
 Can a model's uncertainty be made *guaranteed*? **Split conformal prediction** does it under one assumption: calibration and test points are exchangeable ([Angelopoulos & Bates 2023](/references/#angelopoulos-2023)).
 
-**Proposition 10.1.** Let $s(x, y)$ be any score (higher = less conforming, e.g. $1 - p_{\text{model}}(y\mid x)$). Compute $s_i = s(x_i, y_i)$ on $n$ calibration points and let $\hat q$ be the $\lceil(n+1)(1-\alpha)\rceil$-th smallest. Then for a new exchangeable point, the set $C(x) = \{y: s(x, y)\le\hat q\}$ satisfies $P(y\in C(x))\ge1 - \alpha$.
+**Proposition 10.1.** Let $s(x, y)$ be any score (higher = less conforming, e.g. $1 - p_{\text{model}}(y\mid x)$). Compute $s_i = s(x_i, y_i)$ on $n$ calibration points and let $\hat q$ be the $\lceil(n+1)(1-\alpha)\rceil$-th smallest — or $\hat q = +\infty$ (the set of all labels) if that index exceeds $n$, which happens when $\alpha < 1/(n+1)$. Then for a new exchangeable point, the set $C(x) = \{y: s(x, y)\le\hat q\}$ satisfies $P(y\in C(x))\ge1 - \alpha$.
 
-*Proof.* By exchangeability, the rank of the new point's score among the $n+1$ scores is uniform on $\{1,\dots,n+1\}$ (ties aside). It is at most $\lceil(n+1)(1-\alpha)\rceil$ with probability at least $1 - \alpha$, and that event is exactly $s(x, y)\le\hat q$. $\blacksquare$
+*Proof.* Assume first that the $n + 1$ scores are almost surely distinct. By exchangeability, the rank of the new point's score among them is uniform on $\{1,\dots,n+1\}$, so it is at most $k = \lceil(n+1)(1-\alpha)\rceil$ with probability $k/(n+1)\ge 1 - \alpha$; and when $k\le n$, that event is exactly $s(x, y)\le\hat q$. With ties, ranking tied scores in the new point's favour only enlarges the event, so the inequality still holds; breaking ties uniformly at random makes coverage exact up to $1/(n+1)$. If $k > n$, $\hat q = +\infty$ and coverage is 1. $\blacksquare$
 
 The guarantee holds for *any* model, however bad — a bad model simply produces large sets. It is marginal (averaged over inputs), not conditional on each input, and it breaks under shift: exchangeability between calibration and deployment is the i.i.d. assumption of Unit 01 again.
 

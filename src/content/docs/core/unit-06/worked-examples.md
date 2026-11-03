@@ -1,6 +1,6 @@
 ---
 title: "6.4 Worked examples"
-description: Eight examples — every FLOP of the spine model, the 6N rule for GPT-3, a 7B training budget, arithmetic intensity, decoding latency, a pre-registered scaling fit that missed, the flat compute-optimal optimum, and energy against the thermodynamic floor.
+description: Eight examples — every FLOP of the spine model, the 6N rule for GPT-3, a 7B training budget, arithmetic intensity, decoding latency, a pre-registered scaling fit that missed, the flat compute-optimal optimum, and energy per FLOP — with what the Landauer limit does and does not say.
 sidebar: { label: "6.4 Worked examples", order: 4 }
 ---
 
@@ -71,10 +71,10 @@ Exact numbers are recomputed by `labs/test_worked_examples_u06_u08.py`; the FLOP
 
 **Reading.** A factor of 2.2 in model size costs 0.006 nats under this fit. The location of the optimum is sensitive to the fitted constants; its depth is not. This is why different estimation methods (and a later replication, [Besiroglu et al. 2024](/references/#besiroglu-2024)) could disagree about the optimal size by a factor of two without anyone's model being badly trained.
 
-## Worked Example 6.8 — Energy, and the floor beneath it
+## Worked Example 6.8 — Energy per FLOP, and what Landauer's limit does not say
 
 **Setting.** A100 at 400 W and 40% utilization of 312 TFLOP/s.
 
 **Computation.** $e = 400/(0.4\times3.12\times10^{14}) = 3.2\times10^{-12}$ J per FLOP. GPT-3's $3.14\times10^{23}$ FLOPs → $1.0\times10^{12}$ J ≈ 280 MWh of accelerator energy. [Patterson et al. (2021)](/references/#patterson-2021) estimate 1 287 MWh for the actual run (older V100 hardware, whole data centre). The Landauer limit at 300 K is $kT\ln2 = 2.87\times10^{-21}$ J per bit erased.
 
-**Reading.** Hardware generation and data-centre overheads change the answer by a factor of four; physics allows nine orders of magnitude more. Energy per useful FLOP is an engineering variable, and arithmetic intensity is one of its main levers.
+**Reading.** Hardware generation and data-centre overheads change the answer by a factor of four. The Landauer figure is *per bit erased*, not per FLOP: turning it into a floor per operation would need a model of how many bits a floating-point multiply–add irreversibly erases in a given circuit, so the ratio of the two numbers is not a measure of how much improvement physics permits. Energy per useful FLOP is an engineering variable, and arithmetic intensity is one of its main levers.

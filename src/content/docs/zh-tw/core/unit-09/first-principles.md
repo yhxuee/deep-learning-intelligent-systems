@@ -36,7 +36,7 @@ $$
 \nabla_\theta J = \mathbb{E}_{a\sim\pi_\theta}\big[(r(a) - b)\nabla_\theta\ln\pi_\theta(a)\big].
 $$
 
-期望值不變，因為 $\mathbb{E}_a[\nabla\ln\pi_\theta(a)] = \sum_a\nabla\pi_\theta(a) = \nabla\sum_a\pi_\theta(a) = \nabla 1 = 0$。但變異數可能大幅下降（詳解例題 9.2：在一個三臂問題中下降為四分之一）。當 $b$ 等於平均獎勵時，比平均好的動作被往上推、比平均差的被往下推——$r - b$ 這個量稱為**優勢（advantage）**。主幹專案以每批 64 個提示的平均獎勵作為 $b$；語言模型的群組相對方法則以*同一個*提示的多個答案之平均獎勵作為基準（[Shao et al. 2024](/zh-tw/references/#shao-2024)）。
+期望值不變，因為 $\mathbb{E}_a[\nabla\ln\pi_\theta(a)] = \sum_a\nabla\pi_\theta(a) = \nabla\sum_a\pi_\theta(a) = \nabla 1 = 0$。但變異數可能大幅下降（詳解例題 9.2：在一個三臂問題中下降為四分之一）。當 $b$ 等於平均獎勵時，比平均好的動作被往上推、比平均差的被往下推——$r - b$ 這個量稱為**優勢（advantage）**。有一個條件很重要：$b$ 不能依賴於它所乘之分數對應的動作。*包含*樣本自身獎勵的批次平均會稍微違反這一點——它使梯度偏差一個因子 $(B-1)/B$——所以主幹專案對每個樣本使用批次中*其他* 63 個提示的平均獎勵（**留一法**基準，§9.3.7）；語言模型的群組相對方法則以*同一個*提示的多個答案之平均獎勵作為基準（[Shao et al. 2024](/zh-tw/references/#shao-2024)）。
 
 ## 9.2.4 連續決策
 

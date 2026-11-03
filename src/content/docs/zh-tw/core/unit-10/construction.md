@@ -45,7 +45,11 @@ $$
 
 （[Naeini et al. 2015](/zh-tw/references/#naeini-2015)；[Guo et al. 2017](/zh-tw/references/#guo-2017)。）**可靠度表**列出 $(\overline{c}_b, \overline{a}_b, n_b)$；把 $\overline{a}_b$ 對 $\overline{c}_b$ 作圖就得到可靠度圖，其對角線即完美校準。ECE 依賴分箱方式，且在 $n_b$ 小時向上偏誤（一個完美校準的預測器光是抽樣雜訊就會有正的期望 ECE）。
 
-**Brier 分數** $\frac1n\sum_i(c_i - \mathbb{1}[\text{correct}_i])^2$ 是一個適當評分，與 ECE 不同的是它也獎勵*鑑別度（resolution）*——對的時候有信心、錯的時候不確定（§10.5.1）。
+**Brier 分數。** 對 $K$ 個類別上的預報 $p_i = (p_{i1},\dots,p_{iK})$ 與實現的類別 $y_i$，**多類別 Brier 分數**為
+$$
+\mathrm{BS} = \frac1n\sum_i\sum_{k=1}^{K}\big(p_{ik} - \mathbb{1}[y_i = k]\big)^2 ,
+$$
+它對整個機率向量是嚴格適當的評分（[Gneiting & Raftery 2007](/zh-tw/references/#gneiting-2007)）；有些作者會再除以 $K$。另一個常以同樣名稱回報的量是**首選標籤 Brier 分數（top-label Brier score）** $\frac1n\sum_i(c_i - \mathbb{1}[\text{correct}_i])^2$，其中 $c_i = \max_kp_{ik}$，也就是衍生事件「首選類別正確」的二元 Brier 分數。它只評估首選標籤的信心，這也是 ECE 所量測的；它對機率如何分布在其他類別上毫無說明。*例子：*真實類別為 1 時，$p = (0.6, 0.2, 0.2)$ 與 $p' = (0.6, 0.4, 0)$ 的首選標籤 Brier 分數相同，都是 $0.16$，但多類別分數分別為 $0.24$ 與 $0.32$。兩種版本都與 ECE 不同，也獎勵*鑑別度（resolution）*——對的時候有信心、錯的時候不確定（§10.5.1，該處以二元結果陳述）。
 
 **溫度縮放（temperature scaling）。** 把所有 logits 除以一個在驗證資料上以最小化 NLL 擬合的 $\tau$，不會改變任何預測的 argmax——正確率不變——但能修正系統性的過度或不足自信；對現代網路而言它是一個強基線（[Guo et al. 2017](/zh-tw/references/#guo-2017)）。它無法修正對不同輸入朝不同方向出錯的信心。
 

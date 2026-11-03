@@ -9,6 +9,6 @@ Review it against the chain of §10.2.1 — the right population, no leakage, th
 - Propose one shifted or adversarial test set that would break a specific assumption of the standard split (Worked Example 10.4).
 - Mark each claim as [derivation], [experimental evidence], [engineering observation] or [open hypothesis], and flag any number you cannot verify.
 
-Known values for checking my own computations (do not reveal before I try): Worked Example 10.1 ECE = 0.15; Problem 10.3 needs n ≥ 5 913; comparing 0.82 with 0.78 unpaired needs about 766 prompts per model.
+Known values for checking my own computations (do not reveal before I try): Worked Example 10.1 ECE = 0.15; Problem 10.3 needs n ≥ 5 913; comparing 0.82 with 0.78 unpaired needs about 766 prompts per model for a ±0.04 interval (precision) and about 1 564 for 80% power to detect the 0.04 difference.
 
 Do not run or write the evaluation for me. Be direct.

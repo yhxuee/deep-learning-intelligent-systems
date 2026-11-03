@@ -291,6 +291,59 @@ def test_stage09_policy_gradient_estimator_is_unbiased():
     assert np.allclose(est, exact, atol=4e-3)
 
 
+@pytest.mark.parametrize("B", [2, 4, 64])
+def test_stage09_batch_mean_baseline_is_biased_and_leave_one_out_is_not(B):
+    """Expected per-batch estimate of grad_z E[r] for a bandit, computed exactly by enumerating the
+    sampled action of sample 1 and averaging the other B - 1 rewards in closed form (audit K03)."""
+    rng = np.random.default_rng(B)
+    z, r = rng.normal(size=4), rng.random(4)
+    pi = np.exp(z - z.max())
+    pi /= pi.sum()
+    exact = pi * (r - pi @ r)
+    mean_other = pi @ r                       # E[r_j] for j != i, independent of a_i
+    score = np.eye(4) - pi                    # d log pi(a) / dz, one row per action a
+    # E[(r_i - b_i) score(a_i)] with b_i independent of a_i except through r_i itself
+    loo = sum(pi[a] * (r[a] - mean_other) * score[a] for a in range(4))
+    batch_mean = sum(pi[a] * (r[a] - (r[a] + (B - 1) * mean_other) / B) * score[a] for a in range(4))
+    assert np.allclose(loo, exact, atol=1e-12)
+    assert np.allclose(batch_mean, (B - 1) / B * exact, atol=1e-12)
+    # and the implementation computes exactly these advantages
+    rr = rng.random(B)
+    assert np.allclose(S9.advantages(rr, "loo"), B / (B - 1) * S9.advantages(rr, "mean"))
+
+
+def test_stage09_discounted_policy_gradient_carries_gamma_t():
+    """Two-step episode, reward 1 at t = 1 if the second action is 1, gamma = 0.5, Bernoulli second-step
+    policy with logit theta (p = 0.5). J = E[gamma r_1] = 0.5 sigmoid(theta); dJ/dtheta = 0.125.
+    The theorem with gamma^t gives 0.125; omitting it gives 0.25 (audit K01)."""
+    gamma, theta = 0.5, 0.0
+    p1 = 1 / (1 + np.exp(-theta))
+    exact = gamma * p1 * (1 - p1)
+    with_discount = without = 0.0
+    for a1, prob in ((1, p1), (0, 1 - p1)):   # step 0 has a single action (score 0); enumerate step 1
+        G1 = float(a1 == 1)                   # return-to-go from t = 1
+        score = a1 - p1                       # d log Bernoulli(a1; sigmoid(theta)) / d theta
+        with_discount += prob * gamma ** 1 * score * G1
+        without += prob * score * G1
+    assert exact == pytest.approx(0.125) and with_discount == pytest.approx(0.125)
+    assert without == pytest.approx(0.25)
+
+
+def test_stage09_value_baseline_is_not_the_variance_optimal_baseline():
+    """Bernoulli logit policy, p = 0.8, reward 1 for action 1: V = 0.8 but the variance-minimizing
+    constant baseline is b* = E[r s^2] / E[s^2] = 0.2, which makes the estimate constant (audit K02)."""
+    p = 0.8
+    acts, probs = np.array([1, 0]), np.array([p, 1 - p])
+    r = acts.astype(float)
+    s = acts - p                               # score d log pi / d logit
+    b_star = (probs @ (r * s ** 2)) / (probs @ s ** 2)
+    assert b_star == pytest.approx(0.2) and probs @ r == pytest.approx(0.8)
+    est = (r - b_star) * s
+    assert np.allclose(est, 0.16) and probs @ ((r - 0.8) * s) == pytest.approx(0.16)
+    var = lambda b: probs @ (((r - b) * s) ** 2) - (probs @ ((r - b) * s)) ** 2  # noqa: E731
+    assert var(b_star) == pytest.approx(0.0, abs=1e-15) and var(0.8) > 0.01
+
+
 def test_stage09_kl_regularized_optimum_is_the_tilted_reference():
     rng = np.random.default_rng(1)
     ref = rng.dirichlet(np.ones(6))
@@ -322,7 +375,7 @@ def test_stage09_gradients_through_the_spine_model_match_finite_differences(whic
         if which == "dpo":
             u = 0.5 * ((lp[np.arange(4), yw] - ref_logp[np.arange(4), yw]) - (lp[np.arange(4), yl] - ref_logp[np.arange(4), yl]))
             return np.mean(np.logaddexp(0, -u))
-        A = rewards - rewards.mean()
+        A = S9.advantages(rewards)
         kl = (np.exp(lp) * (lp - ref_logp)).sum(-1)
         return -(A * lp[np.arange(4), actions]).mean() + 0.2 * kl.mean()
 

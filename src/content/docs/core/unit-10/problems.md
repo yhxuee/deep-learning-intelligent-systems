@@ -10,7 +10,7 @@ Difficulty: ★ routine · ★★ combines ideas · ★★★ proof or open-ende
 
 **10.1 ★ [AI-off]** Twenty predictions: ten at confidence 0.8 (seven correct), ten at confidence 0.4 (six correct). Compute accuracy, mean confidence and ECE with these two bins.
 
-**10.2 ★ [AI-off]** Compute the Brier score of the predictor in Problem 10.1 and its calibration, resolution and uncertainty terms.
+**10.2 ★ [AI-off]** Compute the top-label Brier score of the predictor in Problem 10.1 and its calibration, resolution and uncertainty terms.
 
 **10.3 ★** A model scores 81% on 500 questions. Give a normal-approximation 95% interval. How many questions are needed for ±1%?
 

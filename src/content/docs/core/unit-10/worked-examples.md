@@ -86,8 +86,14 @@ Overall: accuracy 0.906, ECE 0.0099.
 
 ## Worked Example 10.8 — How many prompts does a comparison need?
 
-**Setting.** REINFORCE reached 0.82 and DPO 0.78 arithmetic accuracy (Unit 09, Worked Example 9.6). Are they different?
+**Setting.** In v2.0 of this book, REINFORCE reached 0.82 and DPO 0.78 arithmetic accuracy (Unit 09, Worked Example 9.6). Are they different?
 
-**Unpaired.** With $n$ prompts each, the standard error of the difference is $\sqrt{(0.82\cdot0.18 + 0.78\cdot0.22)/n} = \sqrt{0.3192/n}$. For a 95% interval narrower than the 0.04 difference, $n > 0.3192\,(1.96/0.04)^2 = 766$ prompts per model. With the 400 prompts used, the difference is within noise.
+**Precision.** With $n$ independent prompts per model, the standard error of the difference is $\sqrt{(0.82\cdot0.18 + 0.78\cdot0.22)/n} = \sqrt{0.3192/n}$. For the half-width of a 95% interval to be smaller than 0.04, $n > 0.3192\,(1.96/0.04)^2 = 766$ prompts per model. This is a statement about the *precision of an estimate*: if the true difference is 0.04, an interval of that half-width excludes zero only about half the time.
 
-**Reading.** Pairing helps: on prompts both get right or both get wrong, the difference is zero. And the two methods were run with one seed each; a claim that one *method* beats the other also needs seed-to-seed variation (Unit 12).
+**Power.** To *detect* a true difference of 0.04 with a two-sided test at the 5% level and 80% power, the standard error must be $0.04/(1.96 + 0.84)$, which needs
+$$
+n \approx \frac{(1.96 + 0.84)^2\,(0.82\cdot0.18 + 0.78\cdot0.22)}{0.04^2} \approx 1\,564
+$$
+prompts per model — twice the precision answer. With the 400 prompts used, the difference is within noise.
+
+**Reading.** Precision and power answer different questions; plan with power when the goal is a decision. Pairing on the same prompts can reduce the requirement, but by how much depends on how often the two models *disagree* on a prompt — the discordant pairs — which cannot be inferred from the two marginal accuracies. And the two methods were run with one seed each; a claim that one *method* beats the other also needs seed-to-seed variation (Unit 12). The point was made for us: correcting REINFORCE's baseline ([errata](/start/errata/), K03) rescales its advantages by $64/63$, and the re-run scored 0.79 — a shift of 0.03 from a change that does not alter the direction of the expected gradient, three-quarters of the difference this example set out to test.

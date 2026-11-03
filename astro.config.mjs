@@ -62,6 +62,7 @@ export default defineConfig({
           { slug: 'start/notation' },
           { slug: 'start/glossary' },
           { slug: 'start/changelog' },
+          { slug: 'start/errata' },
         ] },
         { label: 'The Core', translations: { 'zh-TW': '核心教材' }, items: [
           { slug: 'core' },

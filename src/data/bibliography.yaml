@@ -347,3 +347,22 @@ agarwal-2021: { authors: "Agarwal, R., Schwarzer, M., Castro, P. S., Courville, 
 popper-1959: { authors: "Popper, K.", year: 1959, title: "The Logic of Scientific Discovery", venue: "Hutchinson", url: "https://www.routledge.com/The-Logic-of-Scientific-Discovery/Popper/p/book/9780415278447", kind: book }
 hendrycks-2017: { authors: "Hendrycks, D., and Gimpel, K.", year: 2017, title: "A Baseline for Detecting Misclassified and Out-of-Distribution Examples in Neural Networks", venue: "ICLR", url: "https://arxiv.org/abs/1610.02136" }
 bricken-2023: { authors: "Bricken, T., Templeton, A., Batson, J., et al.", year: 2023, title: "Towards Monosemanticity: Decomposing Language Models With Dictionary Learning", venue: "Transformer Circuits Thread", url: "https://transformer-circuits.pub/2023/monosemantic-features/index.html" }
+
+# --- Audit corrections (v2.1) and mathematical appendices
+greensmith-2004: { authors: "Greensmith, E., Bartlett, P. L., and Baxter, J.", year: 2004, title: "Variance Reduction Techniques for Gradient Estimates in Reinforcement Learning", venue: "Journal of Machine Learning Research 5, 1471–1530", url: "https://www.jmlr.org/papers/v5/greensmith04a.html" }
+kailath-1980: { authors: "Kailath, T.", year: 1980, title: "Linear Systems", venue: "Prentice-Hall", kind: book }
+antoulas-2005: { authors: "Antoulas, A. C.", year: 2005, title: "Approximation of Large-Scale Dynamical Systems", venue: "SIAM", url: "https://doi.org/10.1137/1.9780898718713", kind: book }
+strang-2016: { authors: "Strang, G.", year: 2016, title: "Introduction to Linear Algebra (5th ed.)", venue: "Wellesley-Cambridge Press", url: "https://math.mit.edu/~gs/linearalgebra/", kind: book }
+axler-2024: { authors: "Axler, S.", year: 2024, title: "Linear Algebra Done Right (4th ed.)", venue: "Springer (open access)", url: "https://linear.axler.net/", kind: book }
+golub-2013: { authors: "Golub, G. H., and Van Loan, C. F.", year: 2013, title: "Matrix Computations (4th ed.)", venue: "Johns Hopkins University Press", kind: book }
+horn-2012: { authors: "Horn, R. A., and Johnson, C. R.", year: 2012, title: "Matrix Analysis (2nd ed.)", venue: "Cambridge University Press", url: "https://doi.org/10.1017/CBO9781139020411", kind: book }
+deisenroth-2020: { authors: "Deisenroth, M. P., Faisal, A. A., and Ong, C. S.", year: 2020, title: "Mathematics for Machine Learning", venue: "Cambridge University Press", url: "https://mml-book.github.io/", kind: book }
+magnus-2019: { authors: "Magnus, J. R., and Neudecker, H.", year: 2019, title: "Matrix Differential Calculus with Applications in Statistics and Econometrics (3rd ed.)", venue: "Wiley", url: "https://doi.org/10.1002/9781119541219", kind: book }
+wasserman-2004: { authors: "Wasserman, L.", year: 2004, title: "All of Statistics: A Concise Course in Statistical Inference", venue: "Springer", url: "https://doi.org/10.1007/978-0-387-21736-9", kind: book }
+casella-2002: { authors: "Casella, G., and Berger, R. L.", year: 2002, title: "Statistical Inference (2nd ed.)", venue: "Duxbury", kind: book }
+grimmett-2020: { authors: "Grimmett, G., and Stirzaker, D.", year: 2020, title: "Probability and Random Processes (4th ed.)", venue: "Oxford University Press", kind: book }
+boucheron-2013: { authors: "Boucheron, S., Lugosi, G., and Massart, P.", year: 2013, title: "Concentration Inequalities: A Nonasymptotic Theory of Independence", venue: "Oxford University Press", url: "https://doi.org/10.1093/acprof:oso/9780199535255.001.0001", kind: book }
+vershynin-2018: { authors: "Vershynin, R.", year: 2018, title: "High-Dimensional Probability", venue: "Cambridge University Press", url: "https://doi.org/10.1017/9781108231596", kind: book }
+puterman-1994: { authors: "Puterman, M. L.", year: 1994, title: "Markov Decision Processes: Discrete Stochastic Dynamic Programming", venue: "Wiley", url: "https://doi.org/10.1002/9780470316887", kind: book }
+levin-2017: { authors: "Levin, D. A., and Peres, Y.", year: 2017, title: "Markov Chains and Mixing Times (2nd ed.)", venue: "American Mathematical Society", url: "https://pages.uoregon.edu/dlevin/MARKOV/", kind: book }
+higham-2002: { authors: "Higham, N. J.", year: 2002, title: "Accuracy and Stability of Numerical Algorithms (2nd ed.)", venue: "SIAM", url: "https://doi.org/10.1137/1.9780898718027", kind: book }

@@ -63,10 +63,10 @@ $$
 二元語法模型族是所有滿足 $q(b\mid a)\ge0$、且對每個 $a$ 都有 $\sum_b q(b\mid a) = 1$ 的表 $q(b\mid a)$。序列 $x_1,\dots,x_n$ 上的訓練對數損失為
 
 $$
-n\hat L(q) = -\sum_{t=2}^{n}\ln q(x_t\mid x_{t-1}) = -\sum_{a}\sum_{b} c(a\to b)\ln q(b\mid a),
+(n-1)\hat L(q) = -\sum_{t=2}^{n}\ln q(x_t\mid x_{t-1}) = -\sum_{a}\sum_{b} c(a\to b)\ln q(b\mid a),
 $$
 
-這裡把相同的配對歸併在一起。總和拆成彼此獨立的問題，每一列 $a$ 一個。
+這裡把相同的配對歸併在一起。總和拆成彼此獨立的問題，每一列 $a$ 一個。（$n$ 個字元的序列有 $n - 1$ 個轉移，因此以 $n - 1$ 正規化得到每個轉移的訓練損失 $\hat L$；若在前面加上序列開始符號，就有 $n$ 個轉移，並以 $n$ 正規化。）
 
 **命題 1.1。** 對每個 $c(a)>0$ 的 $a$，在 $\sum_b q(b\mid a) = 1$ 的限制下，$-\sum_b c(a\to b)\ln q(b\mid a)$ 的最小值發生在 $q(b\mid a) = c(a\to b)/c(a)$。
 

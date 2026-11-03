@@ -36,7 +36,7 @@ $$
 \nabla_\theta J = \mathbb{E}_{a\sim\pi_\theta}\big[(r(a) - b)\nabla_\theta\ln\pi_\theta(a)\big].
 $$
 
-The expectation is unchanged, because $\mathbb{E}_a[\nabla\ln\pi_\theta(a)] = \sum_a\nabla\pi_\theta(a) = \nabla\sum_a\pi_\theta(a) = \nabla 1 = 0$. But the variance can fall dramatically (Worked Example 9.2: a factor of four in a three-armed problem). With $b$ equal to the average reward, actions better than average are pushed up and worse ones down — the quantity $r - b$ is called the **advantage**. The spine uses the mean reward of each batch of 64 prompts as $b$; group-relative methods for language models use the mean reward of several answers to the *same* prompt ([Shao et al. 2024](/references/#shao-2024)).
+The expectation is unchanged, because $\mathbb{E}_a[\nabla\ln\pi_\theta(a)] = \sum_a\nabla\pi_\theta(a) = \nabla\sum_a\pi_\theta(a) = \nabla 1 = 0$. But the variance can fall dramatically (Worked Example 9.2: a factor of four in a three-armed problem). With $b$ equal to the average reward, actions better than average are pushed up and worse ones down — the quantity $r - b$ is called the **advantage**. One condition matters: $b$ must not depend on the action whose score it multiplies. The mean reward of a batch *including* the sample's own reward violates it slightly — it biases the gradient by the factor $(B-1)/B$ — so the spine uses, for each sample, the mean reward of the *other* 63 prompts in the batch (a **leave-one-out** baseline, §9.3.7); group-relative methods for language models use the mean reward of several answers to the *same* prompt ([Shao et al. 2024](/references/#shao-2024)).
 
 ## 9.2.4 Sequences of decisions
 

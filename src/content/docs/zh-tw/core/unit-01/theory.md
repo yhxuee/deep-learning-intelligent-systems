@@ -10,16 +10,18 @@ sidebar: { label: "1.5 一般理論", order: 5 }
 
 令 $\mathcal{H}$ 為一個預測器族，$\ell\in[0,1]$ 為有界損失。ERM 回傳 $\hat h = \arg\min_{h\in\mathcal H}\hat L(h)$。因為 $\hat h$ 取決於訓練樣本，Hoeffding 不等式不能直接套用在它身上。它可以套用在每一個*固定的* $h$ 上；如果這個界對所有 $h\in\mathcal H$ **同時**成立，那它對 $\hat h$ 也成立。
 
-**定理 1.3（有限模型族）。** 若 $|\mathcal H| = K$，則對大小為 $n$ 的 i.i.d. 樣本，以至少 $1-\delta$ 的機率，每個 $h\in\mathcal H$ 都滿足
+**定理 1.3（有限模型族）。** 若 $|\mathcal H| = K$，則對大小為 $n$ 的 i.i.d. 樣本，以至少 $1-\delta$ 的機率，對值域在 $[0, 1]$ 的損失，每個 $h\in\mathcal H$ 都滿足
 $$
-L(h) \le \hat L(h) + \sqrt{\frac{\ln K + \ln(2/\delta)}{2n}} .
+\big|L(h) - \hat L(h)\big| \le \varepsilon,\qquad \varepsilon = \sqrt{\frac{\ln K + \ln(2/\delta)}{2n}} = \sqrt{\frac{\ln(2K/\delta)}{2n}} .
 $$
 
-*證明。* 對每個 $h$ 以信心 $\delta/K$ 套用 Hoeffding 不等式，再取聯集界（§1.3.6）。$\blacksquare$
+*證明。* 對每個固定的 $h$，雙尾 Hoeffding 不等式（定理 1.2）給出 $\Pr(|L(h) - \hat L(h)|\ge\varepsilon)\le 2e^{-2n\varepsilon^2} = \delta/K$。對 $K$ 個成員取聯集界（§1.3.6），使*任一*偏差達到 $\varepsilon$ 的機率至多為 $\delta$。$\blacksquare$
+
+下面兩個方向都需要：上偏差界定所選 $\hat h$ 的風險，下偏差界定比較對象 $h^\star$ 的經驗風險。（單尾陳述只需 $\ln(K/\delta)$，但無法支持這個系理。）
 
 **系理 1.2。** 令 $h^\star$ 為 $\mathcal H$ 中母體風險最小者。以至少 $1-\delta$ 的機率，$L(\hat h) \le L(h^\star) + 2\sqrt{(\ln K + \ln(2/\delta))/(2n)}$。
 
-*證明。* $L(\hat h)\le \hat L(\hat h) + \varepsilon \le \hat L(h^\star) + \varepsilon \le L(h^\star) + 2\varepsilon$，兩次使用均勻界，並使用 $\hat L(\hat h)\le\hat L(h^\star)$（ERM）。$\blacksquare$
+*證明。* $L(\hat h)\le \hat L(\hat h) + \varepsilon \le \hat L(h^\star) + \varepsilon \le L(h^\star) + 2\varepsilon$，在兩個方向上各使用一次雙尾均勻界，並使用 $\hat L(\hat h)\le\hat L(h^\star)$（ERM）。$\blacksquare$
 
 有兩個特點值得強調。額外風險只透過 $\ln K$——一種**容量（capacity）**量度——依賴模型族，並以 $1/\sqrt{n}$ 縮小。而且論證完全沒有用到 ERM 選了*哪一個* $h$；它對族中最差的成員也成立。這是它的優點（假設很少），也是它的弱點，§1.5.4 會說明。
 

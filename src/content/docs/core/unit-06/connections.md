@@ -16,9 +16,9 @@ For decades, processor arithmetic has improved faster than memory bandwidth — 
 
 Proposition 6.2 is a textbook constrained optimization — a consumer splitting a budget between two goods with diminishing returns, where the optimum equates the marginal loss reduction per FLOP spent on parameters with that spent on data. The economic framing also exposes what the proposition leaves out: inference costs (a model is trained once and used many times), latency requirements, the cost of *acquiring* data rather than just processing it (Unit 07), and the value of a loss reduction, which is not linear in nats. Real decisions optimize total cost of ownership, not training loss per FLOP.
 
-## 6.6.4 Thermodynamics: the floor under computation
+## 6.6.4 Thermodynamics: a floor under erasure, not under FLOPs
 
-Erasing one bit of information dissipates at least $kT\ln2$ of heat ([Landauer 1961](/references/#landauer-1961)) — about $2.9\times10^{-21}$ J at room temperature. A 16-bit floating-point operation on current accelerators costs around $10^{-12}$ J including memory traffic (§6.3.6): roughly nine orders of magnitude above the Landauer floor. Physics is not what limits present-day training; engineering is. Most of the energy goes to *moving* data rather than computing on it, which is the roofline's lesson in another unit.
+Erasing one bit of information dissipates at least $kT\ln2$ of heat ([Landauer 1961](/references/#landauer-1961)) — about $2.9\times10^{-21}$ J at room temperature. A 16-bit floating-point operation on current accelerators costs around $10^{-12}$ J including memory traffic (§6.3.6). The two numbers are not directly comparable: Landauer's bound applies to each *irreversible erasure of a bit*, and how many erasures a multiply–add requires depends on the circuit, the number representation and how much of the computation is made reversible; a floating-point operation does not have a known physical floor in joules. What the comparison does show is that present-day energy per operation is dominated by engineering — switching, wires and data movement — not by any thermodynamic limit we are close to. Most of the energy goes to *moving* data rather than computing on it, which is the roofline's lesson in another unit.
 
 ## 6.6.5 Biology: a different trade-off
 

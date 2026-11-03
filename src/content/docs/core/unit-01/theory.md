@@ -10,16 +10,18 @@ Section 1.3 analysed one model at a time. Learning theory asks a stronger questi
 
 Let $\mathcal{H}$ be a family of predictors and $\ell\in[0,1]$ a bounded loss. ERM returns $\hat h = \arg\min_{h\in\mathcal H}\hat L(h)$. Because $\hat h$ depends on the training sample, Hoeffding's inequality does not apply to it directly. It does apply to every *fixed* $h$, and if the bound holds **simultaneously for all** $h\in\mathcal H$, it holds in particular for $\hat h$.
 
-**Theorem 1.3 (finite classes).** If $|\mathcal H| = K$, then with probability at least $1-\delta$ over an i.i.d. sample of size $n$, every $h\in\mathcal H$ satisfies
+**Theorem 1.3 (finite classes).** If $|\mathcal H| = K$, then with probability at least $1-\delta$ over an i.i.d. sample of size $n$, every $h\in\mathcal H$ satisfies, for a loss with values in $[0, 1]$,
 $$
-L(h) \le \hat L(h) + \sqrt{\frac{\ln K + \ln(2/\delta)}{2n}} .
+\big|L(h) - \hat L(h)\big| \le \varepsilon,\qquad \varepsilon = \sqrt{\frac{\ln K + \ln(2/\delta)}{2n}} = \sqrt{\frac{\ln(2K/\delta)}{2n}} .
 $$
 
-*Proof.* Apply Hoeffding's inequality to each $h$ with confidence $\delta/K$ and take the union bound (§1.3.6). $\blacksquare$
+*Proof.* For each fixed $h$, the two-sided Hoeffding inequality (Theorem 1.2) gives $\Pr(|L(h) - \hat L(h)|\ge\varepsilon)\le 2e^{-2n\varepsilon^2} = \delta/K$. The union bound over the $K$ members (§1.3.6) makes the probability that *any* deviation reaches $\varepsilon$ at most $\delta$. $\blacksquare$
+
+Both directions are needed below: the upper deviation bounds the risk of the chosen $\hat h$, the lower one bounds the empirical risk of the comparator $h^\star$. (A one-sided statement would need only $\ln(K/\delta)$, but would not support the corollary.)
 
 **Corollary 1.2.** Let $h^\star$ minimize the population risk over $\mathcal H$. With probability at least $1-\delta$, $L(\hat h) \le L(h^\star) + 2\sqrt{(\ln K + \ln(2/\delta))/(2n)}$.
 
-*Proof.* $L(\hat h)\le \hat L(\hat h) + \varepsilon \le \hat L(h^\star) + \varepsilon \le L(h^\star) + 2\varepsilon$, using the uniform bound twice and $\hat L(\hat h)\le\hat L(h^\star)$ (ERM). $\blacksquare$
+*Proof.* $L(\hat h)\le \hat L(\hat h) + \varepsilon \le \hat L(h^\star) + \varepsilon \le L(h^\star) + 2\varepsilon$, using the two-sided uniform bound once in each direction and $\hat L(\hat h)\le\hat L(h^\star)$ (ERM). $\blacksquare$
 
 Two features deserve emphasis. The excess risk depends on the family only through $\ln K$ — a **capacity** measure — and shrinks as $1/\sqrt{n}$. And the argument never used anything about *which* $h$ ERM picks; it holds for the worst member of the family. That is its strength (it is assumption-light) and, as §1.5.4 shows, its weakness.
 

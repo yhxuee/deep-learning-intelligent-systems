@@ -82,6 +82,6 @@ Numbers are produced by `spine/stage11_induction.py` and checked in `spine/test_
 
 ## Worked Example 11.8 — What changed in post-training?
 
-**Setting.** Unit 09's REINFORCE and buggy-checker runs ended with KL to the reference of 1.37 and 1.32 nats at the answer position — almost the same — with true accuracy 0.82 and 0.06.
+**Setting.** Unit 09's REINFORCE and buggy-checker runs ended with KL to the reference of 1.34 and 1.43 nats at the answer position — about the same — with true accuracy 0.79 and 0.09.
 
-**Reading.** A single summary of how much the model changed says nothing about *what* changed. A mechanistic hypothesis does: if the buggy run learned a prompt-independent bias toward "9", its change in the direct logit contributions should be the same for every prompt; if the correct run learned to use the digits, its change should depend on them. Experiment 11.6 tests exactly this — a prediction the behaviour (both changed) and the KL (both 1.3) cannot make, and one that could turn out wrong.
+**Reading.** A single summary of how much the model changed says nothing about *what* changed. A mechanistic hypothesis does: if the buggy run learned a prompt-independent bias toward "9", its change in the direct logit contributions should be the same for every prompt; if the correct run learned to use the digits, its change should depend on them. Experiment 11.6 tests exactly this — a prediction the behaviour (both changed) and the KL (both about 1.4) cannot make, and one that could turn out wrong.

@@ -46,9 +46,9 @@ Difficulty: ★ routine · ★★ combines ideas · ★★★ proof or open-ende
 
 **9.16 ★ [AI-off]** Implement `reinforce_grad` from memory and pass the spine's finite-difference test.
 
-**9.17 ★★** Add a learned value baseline to Stage 09 (a linear function of the final hidden state predicting the reward) and compare variance and speed with the batch-mean baseline.
+**9.17 ★★** Add a learned value baseline to Stage 09 (a linear function of the final hidden state predicting the reward) and compare variance and speed with the leave-one-out batch baseline.
 
-**9.18 ★★** Implement group-relative advantages: sample 8 answers per prompt, use each prompt's mean reward as its baseline. Compare with the batch-mean baseline.
+**9.18 ★★** Implement group-relative advantages: sample 8 answers per prompt, use each prompt's mean reward as its baseline. Compare with the leave-one-out batch baseline, and measure the $(G-1)/G$ bias of the plain group mean.
 
 **9.19 ★★** Build a preference dataset from the spine's arithmetic by labelling pairs with the checker but flipping 20% of the labels. Train DPO and report how label noise affects the result.
 

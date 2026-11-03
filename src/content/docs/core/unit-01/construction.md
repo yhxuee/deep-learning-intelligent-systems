@@ -63,10 +63,10 @@ Two consequences matter throughout the book. First, no model can reach a held-ou
 The bigram family is all tables $q(b\mid a)$ with $q(b\mid a)\ge0$ and $\sum_b q(b\mid a) = 1$ for each $a$. The training log-loss on a sequence $x_1,\dots,x_n$ is
 
 $$
-n\hat L(q) = -\sum_{t=2}^{n}\ln q(x_t\mid x_{t-1}) = -\sum_{a}\sum_{b} c(a\to b)\ln q(b\mid a),
+(n-1)\hat L(q) = -\sum_{t=2}^{n}\ln q(x_t\mid x_{t-1}) = -\sum_{a}\sum_{b} c(a\to b)\ln q(b\mid a),
 $$
 
-grouping equal pairs together. The sum splits into independent problems, one per row $a$.
+grouping equal pairs together. The sum splits into independent problems, one per row $a$. (A sequence of $n$ characters has $n - 1$ transitions, so the per-transition training loss is $\hat L$ with this normalization by $n - 1$; prepending a beginning-of-sequence symbol would give $n$ transitions and normalization by $n$.)
 
 **Proposition 1.1.** For each $a$ with $c(a)>0$, the minimizer of $-\sum_b c(a\to b)\ln q(b\mid a)$ subject to $\sum_b q(b\mid a) = 1$ is $q(b\mid a) = c(a\to b)/c(a)$.
 

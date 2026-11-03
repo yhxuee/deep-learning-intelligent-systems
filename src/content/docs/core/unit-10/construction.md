@@ -45,7 +45,11 @@ $$
 
 ([Naeini et al. 2015](/references/#naeini-2015); [Guo et al. 2017](/references/#guo-2017).) The **reliability table** lists $(\overline{c}_b, \overline{a}_b, n_b)$; plotting $\overline{a}_b$ against $\overline{c}_b$ gives the reliability diagram, whose diagonal is perfect calibration. ECE depends on the binning and is biased upward for small $n_b$ (a perfectly calibrated predictor has positive expected ECE from sampling noise alone).
 
-**The Brier score** $\frac1n\sum_i(c_i - \mathbb{1}[\text{correct}_i])^2$ is a proper score that, unlike ECE, also rewards *resolution* — being confident when right and unsure when wrong (§10.5.1).
+**The Brier score.** For a forecast $p_i = (p_{i1},\dots,p_{iK})$ over $K$ classes and realized class $y_i$, the **multiclass Brier score** is
+$$
+\mathrm{BS} = \frac1n\sum_i\sum_{k=1}^{K}\big(p_{ik} - \mathbb{1}[y_i = k]\big)^2 ,
+$$
+a strictly proper score for the whole probability vector ([Gneiting & Raftery 2007](/references/#gneiting-2007)); some authors divide by $K$. A different quantity is often reported under the same name: the **top-label Brier score** $\frac1n\sum_i(c_i - \mathbb{1}[\text{correct}_i])^2$ with $c_i = \max_kp_{ik}$, the binary Brier score of the derived event "the top class is correct". It assesses top-label confidence only, which is what ECE also measures; it says nothing about how probability is spread over the other classes. *Example:* $p = (0.6, 0.2, 0.2)$ and $p' = (0.6, 0.4, 0)$ with true class 1 have the same top-label Brier score, $0.16$, but multiclass scores $0.24$ and $0.32$. Both versions, unlike ECE, also reward *resolution* — being confident when right and unsure when wrong (§10.5.1, stated there for binary outcomes).
 
 **Temperature scaling.** Dividing all logits by a single $\tau$ fitted on validation data by minimizing NLL does not change any prediction's argmax — accuracy is unchanged — but can correct systematic over- or under-confidence; for modern networks it is a strong baseline ([Guo et al. 2017](/references/#guo-2017)). It cannot fix confidence that is wrong in different directions for different inputs.
 
