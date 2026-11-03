@@ -12,7 +12,7 @@ $$
 L(N)\approx\Big(\frac{N_c}{N}\Big)^{\alpha_N},\quad L(D)\approx\Big(\frac{D_c}{D}\Big)^{\alpha_D},\quad L(C_{\min})\approx\Big(\frac{C_c}{C_{\min}}\Big)^{\alpha_C},
 $$
 
-其中 $\alpha_N\approx0.076$、$\alpha_D\approx0.095$、$\alpha_C\approx0.050$，$N$ 计算非嵌入参数。更早的研究已在数个领域发现幂律（[Hestness et al. 2017](/zh-cn/references/#hestness-2017)）。幂律在双对数座标上是一条直线：$N$ 每加倍一次，就去除剩余损失中相同的*比例*。
+其中 $\alpha_N\approx0.076$、$\alpha_D\approx0.095$、$\alpha_C\approx0.050$，$N$ 计算非嵌入参数。更早的研究已在数个领域发现幂律（[Hestness et al. 2017](/zh-cn/references/#hestness-2017)）。幂律在双对数坐标上是一条直线：$N$ 每加倍一次，就去除剩余损失中相同的*比例*。
 
 纯幂律终究会失效——损失不可能低于数据的熵（单元 01，推论 1.1）。因此 [Hoffmann et al. (2022)](/zh-cn/references/#hoffmann-2022) 拟合一个有明确下限、同时包含两种资源的形式：
 

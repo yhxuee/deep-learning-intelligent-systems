@@ -89,7 +89,7 @@ $$
 $$
 **留一法**基线 $b_i = \frac1{B-1}\sum_{j\ne i}r_j$ 独立于 $a_i$ 且无偏，它与批量平均只差优势上的一个因子 $B/(B - 1)$。除以群组标准差的群组相对方法，会引入另一个依数据而定的缩放。主干项目使用留一法基线（[勘误](/zh-cn/start/errata/)，K03）。
 
-**方差。** 在单一座标的常数基线中，使方差最小的选择是以分数加权的平均 $b^\star = \mathbb{E}[r\,s^2]/\mathbb{E}[s^2]$，$s = \partial\ln\pi$；对状态依赖基线与整个梯度，$b^\star(s) = \mathbb{E}_a[Q^\pi(s, a)\lVert\nabla\ln\pi(a\mid s)\rVert^2]/\mathbb{E}_a[\lVert\nabla\ln\pi(a\mid s)\rVert^2]$（[Greensmith et al. 2004](/zh-cn/references/#greensmith-2004)）。价值 $V^\pi(s)$ 是常见的实用选择，而不是最优选择。**例题 H.5：**对 logit 参数化、$p = 0.8$、动作 1 奖励为 1 的伯努利策略，$V = 0.8$ 而 $b^\star = 0.2$，后者使单样本估计对任一动作都恰好是 $0.16$（单元 09，§9.5.1）。
+**方差。** 在单一坐标的常数基线中，使方差最小的选择是以分数加权的平均 $b^\star = \mathbb{E}[r\,s^2]/\mathbb{E}[s^2]$，$s = \partial\ln\pi$；对状态依赖基线与整个梯度，$b^\star(s) = \mathbb{E}_a[Q^\pi(s, a)\lVert\nabla\ln\pi(a\mid s)\rVert^2]/\mathbb{E}_a[\lVert\nabla\ln\pi(a\mid s)\rVert^2]$（[Greensmith et al. 2004](/zh-cn/references/#greensmith-2004)）。价值 $V^\pi(s)$ 是常见的实用选择，而不是最优选择。**例题 H.5：**对 logit 参数化、$p = 0.8$、动作 1 奖励为 1 的伯努利策略，$V = 0.8$ 而 $b^\star = 0.2$，后者使单样本估计对任一动作都恰好是 $0.16$（单元 09，§9.5.1）。
 
 ## H.6 熵与 KL 正则化的决策问题
 

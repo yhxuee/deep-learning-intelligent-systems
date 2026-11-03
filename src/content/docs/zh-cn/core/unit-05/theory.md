@@ -80,7 +80,7 @@ $$
 Sk_i = v_i + \underbrace{\sum_{j\ne i}(k_j^{\top}k_i)\,v_j}_{\text{串扰 } e_i}.
 $$
 
-由对称性，均匀单位向量的每个座标都有 $\mathbb{E}[k_m^2] = 1/d_k$，不同座标互不相关，所以 $\mathbb{E}[(k_j^{\top}k_i)^2] = \sum_m\mathbb{E}[k_{jm}^2]\,\mathbb{E}[k_{im}^2] = d_k\cdot\tfrac{1}{d_k^2} = \tfrac1{d_k}$。各串扰项彼此不相关且平均为零，因此
+由对称性，均匀单位向量的每个坐标都有 $\mathbb{E}[k_m^2] = 1/d_k$，不同坐标互不相关，所以 $\mathbb{E}[(k_j^{\top}k_i)^2] = \sum_m\mathbb{E}[k_{jm}^2]\,\mathbb{E}[k_{im}^2] = d_k\cdot\tfrac{1}{d_k^2} = \tfrac1{d_k}$。各串扰项彼此不相关且平均为零，因此
 
 $$
 \mathbb{E}\|e_i\|^2 = \frac{n-1}{d_k}\,s^2,

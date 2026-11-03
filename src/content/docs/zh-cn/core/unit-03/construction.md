@@ -212,7 +212,7 @@ $$
 
 <div class="dlis-widget not-content" data-widget="gd-2d">交互图需要 JavaScript；上方的静态图与表格包含相同的信息。</div>
 
-**逐座标的自适应步长：Adam。** 第二个想法是给每个座标各自的步长，依它的梯度通常有多大来缩放。Adam（[Kingma & Ba 2015](/zh-cn/references/#kingma-2015)）维护梯度及其逐元素平方的指数移动平均：
+**逐坐标的自适应步长：Adam。** 第二个想法是给每个坐标各自的步长，依它的梯度通常有多大来缩放。Adam（[Kingma & Ba 2015](/zh-cn/references/#kingma-2015)）维护梯度及其逐元素平方的指数移动平均：
 
 $$
 \begin{aligned}
@@ -224,7 +224,7 @@ $$
 
 *为什么要偏差校正（bias correction）？* 由 $m_0 = 0$，$m_k = (1-\beta_1)\sum_{j=1}^{k}\beta_1^{k-j}g_j$。若梯度为常数 $g_j = g$，这个和等于 $(1-\beta_1^{k})g$——早期太小，因为平均是从零开始的。除以 $1-\beta_1^k$ 正好消除这个偏差；$v_k$ 亦同。
 
-*这个更新在做什么。* 比值 $\hat m/\sqrt{\hat v}$ 没有单位：把每个梯度乘上常数 $c>0$，比值不变（除了 $\epsilon$）。第一步时 $\hat m_1 = g_1$、$\hat v_1 = g_1^2$，所以每个座标都恰好移动 $\eta\,\mathrm{sign}(g_1)$，不论梯度大小（例题 3.7）。因此 Adam 的行为像逐座标、类似符号的方法，在梯度噪声大的地方（$|\hat m|\ll\sqrt{\hat v}$）步长缩小。
+*这个更新在做什么。* 比值 $\hat m/\sqrt{\hat v}$ 没有单位：把每个梯度乘上常数 $c>0$，比值不变（除了 $\epsilon$）。第一步时 $\hat m_1 = g_1$、$\hat v_1 = g_1^2$，所以每个坐标都恰好移动 $\eta\,\mathrm{sign}(g_1)$，不论梯度大小（例题 3.7）。因此 Adam 的行为像逐坐标、类似符号的方法，在梯度噪声大的地方（$|\hat m|\ll\sqrt{\hat v}$）步长缩小。
 
 **AdamW：解耦的权重衰减。** 常见的正则化（regularization）是在损失加上 $\tfrac\lambda2\|\theta\|^2$，也就是在梯度加上 $\lambda\theta$。在 Adam 内部，这一项会被 $\sqrt{\hat v}$ 除，所以梯度大的参数反而被正则化得*较少*——这不是惩罚项的本意。AdamW 把权重衰减（weight decay）直接作用在参数上，放在自适应缩放之外（[Loshchilov & Hutter 2019](/zh-cn/references/#loshchilov-2019)）：
 

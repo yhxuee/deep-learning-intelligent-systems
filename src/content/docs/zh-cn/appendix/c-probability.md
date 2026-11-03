@@ -83,7 +83,7 @@ p(z) = (2\pi)^{-n/2}\det(\Sigma)^{-1/2}\exp\big(-\tfrac12(z - \mu)^{\top}\Sigma^
 $$
 它的三个封闭性质完成了单元 02、03 与 08 中的大部分工作：
 
-1. **仿射映射。** $AZ + b\sim N(A\mu + b, A\Sigma A^{\top})$。特别地，以 $\varepsilon\sim N(0, I)$ 与 $LL^{\top} = \Sigma$，$\mu + L\varepsilon$ 从 $N(\mu, \Sigma)$ 采样；而以元素独立为 $N(0, 1/k)$ 的矩阵对向量 $x$ 做随机投影，其座标独立同分布为 $N(0, \lVert x\rVert^2/k)$（单元 02，§2.5.3）。
+1. **仿射映射。** $AZ + b\sim N(A\mu + b, A\Sigma A^{\top})$。特别地，以 $\varepsilon\sim N(0, I)$ 与 $LL^{\top} = \Sigma$，$\mu + L\varepsilon$ 从 $N(\mu, \Sigma)$ 采样；而以元素独立为 $N(0, 1/k)$ 的矩阵对向量 $x$ 做随机投影，其坐标独立同分布为 $N(0, \lVert x\rVert^2/k)$（单元 02，§2.5.3）。
 2. **和。** 独立的 $N(\mu_1, \Sigma_1)$ 与 $N(\mu_2, \Sigma_2)$ 之和为 $N(\mu_1 + \mu_2, \Sigma_1 + \Sigma_2)$。流匹配中加了噪声的数据 $x_t = tx_1 + (1 - t)x_0$，在 $x_0$ 与数据都是高斯时仍是高斯，这就是它的精确速度场有闭式的原因（单元 08，§8.3.6）。
 3. **条件化。** 把 $z = (z_a, z_b)$ 分块，对应 $\mu_a, \mu_b$ 与 $\Sigma_{aa}, \Sigma_{ab}, \Sigma_{bb}$。则
 $$

@@ -95,7 +95,7 @@ $$
 
 ## 3.2.4 多个参数：偏导数与梯度
 
-有 $n$ 个参数时，就在每个座标上问同样的问题。**偏导数（partial derivative）** $\partial L/\partial\theta_j$ 是固定其他座标、只对 $\theta_j$ 求的导数。把它们收集成**梯度**
+有 $n$ 个参数时，就在每个坐标上问同样的问题。**偏导数（partial derivative）** $\partial L/\partial\theta_j$ 是固定其他坐标、只对 $\theta_j$ 求的导数。把它们收集成**梯度**
 
 $$
 \nabla L(\theta) = \Bigl(\frac{\partial L}{\partial\theta_1},\dots,\frac{\partial L}{\partial\theta_n}\Bigr)^{\!\top}.
@@ -151,7 +151,7 @@ $$
 
 计算 $\nabla L$ 有两种显而易见的方法，两者在大规模时都失败。
 
-**有限差分（finite difference）。** 一次扰动一个座标来近似每个偏导数：
+**有限差分（finite difference）。** 一次扰动一个坐标来近似每个偏导数：
 
 $$
 \frac{\partial L}{\partial\theta_j}\approx\frac{L(\theta + he_j) - L(\theta - he_j)}{2h},

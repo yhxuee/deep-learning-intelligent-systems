@@ -110,7 +110,7 @@ $$
 $$
 应用到概率密度，就是标准化流背后的公式 $p_Y(y) = p_X(g^{-1}(y))\,|\det J_{g^{-1}}(y)|$（单元 08，§8.3.2；附录 C）。
 
-**高斯积分。** $\int_{-\infty}^{\infty}e^{-x^2/2}dx = \sqrt{2\pi}$。*证明：*把它平方，得 $\iint e^{-(x^2 + y^2)/2}dx\,dy$，换成极座标，其雅可比行列式为 $r$：$\int_0^{2\pi}\int_0^\infty e^{-r^2/2}r\,dr\,d\theta = 2\pi$。$\blacksquare$
+**高斯积分。** $\int_{-\infty}^{\infty}e^{-x^2/2}dx = \sqrt{2\pi}$。*证明：*把它平方，得 $\iint e^{-(x^2 + y^2)/2}dx\,dy$，换成极坐标，其雅可比行列式为 $r$：$\int_0^{2\pi}\int_0^\infty e^{-r^2/2}r\,dr\,d\theta = 2\pi$。$\blacksquare$
 
 **积分号下求导。** 若 $p_\theta(x)$ 及其对 $\theta$ 的导数连续，且被一个可积函数所控制，则 $\nabla_\theta\int f(x)p_\theta(x)\,dx = \int f(x)\nabla_\theta p_\theta(x)\,dx$。两个推断支撑了单元 08 与 09：
 

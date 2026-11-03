@@ -68,7 +68,7 @@ $$
 
 **绝对位置嵌入。** 为每个位置 $t$（直到最大长度）学习一个向量 $p_t\in\mathbb{R}^d$，加到词元嵌入上：$x_t\leftarrow x_t + p_t$（如 GPT-2，[Radford et al. 2019](/zh-cn/references/#radford-2019)）。简单有效；超过最大长度的位置则完全没有嵌入。
 
-**正弦位置编码（positional encoding）。** 使用固定向量，其座标位于等比间隔的频率 $\omega_i = 10000^{-2i/d}$（[Vaswani et al. 2017](/zh-cn/references/#vaswani-2017)）：
+**正弦位置编码（positional encoding）。** 使用固定向量，其坐标位于等比间隔的频率 $\omega_i = 10000^{-2i/d}$（[Vaswani et al. 2017](/zh-cn/references/#vaswani-2017)）：
 
 $$
 p_{t,2i} = \sin(\omega_it),\qquad p_{t,2i+1} = \cos(\omega_it).

@@ -20,7 +20,7 @@ $$
 p_X(x) = p_Z(f(x))\,\big|\det J_f(x)\big| .
 $$
 
-一维中：若 $x = \mu + \sigma z$、$z\sim N(0,1)$，则 $p_X(x) = \frac{1}{\sigma}\phi\big(\frac{x-\mu}{\sigma}\big)$——$1/\sigma$ 就是雅可比，拉伸空间会让密度变稀。**标准化流**组合许多雅可比行列式很便宜的简单可逆映射——例如耦合层：以一个依另一半座标决定参数的仿射映射转换一半座标，使雅可比为三角矩阵（[Dinh et al. 2017](/zh-cn/references/#dinh-2017)；[Rezende & Mohamed 2015](/zh-cn/references/#rezende-2015)）。对数似然 $\ln p_X(x) = \ln p_Z(f(x)) + \sum_\ell\ln|\det J_{f_\ell}|$ 于是是精确的，可以直接最大化——单元 01 的原则用在连续密度上。代价在架构上：每一层都必须可逆，且行列式容易计算。
+一维中：若 $x = \mu + \sigma z$、$z\sim N(0,1)$，则 $p_X(x) = \frac{1}{\sigma}\phi\big(\frac{x-\mu}{\sigma}\big)$——$1/\sigma$ 就是雅可比，拉伸空间会让密度变稀。**标准化流**组合许多雅可比行列式很便宜的简单可逆映射——例如耦合层：以一个依另一半坐标决定参数的仿射映射转换一半坐标，使雅可比为三角矩阵（[Dinh et al. 2017](/zh-cn/references/#dinh-2017)；[Rezende & Mohamed 2015](/zh-cn/references/#rezende-2015)）。对数似然 $\ln p_X(x) = \ln p_Z(f(x)) + \sum_\ell\ln|\det J_{f_\ell}|$ 于是是精确的，可以直接最大化——单元 01 的原则用在连续密度上。代价在架构上：每一层都必须可逆，且行列式容易计算。
 
 ## 8.3.3 潜变量与证据下界
 
