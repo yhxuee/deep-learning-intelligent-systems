@@ -95,7 +95,7 @@ $$
 
 从几何上读，每个线性映射都是一次旋转（$V^{\top}$）、一次沿坐标轴的伸缩（$\Sigma$），再一次旋转（$U$）。奇异值就是伸缩倍数：$\sigma_1 = \max_{\lVert x\rVert = 1}\lVert Ax\rVert$。
 
-**低秩近似。** 截取最大的 $k$ 项，$A_k = \sum_{i\le k}\sigma_iu_iv_i^{\top}$，在谱范数与 Frobenius 范数下都是最优的秩 $k$ 近似，误差分别为 $\sigma_{k+1}$ 与 $\sqrt{\sum_{i>k}\sigma_i^2}$（Eckart–Young 定理，证明於单元 02，§2.5.5）。
+**低秩近似。** 截取最大的 $k$ 项，$A_k = \sum_{i\le k}\sigma_iu_iv_i^{\top}$，在谱范数与 Frobenius 范数下都是最优的秩 $k$ 近似，误差分别为 $\sigma_{k+1}$ 与 $\sqrt{\sum_{i>k}\sigma_i^2}$（Eckart–Young 定理，证明于单元 02，§2.5.5）。
 
 **伪逆。** $A^{+} = V\Sigma^{+}U^{\top}$，把非零奇异值取倒数。$A^{+}y$ 是 $Ax\approx y$ 的最小范数最小二乘解——在欠定线性问题上，从零出发的梯度下降法正是收敛到它，这是隐式偏差最简单的例子（单元 01，§1.5.4）。
 

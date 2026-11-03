@@ -1,18 +1,18 @@
 ---
 title: "3.2 First principles: losses, slopes and the chain rule"
-description: Learning as minimizing a loss; the derivative as a local linear model; steepest descent; the step-size condition derived on a one-parameter problem; the chain rule from one path to many.
+description: Learning as minimizing an objective; the derivative as a local linear model; negative-gradient descent; an exact step-size condition; and the chain rule from one path to many.
 sidebar: { label: "3.2 First principles", order: 2 }
 ---
 
 ## 3.2.1 Learning as minimizing a loss
 
-A **model** is a function $f(x;\theta)$ of an input $x$ and a vector of **parameters** $\theta\in\mathbb{R}^n$. A **loss** measures how badly the model does on one example, $\ell\bigl(f(x;\theta), y\bigr)$, and the **training loss** averages it over a dataset of $N$ examples:
+A **model** is a function $f(x;\theta)$ of an input $x$ and a vector of adjustable **parameters** $\theta\in\mathbb{R}^n$. A per-example **loss** $\ell\bigl(f(x;\theta),y\bigr)$ converts a prediction and target into one number; the **training loss** averages those numbers over $N$ examples:
 
 $$
 L(\theta) = \frac1N\sum_{i=1}^{N}\ell\bigl(f(x_i;\theta),\,y_i\bigr).
 $$
 
-Training is the problem $\min_\theta L(\theta)$. (Whether a small *training* loss means good performance on *new* data is the subject of Unit 01; this unit is about how to make the training loss small at all.)
+Training solves, or more realistically attempts to solve, $\min_\theta L(\theta)$. A practical objective may add a regularization penalty, but the optimization logic is the same. Keep three objects distinct: $f$ makes a prediction, $\ell$ scores one prediction, and $L$ aggregates the scores into the scalar that the optimizer sees. Whether small *training* loss implies good performance on *new* data belongs to Unit 01; this unit asks how to reduce the chosen training objective at all.
 
 **A model small enough to see.** Fit a line through the origin, $f(x;w) = wx$, to three points with the squared loss $\ell = (f - y)^2$:
 
@@ -24,19 +24,25 @@ $$
 L(w) = \tfrac13\bigl[(w-2)^2 + (2w-3.9)^2 + (3w-6.1)^2\bigr].
 $$
 
-Expanding, $L(w) = \tfrac13\bigl(14w^2 - 56.2w + 56.42\bigr)$: a parabola. Its minimum is where the derivative vanishes, $L'(w) = \tfrac13(28w - 56.2) = 0$, i.e. $w^* = 56.2/28 = 2.0071$. Here calculus finds the answer in one line.
+Expanding gives $L(w)=\tfrac13(14w^2-56.2w+56.42)$, a parabola opening upward. Its derivative is $L'(w)=\tfrac13(28w-56.2)$, so the stationary point is $w^*=56.2/28=2.0071$. Because the second derivative $L''(w)=28/3$ is positive, that point is the unique minimum. The second-derivative check matters: for a general function, $L'(w)=0$ can also mark a maximum or a flat inflection point.
 
-For almost any model worth training, there is no such formula: the equation $\nabla L(\theta) = 0$ cannot be solved in closed form, and the loss is not a parabola. We need a method that only uses what we *can* compute at a given $\theta$ — the loss and its local behaviour — and improves $\theta$ step by step. The one-parameter line fit will be our test case throughout this section, because there we know the answer.
+For many useful models there is no comparable formula: $\nabla L(\theta)=0$ cannot be solved directly, and even listing all stationary points is infeasible. We need a method that uses quantities available at the current $\theta$—the loss and its local behavior—to propose the next $\theta$. The one-parameter line fit remains our test case because its known answer lets us check the method rather than trust it blindly.
 
 ## 3.2.2 The derivative is the best local linear model
 
-Near a point $w$, a differentiable function looks like a straight line. That is what the derivative means:
+Near a point $w$, a differentiable function is approximated by a straight line whose slope is $L'(w)$. In informal form,
+
+$$
+\text{new loss}\approx\text{old loss}+\text{slope}\times\text{step}.
+$$
+
+The precise statement is
 
 $$
 L(w + \delta) = L(w) + L'(w)\,\delta + o(\delta),
 $$
 
-where $o(\delta)$ denotes terms that become negligible *relative to* $\delta$ as $\delta\to0$. Read it as a prediction: *if I move $w$ by a small amount $\delta$, the loss changes by approximately $L'(w)\,\delta$.*
+where $o(\delta)$ collects the approximation error and satisfies $o(\delta)/\delta\to0$ as $\delta\to0$. Read the formula as a local prediction: *a small parameter change $\delta$ should change the loss by about $L'(w)\delta$.* It is not a promise for a large step.
 
 That prediction tells us which way to move. If $L'(w) > 0$, decreasing $w$ decreases $L$; if $L'(w) < 0$, increasing $w$ does. In both cases, moving **against the sign of the derivative** helps. Choose $\delta = -\eta\,L'(w)$ for a small $\eta>0$:
 
@@ -50,7 +56,7 @@ $$
 w_{k+1} = w_k - \eta\,L'(w_k).
 $$
 
-$\eta$ is the **step size** or **learning rate**.
+$\eta$ is the **step size** or **learning rate**. Notice that the parameter step is $-\eta L'(w)$, not merely $-\eta$: a larger slope produces a larger move unless the algorithm rescales it.
 
 ## 3.2.3 How large a step? The exact answer for a parabola
 
@@ -89,7 +95,7 @@ For $L(w) = 2w^2$ (so $a = 4$, stable iff $\eta < 0.5$) starting at $w_0 = 1$:
 
 <div class="dlis-widget not-content" data-widget="gd-parabola">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
 
-Two lessons generalize far beyond parabolas. First, **the safe step size is set by curvature**: a sharply curved loss demands small steps. Second, **too large a step does not merely slow progress — it makes things worse**, because the linear prediction of §3.2.2 overshoots.
+Two lessons generalize, with qualifications, far beyond parabolas. First, **curvature controls the locally safe scale**: a sharply curved direction demands a smaller step. In many dimensions there are many curvatures, and the sharpest relevant one can set the stability limit. Second, **too large a step can make the loss grow rather than merely slow progress**, because the local linear prediction of §3.2.2 is trusted too far. The exact threshold $2/a$ belongs to this quadratic; later sections replace it with bounds for broader function classes.
 
 For the line-fit loss, $L''(w) = 28/3 \approx 9.33$, so gradient descent is stable for $\eta < 0.214$. With $\eta = 0.1$ from $w_0 = 0$ the iterates are $0 \to 1.873 \to 1.998 \to 2.0065 \to 2.0071$ (Worked Example 3.1).
 
@@ -107,7 +113,7 @@ $$
 L(\theta + \delta) = L(\theta) + \nabla L(\theta)^{\top}\delta + o(\|\delta\|).
 $$
 
-## 3.2.5 The gradient is the direction of steepest descent
+## 3.2.5 The negative gradient is the direction of steepest descent
 
 Of all directions $u$ of unit length, which makes the loss decrease fastest? The rate of change in direction $u$ — the **directional derivative** — is $\nabla L^{\top}u$, from the linear model with $\delta = \epsilon u$. By the Cauchy–Schwarz inequality,
 
@@ -121,7 +127,7 @@ $$
 \boxed{\;\theta_{k+1} = \theta_k - \eta\,\nabla L(\theta_k).\;}
 $$
 
-"Steepest" is measured in the Euclidean norm. Choosing a different notion of distance gives a different steepest direction — the idea behind preconditioning and adaptive methods (§3.3.8, §3.5.8).
+“Steepest” is measured in the Euclidean norm of the chosen coordinates. Rescaling a parameter changes that geometry and can change the gradient-descent trajectory even when the represented function is unchanged. Choosing a different notion of distance gives a different steepest direction—the idea behind preconditioning and adaptive methods (§3.3.8, §3.5.8).
 
 ## 3.2.6 The chain rule: from one path to many
 
@@ -143,9 +149,9 @@ $$
 
 Contributions along different paths **add**.
 
-**The general rule.** Rates multiply along each path from $x$ to $z$, and the contributions of all paths add. For example, for $z = x\cdot x$, the two "paths" are the two factors: $dz/dx = x + x = 2x$. For $z = \sin(x^2)$, there is one path: $dz/dx = \cos(x^2)\cdot 2x$, which is $1.0806$ at $x = 1$.
+**The general rule.** Local derivatives multiply along each directed path from $x$ to $z$, and contributions from distinct paths add. For $z=x\cdot x$, the same input is used twice, so the product rule exposes two paths: $dz/dx=x+x=2x$. For $z=\sin(x^2)$ there is one chain of operations, giving $dz/dx=\cos(x^2)\cdot2x=1.0806$ at $x=1$.
 
-Everything in §3.3 is this rule, applied systematically to programs with millions of operations. The two words to remember are **multiply** (along a path) and **add** (across paths).
+Everything in §3.3 is this rule applied systematically to the executed computation graph. The two words to remember are **multiply** along a path and **add** across paths. Backpropagation is not a different derivative rule; it is an efficient schedule for reusing these products and sums.
 
 ## 3.2.7 Why computing gradients naively is too expensive
 
@@ -157,17 +163,17 @@ $$
 \frac{\partial L}{\partial\theta_j}\approx\frac{L(\theta + he_j) - L(\theta - he_j)}{2h},
 $$
 
-where $e_j$ is the $j$-th unit vector. This costs $2n$ evaluations of $L$ per gradient, and it is only approximate: §3.7.5 shows that floating-point rounding limits its accuracy to about $10^{-10}$ relative error at best, even in double precision. It remains invaluable as a **check** on small instances ([gradient checking](/atlas/nodes/method-gradient-check/)), but it cannot train a large model.
+where $e_j$ is the $j$-th unit vector. This costs $2n$ evaluations of $L$ per gradient. It is also approximate: large $h$ gives truncation error, while tiny $h$ subtracts nearly equal floating-point numbers and amplifies rounding error. In a well-scaled smooth double-precision example, the best central-difference relative error is often around $10^{-10}$, not machine epsilon (§3.7.5). Finite differences remain invaluable as an independent **check** on small instances ([gradient checking](/atlas/nodes/method-gradient-check/)), but they are unsuitable as the training algorithm for a large model.
 
-**Symbolic differentiation.** Write $L$ as a formula and apply differentiation rules to obtain a formula for each partial derivative. For deep compositions the derivative formulas grow much faster than the original expression, because the chain and product rules duplicate subexpressions — the "expression swell" problem ([Baydin et al. 2018](/references/#baydin-2018)). Shared intermediate results are recomputed again and again.
+**Naive symbolic differentiation.** Write $L$ as a formula and apply differentiation rules to produce a separate formula for each partial derivative. Without common-subexpression reuse, chain and product rules duplicate expressions and shared intermediates are recomputed—the **expression swell** problem ([Baydin et al. 2018](/references/#baydin-2018)). Symbolic systems can simplify and reuse expressions, but an arbitrary program with branches, loops, and array operations is more naturally handled as an executed graph.
 
-What we want is a method that (i) is **exact** up to floating-point rounding, (ii) reuses intermediate values, and (iii) costs a small constant times one evaluation of $L$, regardless of $n$. Section 3.3 constructs it.
+What we want is a method that (i) applies the chain rule to the executed differentiable operations rather than approximating derivatives by perturbation, (ii) reuses intermediate values, and (iii) computes all parameter derivatives in a reverse traversal whose cost is usually a small multiple of evaluating $L$. The absolute cost still grows with the program and its parameter use; what avoids the $2n$ disaster is that the cost ratio does not acquire an extra factor of $n$. Section 3.3 constructs this method.
 
 ## 3.2.8 What we have established
 
-- Training minimizes $L(\theta)$; closed-form solutions are the exception.
+- Training attempts to minimize a chosen scalar objective $L(\theta)$; optimization success and generalization are separate questions.
 - The derivative is a local linear prediction; stepping against it decreases the loss for small enough steps.
 - On a parabola of curvature $a$, gradient descent converges iff $0<\eta<2/a$, fastest at $\eta = 1/a$; beyond $2/a$ it diverges.
-- The negative gradient is the steepest-descent direction (Cauchy–Schwarz).
-- The chain rule: multiply along paths, add across paths.
+- The negative gradient is the steepest-descent direction in Euclidean parameter coordinates (Cauchy–Schwarz).
+- The chain rule says to multiply local derivatives along paths and add contributions across paths.
 - Finite differences cost $2n$ evaluations and are inexact; symbolic differentiation duplicates work. We need something better.
