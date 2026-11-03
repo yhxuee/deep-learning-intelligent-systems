@@ -59,7 +59,7 @@ unit:
 | [8.3 数学构建](/zh-cn/core/unit-08/construction/) | 流、VAE、扩散、流匹配 | 2–3 小时 |
 | [8.4 例题](/zh-cn/core/unit-08/worked-examples/) | 八个例题 | 75 分钟 |
 | [8.5 一般理论](/zh-cn/core/unit-08/theory/) | 输运、分数匹配、离散化误差、评估 | 90 分钟 |
-| [8.6 联系](/zh-cn/core/unit-08/connections/) | 统计物理、数值分析、蒙地卡罗、最优传输 | 30 分钟 |
+| [8.6 联系](/zh-cn/core/unit-08/connections/) | 统计物理、数值分析、蒙特卡洛、最优传输 | 30 分钟 |
 | [8.7 局限与反例](/zh-cn/core/unit-08/limitations/) | 退化、似然与质量、少步数误差 | 40 分钟 |
 | [8.8 最新进展](/zh-cn/core/unit-08/modern/) | 整流流、引导、蒸馏、推测解码 | 35 分钟 |
 | [8.9 实验](/zh-cn/core/unit-08/experiments/) | 六个实验 | 实验时间 |

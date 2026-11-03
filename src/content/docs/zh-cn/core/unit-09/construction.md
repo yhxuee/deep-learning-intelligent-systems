@@ -53,7 +53,7 @@ $$
 
 ## 9.3.5 奖励模型与 PPO
 
-**奖励模型。** 收集附带成对回应的提示，以及人类（或 AI）对哪一个较好的标注。以最大化 Bradley–Terry 对数似然 $\sum\ln\sigma\big(r_\phi(y_w) - r_\phi(y_l)\big)$ 拟合 $r_\phi$——对奖励差做逻辑回归（[Christiano et al. 2017](/zh-cn/references/#christiano-2017)；[Stiennon et al. 2020](/zh-cn/references/#stiennon-2020)）。只有差值可被辨识：每个奖励都加上一个常数不会改变任何事。
+**奖励模型。** 收集附带成对回应的提示，以及人类（或 AI）对哪一个较好的标注。以最大化 Bradley–Terry 对数似然 $\sum\ln\sigma\big(r_\phi(y_w) - r_\phi(y_l)\big)$ 拟合 $r_\phi$——对奖励差做逻辑回归（[Christiano et al. 2017](/zh-cn/references/#christiano-2017)；[Stiennon et al. 2020](/zh-cn/references/#stiennon-2020)）。只有差值可被识别：每个奖励都加上一个常数不会改变任何事。
 
 **PPO。** 接着以 KL 惩罚针对 $r_\phi$ 优化策略。因为每批样本会被重复用于好几个梯度步，正在更新的策略与产生样本的策略不同；近端策略优化（Proximal Policy Optimization，PPO）以重要性比值 $\rho = \pi_\theta(a\mid s)/\pi_{\text{old}}(a\mid s)$ 修正，并在目标函数 $\mathbb{E}[\min(\rho A, \mathrm{clip}(\rho, 1-\epsilon, 1+\epsilon)A)]$ 中把它**截断（clip）**在 $[1-\epsilon, 1+\epsilon]$（[Schulman et al. 2017](/zh-cn/references/#schulman-2017)）。截断移除的是把被抽到之动作的比值推到区间之外的*诱因*；它不是硬性限制。未被抽到之动作的比值，以及相邻策略之间的 KL 散度，都不受它约束，大幅更新仍可能发生——这就是为什么实现会监控 KL 的估计值，并在它变大时提早结束该轮。这条三阶段流程——监督微调、奖励模型、带 KL 的 PPO——产生了第一批被广泛使用、能遵循指令的助理（[Ouyang et al. 2022](/zh-cn/references/#ouyang-2022)）。
 

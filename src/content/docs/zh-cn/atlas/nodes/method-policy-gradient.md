@@ -18,7 +18,7 @@ atlas:
 
 ## 不变量
 
-- 估计量无偏：在多臂老虎机问题上，其蒙地卡罗平均等于精确梯度 $\pi\odot(r - \pi^{\top}r)$（主干项目 `test_stage09_policy_gradient_estimator_is_unbiased`）。
+- 估计量无偏：在多臂老虎机问题上，其蒙特卡洛平均等于精确梯度 $\pi\odot(r - \pi^{\top}r)$（主干项目 `test_stage09_policy_gradient_estimator_is_unbiased`）。
 - 减去常数基线不改变期望梯度，且（通常）降低其方差。
 - 对 $\mathbb{E}_\pi[r] - \beta\mathrm{KL}(\pi\Vert\pi_{\text{ref}})$ 做梯度上升会收敛到 $\pi_{\text{ref}}e^{r/\beta}/Z$（主干项目 `test_stage09_kl_regularized_optimum_is_the_tilted_reference`）。
 - 穿过主干模型的 REINFORCE + KL 梯度与有限差分一致。

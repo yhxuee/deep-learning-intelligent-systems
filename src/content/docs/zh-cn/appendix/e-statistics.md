@@ -44,7 +44,7 @@ $$
 | $N(\mu, \sigma^2)$ | $\hat\mu = \bar x$、$\hat\sigma^2 = \frac1n\sum(x_i - \bar x)^2$（偏差因子 $\frac{n-1}{n}$） |
 | 高斯噪声的线性模型 | 最小二乘法（附录 A.3） |
 
-**费希尔信息与渐近正态性。** 对正则的单参数模型，**费希尔信息（Fisher information）**为 $I(\theta) = \mathbb{E}\big[(\partial_\theta\ln p_\theta(X))^2\big] = -\mathbb{E}\big[\partial^2_\theta\ln p_\theta(X)\big]$。在正则条件下——真实分布在模型中、参数字于内部且可辨识、似然平滑——MLE 是一致的，且
+**费希尔信息与渐近正态性。** 对正则的单参数模型，**费希尔信息（Fisher information）**为 $I(\theta) = \mathbb{E}\big[(\partial_\theta\ln p_\theta(X))^2\big] = -\mathbb{E}\big[\partial^2_\theta\ln p_\theta(X)\big]$。在正则条件下——真实分布在模型中、参数字于内部且可识别、似然平滑——MLE 是一致的，且
 $$
 \sqrt n(\hat\theta - \theta)\ \to\ N\big(0, I(\theta)^{-1}\big),
 $$
