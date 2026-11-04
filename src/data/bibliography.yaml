@@ -242,6 +242,7 @@ korthikanti-2023: { authors: "Korthikanti, V. A., Casper, J., Lym, S., et al.", 
 landauer-1961: { authors: "Landauer, R.", year: 1961, title: "Irreversibility and Heat Generation in the Computing Process", venue: "IBM Journal of Research and Development 5(3), 183–191", url: "https://doi.org/10.1147/rd.53.0183" }
 
 # ---- Unit 07: self-supervision and data
+saffran-1996: { authors: "Saffran, J. R., Aslin, R. N., and Newport, E. L.", year: 1996, title: "Statistical Learning by 8-Month-Old Infants", venue: "Science 274(5294), 1926–1928", url: "https://doi.org/10.1126/science.274.5294.1926" }
 broder-1997: { authors: "Broder, A. Z.", year: 1997, title: "On the resemblance and containment of documents", venue: "Compression and Complexity of SEQUENCES 1997, 21–29", url: "https://doi.org/10.1109/SEQUEN.1997.666900" }
 radford-2018: { authors: "Radford, A., Narasimhan, K., Salimans, T., and Sutskever, I.", year: 2018, title: "Improving Language Understanding by Generative Pre-Training", venue: "OpenAI technical report", url: "https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf" }
 chen-2020: { authors: "Chen, T., Kornblith, S., Norouzi, M., and Hinton, G.", year: 2020, title: "A Simple Framework for Contrastive Learning of Visual Representations", venue: "ICML", url: "https://arxiv.org/abs/2002.05709" }
