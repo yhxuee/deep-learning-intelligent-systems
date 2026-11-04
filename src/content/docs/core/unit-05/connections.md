@@ -6,7 +6,7 @@ sidebar: { label: "5.6 Connections", order: 6 }
 
 Deep-learning memory did not appear from nowhere. Each mechanism in this unit is a well-studied object in another field, and knowing the connection lets you borrow decades of theory.
 
-## 5.6.1 Signal processing: recurrences are IIR filters, windows are FIR filters
+## 5.6.1 Signal processing: recurrences are usually IIR; finite windows are FIR
 
 A causal filter that computes $y_t$ from a **finite** window, $y_t=\sum_{j=0}^{W-1}K_jx_{t-j}$, is a *finite impulse response* (FIR) filter—a convolution, as in Unit 04. A recurrence whose reachable and observable modes keep feeding the output generally has a nonzero tail: an *infinite impulse response* (IIR) filter. “Recurrence” does not logically imply IIR: a nilpotent transition, or cancellation of every long-lived mode, can give a finite response. The EMA is the standard first-order IIR low-pass filter; §5.5.1 derived its frequency response.
 
@@ -62,7 +62,7 @@ Attention's KV cache is a temporary key--value store queried by learned similari
 
 | Unit | Connection |
 |---|---|
-| [03 · Optimization](/core/unit-03/) | backpropagation through time is reverse-mode differentiation on the unrolled graph; the learning-rate limit $\eta < 2/\lambda$ is the Euler stability limit of §5.2.8 |
+| [03 · Optimization](/core/unit-03/) | backpropagation through time is reverse-mode differentiation on the unrolled graph; for a quadratic mode, the learning-rate limit $0<\eta < 2/\lambda$ is the Euler stability limit of §5.2.8 |
 | [04 · Interaction](/core/unit-04/) | attention retains one learned record per cached token and reads a weighted blend; linear attention replaces the growing cache with a recurrent matrix state |
 | [06 · Compute](/core/unit-06/) | KV-cache memory and the sequence-length scaling of attention and structured recurrences shape inference economics |
 | [10 · Failure](/core/unit-10/) | recall stress tests are evaluation design: what a benchmark measures vs. what a memory claim needs |

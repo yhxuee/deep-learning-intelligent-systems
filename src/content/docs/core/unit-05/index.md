@@ -11,7 +11,7 @@ unit:
   checkpoint: Derive the closed form of a linear recurrence, relate its eigenvalues to memory decay and stability, and design a memory stress test — without AI.
   status: draft
   atlas: [mech-linear-recurrence, mech-kv-cache, arch-selective-ssm, mech-attention]
-  answer: "A recurrent state compresses history into a fixed size and is stable when its dynamics contract; selective state-space models and linear attention trade exact recall for constant memory, while a KV cache stores one learned key/value record per past token at linear cost."
+  answer: "A recurrent state compresses history into a fixed size; an asymptotically stable transition forgets perturbations, while selective state-space models and linear attention use bounded states that must merge or overwrite information. A KV cache instead stores one learned key/value record per past token, so its memory grows linearly with context length."
   leaves: "Every architectural choice has a price in FLOPs, memory traffic and latency; to choose between them, and to decide how large a model should be, computation must be accounted for explicitly."
   builds_on:
     - { unit: 3, uses: "gradient flow through time, eigenvalues and stability" }
@@ -67,7 +67,7 @@ By the end, the RNN, LSTM, state-space model and Transformer will not be four un
 
 ## Prerequisites
 
-- **From Unit 03:** the chain rule on computation graphs, reverse-mode differentiation, gradient descent, and the stability condition $\eta < 2/\lambda_{\max}$. (We will meet that condition again in a new form.)
+- **From Unit 03:** the chain rule on computation graphs, reverse-mode differentiation, gradient descent, and the quadratic-case stability condition $0<\eta < 2/\lambda_{\max}$. (We will meet that condition again in a new form.)
 - **From Unit 04:** scaled dot-product attention and the KV cache (needed only from §5.3.11 on).
 - **Mathematics:** geometric series; matrix multiplication; eigenvalues and eigenvectors (reviewed when first used in §5.3.3); the exponential function and a first-order linear differential equation (solved from scratch in §5.2.7).
 
@@ -86,5 +86,5 @@ If eigenvalues are new, follow the scalar EMA through §5.2 first and read §5.3
 | [5.6 Connections](/core/unit-05/connections/) | signal processing, control and the Kalman filter, numerical ODEs, associative memory | 30 min |
 | [5.7 Limitations and counterexamples](/core/unit-05/limitations/) | where each memory design fails, with constructions | 45 min |
 | [5.8 Modern developments](/core/unit-05/modern/) | S4, Mamba, SSD, linear-attention variants, hybrids — with evidence status | 45 min |
-| [5.9 Experiments](/core/unit-05/experiments/) | eight experiments with predictions | lab time |
+| [5.9 Experiments](/core/unit-05/experiments/) | nine reproducible experiments with predictions and controls | lab time |
 | [5.10 Problems and further study](/core/unit-05/problems/) | graded problems and a reading list | — |

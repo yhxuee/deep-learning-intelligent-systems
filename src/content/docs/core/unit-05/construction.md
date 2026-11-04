@@ -353,7 +353,7 @@ So linear attention trades a growing per-token cache for a fixed $d_v\times r$ m
 
 | Design | State at step $t$ | Per-step cost | Write decision | Exact recall at distance $T$? |
 |---|---|---|---|---|
-| Fixed window $W$ | last $W$ inputs | $O(Wd)$ | none (FIFO) | only if $T\le W$ |
+| Fixed window $W$ | previous $W$ inputs (lags $1,\dots,W$) | $O(Wd)$ | none (FIFO) | only if $1\le T\le W$ under this lag convention |
 | stable fading EMA / LTI recurrence / LTI SSM | $N$ numbers | $O(N)$ | fixed dynamics | not generally; protected unit modes are a special case |
 | Gated RNN (LSTM, GRU) | $N$ numbers | $O(N^2)$ | input-dependent gates | only what the gates chose to keep |
 | Selective SSM | $N$ per channel | $O(N)$ per channel | input-dependent $\Delta_t$ | only what $\Delta_t$ chose to keep |

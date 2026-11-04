@@ -1,6 +1,6 @@
 ---
 title: "5.4 Worked examples"
-description: Nine fully computed examples — designing a filter, a change detector, a kernel via diagonalization, oscillating and non-normal memories, backpropagation through time by hand, associative-memory cross-talk, and a parallel scan.
+description: Nine fully computed examples — designing a filter, a change detector, a kernel via diagonalization, oscillating and non-normal memories, backpropagation through time by hand, associative-memory cross-talk, a parallel scan, and choosing a memory architecture for a task.
 sidebar: { label: "5.4 Worked examples", order: 4 }
 ---
 
