@@ -14,18 +14,18 @@ $$
 s_t = F(s_{t-1},\, x_t).
 $$
 
-We call $s_t$ a **state** if everything the device will ever output in the future depends on the past inputs **only through** $s_t$. The state is the device's entire memory: two different histories that lead to the same state are, from that moment on, indistinguishable.
+We call $s_t$ a **state** if, once $s_t$ is known, predicting the device's future behaviour requires no other information about $x_1,\dots,x_t$. More precisely, two histories that reach the same $s_t$ and then receive the same future inputs must produce the same future outputs. The state is therefore the device's entire operational memory of the past; histories merged into the same state are indistinguishable to the device from that moment on.
 
 The size of the state is the size of the memory. Some questions about a stream can be answered with a tiny state; others cannot. Consider four:
 
-| Question about $x_1,\dots,x_t$ | Minimal state | Update rule |
+| Question about $x_1,\dots,x_t$ | One sufficient state | Update rule |
 |---|---|---|
 | largest reading so far | 1 number $m_t$ | $m_t = \max(m_{t-1}, x_t)$ |
-| mean reading so far | 2 numbers $(S_t, t)$ | $S_t = S_{t-1} + x_t$; mean $= S_t/t$ |
-| mean and variance so far | 3 numbers | Welford's update ([Welford 1962](/references/#welford-1962)) |
-| the reading exactly 1000 s ago | 1000 numbers | a shift register: drop the oldest, append $x_t$ |
+| mean reading so far | 2 numbers $(S_t,n_t)$ | $S_t = S_{t-1} + x_t$; $n_t=n_{t-1}+1$; mean $=S_t/n_t$ |
+| mean and variance so far | 3 numbers $(n_t,m_t,M_{2,t})$ | Welford's update ([Welford 1962](/references/#welford-1962)) |
+| the most recent 1000 readings, exactly | 1000 numbers | a circular buffer: overwrite the oldest with $x_t$ |
 
-The first three summaries are *compressions*: a fixed number of values answers the question exactly, no matter how long the stream. The fourth is not compressible at all; §5.5.2 proves that no state with fewer distinguishable values than there are possible windows — in bits, fewer than the window's own information content — can answer it for arbitrary inputs. (With infinitely precise real numbers the count is unbounded; the statement is about states of finite precision, which is what every real device has.)
+The first three summaries are *compressions*: a fixed number of values answers the question exactly, no matter how long the stream. The fourth must distinguish every possible length-1000 window; §5.5.2 turns that requirement into a bit bound. The table gives sufficient states, not a proof that each displayed representation is uniquely minimal—for example, an externally supplied time index can remove the need to store $n_t$. With infinitely precise real numbers, one could hide unbounded bits in digits; the capacity statement is about finite-precision states, as used by physical computers.
 
 **The task defines what memory is needed.** "Remember the past" is not a well-posed goal; "remember what is needed to answer *this* question about the past" is. This sentence will return at the end of the unit, when we compare recurrent models with attention.
 
@@ -95,13 +95,13 @@ $$
 
 and the last term is the $k = t$ term of the sum. $\blacksquare$
 
-The closed form exposes a structural fact. **The device never stores a past reading, yet its state is a linear combination of every reading it has ever seen**, with weight
+The closed form exposes a structural fact. **The device never stores a past reading separately, yet its state is a linear combination of every reading it has seen**, with weight
 
 $$
 w_k = (1-\alpha)\,\alpha^{\,t-k}
 $$
 
-on the reading from $t-k$ steps ago. The weights shrink geometrically with age: that is the "exponential" in the name.
+on input $x_k$, whose age is $t-k$ steps. The weights shrink geometrically with age: that is the “exponential” in the name. Influence is not recoverability—many different histories can have the same weighted sum.
 
 Do the weights form an average? Sum them with the geometric series $\sum_{j=0}^{n-1}\alpha^j = (1-\alpha^n)/(1-\alpha)$:
 
@@ -109,7 +109,7 @@ $$
 \sum_{k=1}^{t} w_k = (1-\alpha)\sum_{j=0}^{t-1}\alpha^{j} = 1 - \alpha^t .
 $$
 
-Together with the weight $\alpha^t$ on the initial state $h_0$, the weights sum to exactly 1. So $h_t$ is a **weighted average** of the initial guess and all inputs — which is why, in the table above, $h_t$ always stayed in the range of the readings.
+Together with the weight $\alpha^t$ on the initial state $h_0$, the weights sum to exactly 1. So $h_t$ is a **weighted average** of the initial guess and all inputs—which is why it stays within the range spanned by $h_0$ and the readings.
 
 ## 5.2.5 How long does the memory last?
 
@@ -119,7 +119,7 @@ $$
 0.9^{20} \approx 0.122 ,
 $$
 
-so only about 12% of the original influence remains. No reading is ever forgotten completely, but its influence decays geometrically.
+so only about 12% of the original influence remains. In exact real arithmetic the coefficient is never exactly zero, but it decays geometrically; finite precision can eventually round or underflow it away. In neither case does a nonzero coefficient mean that the individual reading can be reconstructed from the single state value.
 
 A convenient single number is the **half-life**: the age $n$ at which the influence has dropped to one half. Solve $\alpha^{n} = \tfrac12$ by taking logarithms:
 
@@ -127,7 +127,7 @@ $$
 t_{1/2} = \frac{\ln(1/2)}{\ln \alpha} = \frac{\ln 2}{-\ln\alpha}.
 $$
 
-For $\alpha = 0.9$, $t_{1/2} = 0.6931/0.1054 \approx 6.58$ steps.
+For $\alpha = 0.9$, $t_{1/2} = 0.6931/0.1054 \approx 6.58$ steps. The half-life is a real-valued timescale; the first integer age at which the influence is at most one half is $\lceil6.58\rceil=7$ steps.
 
 When $\alpha$ is close to 1, write $\alpha = 1-\varepsilon$ and use $\ln(1-\varepsilon) \approx -\varepsilon$ for small $\varepsilon$:
 
@@ -157,7 +157,7 @@ $$
 h_t = 20\,\alpha^t + 23\,(1-\alpha)\sum_{k=1}^{t}\alpha^{t-k} = 20\,\alpha^t + 23\,(1-\alpha^t) = 23 - 3\,\alpha^t .
 $$
 
-The remaining error after $t$ steps is the fraction $\alpha^t$ of the jump. The state is within 5% of the new value once $\alpha^t \le 0.05$, i.e. after $t_{95} = \ln 0.05/\ln\alpha$ steps.
+The remaining error after $t$ steps is the fraction $\alpha^t$ of the jump. The state is within 5% of the new value once $\alpha^t \le 0.05$. The real-valued response timescale is $t_{95}=\ln0.05/\ln\alpha$; the first qualifying discrete step is its ceiling.
 
 | $\alpha$ | half-life (steps) | 95% response time (steps) | noise variance factor $\tfrac{1-\alpha}{1+\alpha}$ | noise std factor |
 |---|---|---|---|---|
@@ -171,7 +171,7 @@ The remaining error after $t$ steps is the fraction $\alpha^t$ of the jump. The 
 
 <div class="dlis-widget not-content" data-widget="ema-filter">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
 
-**No single $\alpha$ answers question 3 from §5.1.** A rule that forgets noise quickly also forgets real changes quickly. To do better, the update would have to *know* which inputs matter — to use a large weight for a genuine change and a small one for a glitch. That requires the decay itself to depend on the input. We will build exactly that in §5.3.8 (gates) and §5.3.10 (selective state-space models), and we will see a completely different solution — store everything, then choose at read time — in §5.3.11 (attention).
+**No single $\alpha$ answers question 3 from §5.1.** A fixed EMA treats equal-sized innovations $x_t-h_{t-1}$ in the same way: it cannot assign a small arrival weight to a one-sample glitch but a large arrival weight to the first sample of a genuine change. A large $\alpha$ admits little of either event and then lets the admitted effect decay slowly; a small $\alpha$ admits much of either event and responds quickly. To distinguish them, the update needs evidence from the input and context, so its gate or decay must be data-dependent. We build that idea in §5.3.8 (gates) and §5.3.10 (selective state-space models), then compare it with a different solution—keep a growing per-token record and choose at read time—in §5.3.11 (attention).
 
 ## 5.2.7 Where does α come from? Memory as a physical system
 
@@ -202,7 +202,7 @@ The decay factor is not arbitrary: it is the sampled decay of a physical time co
 - The half-life in **seconds** is $t_{1/2}\,\Delta t = \tau\ln 2$, independent of the sampling rate. Sample twice as fast and $\alpha$ moves closer to 1 by exactly the amount needed to keep the physical memory the same.
 - For $\tau = 10$ s sampled every second, $\alpha = e^{-0.1} \approx 0.905$; for $\tau = 1$ s, $\alpha = e^{-1} \approx 0.368$.
 
-The same construction — write a continuous-time system, then sample it exactly — is how modern **state-space models** (§5.3.9) obtain their recurrences, with a learned time step $\Delta$.
+The same construction—write a continuous-time system, state how the input behaves between samples, then discretize it—is used by many modern **state-space models** (§5.3.9). Some parameterizations learn a time step $\Delta$; “exact” always refers to the chosen continuous dynamics and between-sample input assumption.
 
 ## 5.2.8 A warning: a careless discretization can make memory explode
 
@@ -244,6 +244,6 @@ In Unit 03, gradient descent on $L(w) = \tfrac{\lambda}{2}w^2$ updates $w \lefta
 - The **EMA** $h_t = \alpha h_{t-1} + (1-\alpha)x_t$ is a weighted average of the entire history with geometrically decaying weights $(1-\alpha)\alpha^{t-k}$.
 - Its memory has half-life $\ln 2/(-\ln\alpha) \approx 0.693/(1-\alpha)$ steps.
 - A fixed $\alpha$ trades noise suppression, $\tfrac{1-\alpha}{1+\alpha}$, against lag, $\alpha^t$; doing better requires a decay that depends on the input.
-- $\alpha = e^{-\Delta t/\tau}$ is the exact sampled decay of a first-order system with time constant $\tau$; forward Euler gives $1 - \Delta t/\tau$ and is unstable for $\Delta t > 2\tau$.
+- Under a zero-order-hold input assumption, $\alpha=e^{-\Delta t/\tau}$ is the exact sampled decay of a first-order system with time constant $\tau$; forward Euler gives $1-\Delta t/\tau$ and is unstable for $\Delta t>2\tau$.
 
 **Next:** one decay rate is one timescale. Real signals carry information on many timescales at once — the last word, the current sentence, the topic of the chapter. In [§5.3](/core/unit-05/construction/) we give the memory a vector state and a matrix of decay rates, and discover that its eigenvalues are its memory modes.
