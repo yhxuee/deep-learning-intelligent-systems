@@ -1,43 +1,91 @@
 ---
 title: "6.8 Modern developments"
-description: IO-aware kernels, low-precision arithmetic and quantization, memory management and speculative decoding for inference, mixture of experts, data-constrained scaling, and scaling compute at test time — each tied to a quantity of this unit.
+description: How IO-aware kernels, lower precision, serving systems, sparse experts, scarce data, and test-time compute change the resource equations—and where each promised speed-up can fail.
 sidebar: { label: "6.8 Modern developments", order: 8 }
 ---
 
-Labels: **[D]** derivation, **[E]** experimental evidence, **[O]** engineering observation, **[H]** open hypothesis.
+This is a selective literature snapshot checked through **4 November 2026**, not a leaderboard. Hardware, kernels and model recipes change quickly; the durable skill is to ask **which term in the cost model changed**. Labels: **[D]** derivation, **[E]** experimental evidence, **[O]** engineering observation, **[H]** open hypothesis.
 
 ## 6.8.1 Moving fewer bytes: IO-aware kernels
 
-**Quantity:** bytes moved, $M$ in $t\ge M/\beta$.
+Recall the roofline lower bound
 
-FlashAttention computes exact attention block by block in fast on-chip memory, never writing the $T\times T$ matrix to slow memory (Unit 04, §4.8.1) **[D]/[E]**. The FLOPs are unchanged (slightly increased by recomputation in the backward pass); the time falls because the operation's arithmetic intensity rises ([Dao et al. 2022](/references/#dao-2022)). The same principle — fuse operations so intermediates never leave fast memory — is applied to normalization, activation functions and optimizer updates **[O]**.
+$$
+t\ge \max\!\left(\frac{F}{\pi},\frac{M}{\beta}\right).
+$$
+
+If an operation is limited by bytes moved $M$, reducing its FLOPs may do little. FlashAttention attacks $M$ instead: it computes attention in blocks that fit in fast on-chip memory and avoids materializing the full $T\times T$ score and probability matrices in slower high-bandwidth memory ([Dao et al. 2022](/references/#dao-2022)). The forward pass still computes **exact softmax attention**, up to ordinary floating-point roundoff. Its backward pass reconstructs blocks from saved row statistics, so it may perform extra arithmetic and still finish sooner because it moves far fewer bytes **[D]/[E]**.
+
+That example suggests a general pattern: fuse normalization, activation or optimizer operations so their intermediate arrays stay on chip **[O]**. But “fused” is not a correctness argument. A replacement kernel must still preserve causal masking, stable softmax, gradient agreement and acceptable numerical error. Faster wrong answers are not an optimization.
+
+**Beginner checkpoint.** FlashAttention does not make dense attention linear in sequence length. It changes memory traffic and stored intermediates; the attention arithmetic is still quadratic in $T$.
 
 ## 6.8.2 Fewer bits per number
 
-**Quantity:** bytes per parameter in memory and traffic.
+Lower precision can change three different quantities:
 
-Training in 16-bit formats with 32-bit master weights halves memory traffic relative to 32-bit training ([Micikevicius et al. 2018](/references/#micikevicius-2018)) **[E]**; 8-bit training formats push further. For inference, weights can be quantized after training: 8-bit matrix multiplication with special handling of rare large activations preserves quality at large scale ([Dettmers et al. 2022](/references/#dettmers-2022)), and 3–4-bit weight quantization using second-order information loses little on many benchmarks ([Frantar et al. 2023](/references/#frantar-2023)) **[E]**. Because batch-1 decoding is memory-bound (§6.3.4), 4-bit weights make it up to about four times faster than 16-bit weights **[D]**.
+1. **stored bytes** for weights, optimizer states and activations;
+2. **moved bytes** between memory levels; and
+3. **peak arithmetic rate**, because accelerators often execute low-precision matrix products faster.
 
-## 6.8.3 Serving: memory management and speculative decoding
+Mixed-precision training commonly uses 16-bit tensors for many forward and backward operations while retaining selected 32-bit values for stability ([Micikevicius et al. 2018](/references/#micikevicius-2018)) **[E]**. The traffic for eligible tensors can be roughly half that of all-FP32 computation, but total training memory does **not** automatically halve: master weights, optimizer moments, gradients and scaling metadata depend on the recipe. Newer 8-bit and FP8 recipes push the same trade-off further. For example, the DeepSeek-V3 report combines FP8 mixed-precision training with a sparse-expert model ([DeepSeek-AI et al. 2024](/references/#deepseek-v3-2024)) **[O]**; it is a system-level example, not proof that every model trains safely in FP8.
 
-**Quantity:** KV-cache bytes; tokens per weight read.
+For inference, **post-training quantization** compresses an already trained model. LLM.int8() treats rare large activation dimensions specially ([Dettmers et al. 2022](/references/#dettmers-2022)); GPTQ uses approximate second-order information to choose 3–4-bit weight errors ([Frantar et al. 2023](/references/#frantar-2023)). Both report small quality losses in their tested model-and-benchmark ranges **[E]**. Neither says that four bits are universally lossless.
 
-Serving systems allocate KV caches in fixed-size pages, like virtual memory, so that many sequences of unpredictable length share the device without fragmentation ([Kwon et al. 2023](/references/#kwon-2023)) **[E]**; larger effective batches raise arithmetic intensity (§6.3.4). **Speculative decoding** lets a small model propose several tokens that the large model then checks in one forward pass; a modified rejection-sampling rule keeps the output distribution *exactly* that of the large model ([Leviathan et al. 2023](/references/#leviathan-2023)) **[D]**, and because the large model's pass over several tokens costs about the same memory traffic as over one, wall-clock time falls **[E]**. Unit 08 derives the acceptance rule.
+Suppose batch-1 decoding is purely limited by reading weights. Replacing 16-bit weights by 4-bit weights divides the idealized weight traffic by four, so the **weight-bandwidth ceiling** rises by at most $4\times$ **[D]**. Real speed-up is usually smaller because scales and zero points occupy space, dequantization costs work, KV-cache and activation traffic remain, kernels may not reach peak rate, and some layers lose accuracy unless kept at higher precision.
 
-## 6.8.4 Parameters without FLOPs: mixture of experts
+## 6.8.3 Serving: pages and speculative decoding
 
-**Quantity:** the ratio of parameters to FLOPs per token.
+Serving has two recurrent wastes: unused cache space and repeated weight reads.
 
-A mixture-of-experts layer routes each token to a few of many expert MLPs (Unit 04, §4.8.4), so total parameters grow while FLOPs per token stay nearly fixed **[D]**. Scaling laws must then be stated in terms of both total and active parameters; memory and communication, not FLOPs, become the binding costs **[O]**.
+**Paged KV caches.** Requests end at unpredictable lengths. Reserving one contiguous maximum-size cache per request leaves holes. PagedAttention stores cache blocks through a page table, analogous to virtual memory, so blocks can be allocated and shared as needed ([Kwon et al. 2023](/references/#kwon-2023)) **[E]**. This greatly reduces—not literally eliminates—fragmentation and can admit larger effective batches. Larger batches reuse each weight read across more tokens, raising arithmetic intensity.
 
-## 6.8.5 When data are limited
+**Speculative decoding.** A small draft model proposes several tokens. The large target model scores the proposed block in one parallel pass; an acceptance-and-correction rule then returns exactly the target model's distribution ([Leviathan et al. 2023](/references/#leviathan-2023)) **[D]**. Unit 08 derives that rule.
 
-**Quantity:** $D$ in $L(N, D)$ when unique data are scarce.
+Why might this be faster? During memory-bound decoding, checking several positions can require a similar **target-weight** read to checking one. But total traffic is not identical: the draft model, KV caches, verification tensors and rejected proposals all cost something. Speed-up therefore depends on draft acceptance, block length, verification kernels, batching and cache overhead **[E]**. A poor draft can make speculation slower. “Exact” describes the corrected output distribution, not arbitrary greedy acceptance of draft tokens.
 
-[Muennighoff et al. (2023)](/references/#muennighoff-2023) extended scaling laws to repeated data: up to about four epochs, repeated tokens are worth nearly as much as new ones; beyond that their value decays quickly **[E]**. Generating synthetic training data with models and curating data more aggressively are active responses; training on a model's own outputs repeatedly can degrade the distribution (Unit 07, §7.8) **[E]**.
+## 6.8.4 More total parameters without proportional active FLOPs
 
-## 6.8.6 Spending compute at test time
+A mixture-of-experts (MoE) layer has many expert MLPs but routes each token to only a few. If there are $E$ experts and $k\ll E$ are active, expert capacity can grow roughly with $E$ while expert arithmetic per token grows with $k$ **[D]**. This is why DeepSeek-V3 reports 671 billion total parameters but 37 billion activated per token ([DeepSeek-AI et al. 2024](/references/#deepseek-v3-2024)) **[O]**.
 
-**Quantity:** FLOPs spent per answer rather than per training token.
+The shortcut “parameters without FLOPs” is memorable but incomplete. Attention, routing, shared layers and communication still cost work; all expert weights still require storage; uneven routing can overflow capacity or leave devices idle. Scaling reports must therefore separate **total parameters**, **active parameters**, **FLOPs/token**, **inter-device traffic** and **measured throughput**. MoE changes the constraint—it does not remove constraints.
 
-A fixed model can be made more accurate on some tasks by spending more inference compute: sampling several answers and choosing by a verifier or by majority vote, or generating longer chains of intermediate reasoning. [Snell et al. (2024)](/references/#snell-2024) found that, for some problems and budgets, optimally allocated test-time compute outperforms a model many times larger **[E]**. Training-time and test-time compute have become two axes of one budget; Unit 09 shows how reinforcement learning against a verifier trains models to use the second axis well **[O]**.
+## 6.8.5 When unique data run short
+
+The variable $D$ in $L(N,D)$ counts training tokens, but the value of the next token depends on whether it is new, repeated, contaminated, mislabeled or generated. In the regimes tested by [Muennighoff et al. (2023)](/references/#muennighoff-2023), repeating data for up to roughly four epochs caused little loss relative to using the same number of unique tokens; returns then diminished, and the useful amount depended on the compute regime and data mixture **[E]**. “Four epochs are free” is therefore not a universal law.
+
+Three responses target different bottlenecks:
+
+- **deduplicate and curate** to raise information per token;
+- **repeat high-quality data** when another unique token is unavailable;
+- **generate synthetic data** to cover tasks or provide feedback that the raw corpus lacks.
+
+Synthetic data are not automatically diverse or correct. Repeated self-training can amplify omissions and errors, while verified synthetic mathematics or code may be unusually valuable because answers can be checked. The source model, filtering rule, verifier and mixture weight are part of $D$'s provenance, not implementation trivia.
+
+## 6.8.6 Spending compute after training
+
+Training compute buys a fixed model. **Test-time scaling** spends a variable budget per problem: sample several answers and vote, search with a verifier, revise an answer, or generate a longer reasoning trace. The relevant curve is now
+
+$$
+\text{quality}=q(\text{model},\text{problem},C_{\text{test}}),
+$$
+
+not simply quality versus parameter count.
+
+[Snell et al. (2024)](/references/#snell-2024) found regimes where allocating test-time compute according to problem difficulty was more efficient than uniform best-of-$N$, and where a smaller model beat a model 14 times larger under a FLOP-matched comparison on problems the smaller model could already solve nontrivially **[E]**. That qualification matters: extra samples cannot rescue a model whose candidates contain no useful signal. A later comparison across eight open models and four reasoning datasets found no universally best strategy; the best choice varied with model type, difficulty and budget ([Agarwal et al. 2025](/references/#agarwal-2025)) **[E]**.
+
+Training can also change how the model uses this budget. DeepSeek-R1 reports reinforcement-learning runs in which longer verification and self-correction patterns emerged on verifiable tasks ([DeepSeek-AI et al. 2025](/references/#deepseek-r1-2025)) **[O]**. This is evidence for one training recipe, not proof that longer text is itself reasoning or that reinforcement learning always produces it. Unit 09 studies the learning signal; this unit asks who pays the inference bill.
+
+## 6.8.7 A decision table, not a bag of tricks
+
+| Intervention | Primarily reduces | What may increase | Typical failure mode |
+|---|---|---|---|
+| IO-aware fusion | intermediate memory traffic | recomputation, kernel complexity | numerical or masking mismatch |
+| lower precision | bytes/value; sometimes time/FLOP | metadata and conversion | accuracy loss or overflow |
+| paged KV cache | wasted reserved cache space | address-management overhead | tiny pages or poor batching |
+| speculative decoding | target weight reads per accepted token | draft and rejection work | low acceptance rate |
+| mixture of experts | active compute per unit of total capacity | storage and communication | load imbalance |
+| data repetition/synthesis | need for new raw examples | correlation and filtering burden | error amplification |
+| test-time scaling | training needed for a fixed quality target | latency and serving cost | weak verifier or useless candidates |
+
+For a new optimization, do not begin with “How many times faster is it?” Begin with four questions: **Which term—$F$, $M$, capacity, or answer-time budget—changed? What new cost appeared? Under what workload was it measured? Which correctness or quality invariant was checked?** Those questions survive the next paper cycle.
