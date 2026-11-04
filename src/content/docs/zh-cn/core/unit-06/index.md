@@ -60,6 +60,6 @@ unit:
 | [6.5 一般理论](/zh-cn/core/unit-06/theory/) | 缩放定律、计算最适分配、并行化 | 90 分钟 |
 | [6.6 联系](/zh-cn/core/unit-06/connections/) | 复杂度、计算机结构、经济学、物理 | 30 分钟 |
 | [6.7 局限与反例](/zh-cn/core/unit-06/limitations/) | FLOPs ≠ 时间、脆弱的外推、数据之墙 | 40 分钟 |
-| [6.8 最新进展](/zh-cn/core/unit-06/modern/) | 考量 IO 的核心、量化、推测解码、测试时计算 | 35 分钟 |
+| [6.8 最新进展](/zh-cn/core/unit-06/modern/) | 面向内存读写优化的内核、量化、推测解码、测试时计算 | 35 分钟 |
 | [6.9 实验](/zh-cn/core/unit-06/experiments/) | 六个实验 | 实验时间 |
 | [6.10 习题与延伸阅读](/zh-cn/core/unit-06/problems/) | 分级习题与阅读清单 | — |

@@ -37,7 +37,7 @@ $$
 M_{\text{act}} \approx T\,(c\,d) + hT^2
 $$
 
-个数，对这种排列 $c\approx 16$（[Korthikanti et al. 2023](/zh-cn/references/#korthikanti-2023) 给出实际生产排列的精确计数）。$hT^2$ 项——注意力矩阵——正是考量 IO 的核心避免存储的东西（单元 04，§4.8.1）。
+个数，对这种排列 $c\approx 16$（[Korthikanti et al. 2023](/zh-cn/references/#korthikanti-2023) 给出实际生产排列的精确计数）。$hT^2$ 项——注意力矩阵——正是面向内存读写优化的内核避免存储的东西（单元 04，§4.8.1）。
 
 **重算（recomputation）**以 FLOPs 换取内存：只在某些层的边界存储激活值，其余在反向传递时重新计算。把 $L$ 层分成每段 $\sqrt L$ 层，峰值激活值内存从 $O(L)$ 降到 $O(\sqrt L)$ 个区块，代价是多一次前向传递，约多三分之一的 FLOPs（[Chen et al. 2016](/zh-cn/references/#chen-2016)）。这个交换值不值得，取决于设备缺的是内存还是 FLOPs——又是屋顶线。
 
