@@ -6,6 +6,8 @@ sidebar: { label: "5.10 Problems", order: 10 }
 
 Difficulty: ★ routine application · ★★ requires combining ideas · ★★★ proof or open-ended design. Problems marked **[AI-off]** are intended for unaided practice and assessment; the rest may be explored with the [Mentor](/mentor/) after a first attempt. Short answers to selected problems follow the list.
 
+If this is your first pass, use a ladder rather than attempting all twenty in order: do **5.1--5.5** after §5.2--§5.3, then **5.7, 5.10, 5.13 and 5.14** after the derivations, and only then enter the proofs. When stuck, write four lines: **given shapes and assumptions; requested object; governing equation; one check** (units, a limiting case, or a numerical substitution). This keeps an algebra error separate from a conceptual gap.
+
 ## Computation
 
 **5.1 ★ [AI-off]** Apply the EMA with $\alpha = 0.7$ and $h_0 = 10$ to the inputs $(10, 12, 10, 30, 10)$. Report $h_1,\dots,h_5$ and the fraction of the spike that remains in $h_5$.
@@ -16,7 +18,7 @@ Difficulty: ★ routine application · ★★ requires combining ideas · ★★
 
 **5.4 ★ [AI-off]** A sensor is sampled at 10 Hz and should have a memory time constant of 2 s. Give the exact $\alpha$, the forward-Euler $\alpha$, and the backward-Euler $\alpha$ (§5.6.3). Which is closest to exact?
 
-**5.5 ★** Find the eigenvalues, the spectral radius, and the oscillation period of $A = \begin{pmatrix}0.8&-0.6\\0.6&0.8\end{pmatrix}$. Is the recurrence stable? What happens to the impulse response?
+**5.5 ★** Find the eigenvalues, spectral radius and oscillation period of $A=\begin{pmatrix}0.8&-0.6\\0.6&0.8\end{pmatrix}$. Is the homogeneous recurrence asymptotically stable, merely bounded, or unstable? For an input/readout that couples to this mode, what happens to the impulse response?
 
 **5.6 ★★** Compute $K_j = CA^jB$ for $A = \begin{pmatrix}0.6&0.2\\0&0.9\end{pmatrix}$, $B = (0, 1)^\top$, $C = (1, 0)$ in closed form by diagonalization, and find the lag $j$ at which $K_j$ peaks.
 
@@ -40,26 +42,26 @@ Difficulty: ★ routine application · ★★ requires combining ideas · ★★
 
 ## Proof
 
-**5.15 ★★ [AI-off]** Prove Theorem 5.1 (stability of diagonalizable recurrences), including the bound $\|A^t\|\le\kappa(V)\rho(A)^t$.
+**5.15 ★★ [AI-off]** Prove Theorem 5.1 for a diagonalizable matrix, including the operator-2-norm bound $\|A^t\|_2\le\kappa_2(V)\rho(A)^t$. Then explain why all finite-dimensional norms give the same convergence conclusion even though this exact constant need not carry over unchanged.
 
 **5.16 ★★** Show that one delta-rule update $S \leftarrow S + (v - Sk)k^\top$ with $\|k\| = 1$ makes $Sk = v$ exactly, and that it leaves $Sk'$ unchanged for every $k'\perp k$. Conclude that the delta rule stores orthonormal keys with zero interference in a single pass.
 
-**5.17 ★★★** Extend Theorem 5.2 to recall that is allowed to fail with probability $\varepsilon$ on uniformly random windows. *Hint: Fano's inequality gives a lower bound on the entropy of the state.*
+**5.17 ★★★** Extend Theorem 5.2 to whole-window recall that may fail with probability $\varepsilon$ on a uniformly random length-$W$ window over $V$ symbols. Derive a lower bound on the required state bits and check that it reduces to $W\log_2V$ at $\varepsilon=0$. *Hint: Fano's inequality bounds $H(X_{1:W}\mid S)$ by the binary entropy of $\varepsilon$ plus $\varepsilon\log_2(V^W-1)$.*
 
-**5.18 ★★★** Prove that for any cut $c$ the past-to-future block of the matrix $M$ of a selective SSM with state size $N$ has rank at most $N$ (§5.5.4). Then construct inputs for which a single softmax attention layer produces a past-to-future block of rank $\min(c, T-c)$.
+**5.18 ★★★** Freeze the input-dependent coefficients of a selective SSM on one sequence. Prove that for any cut $c$, the past-to-future block of its conditional mixing matrix has rank at most $N$ (§5.5.4). Then construct scalar or vector queries and keys for which one softmax-attention cut block has rank $\min(c,T-c)$. Explain why this conditional rank result is not a global capacity theorem for every nonlinear recurrence.
 
 ## Design and implementation
 
 **5.19 ★★★** Design a bank of $N = 8$ EMAs whose half-lives are geometrically spaced from 1 to $10^4$ steps. Give the $\alpha_i$. Propose a readout that estimates "the mean of the last $W$ inputs" for arbitrary $W$ in that range, and analyse its error. What does this suggest about initializing the time constants of diagonal SSMs?
 
-**5.20 ★★ (Spine)** Complete Experiment 5.8: KV-cache decoding for the spine model with the equivalence test, plus the recall stress test with its control. Report one page: prediction, result, discrepancy, explanation.
+**5.20 ★★ (Spine)** Complete Experiment 5.8: KV-cache decoding with a declared numerical tolerance and benchmark protocol, plus the recall stress test with removal and value-permutation controls. Report one page: prediction, result with uncertainty, discrepancy and explanation. A flat or failed recall curve is a valid result.
 
 ## Selected answers
 
 - **5.1** $h = (10, 10.6, 10.42, 16.294, 14.406)$. The spike enters $h_5$ with weight $(1-\alpha)\alpha = 0.21$; its excess of 20 °C over the baseline contributes $0.21\cdot 20 = 4.2$ to $h_5$ (it contributed 6 to $h_4$, so 70% of its effect survives one more step).
 - **5.4** $\Delta t/\tau = 0.05$: exact $e^{-0.05} = 0.951229$; forward Euler $0.95$ (error 0.00123); backward Euler $1/1.05 = 0.952381$ (error 0.00115). Both are first-order accurate and bracket the exact value; backward Euler is slightly closer here, and unlike forward Euler it stays stable for any step.
-- **5.5** $\lambda = 0.8\pm0.6i$, $|\lambda| = 1$: the matrix is a pure rotation by $\arctan(0.6/0.8)\approx0.6435$ rad, period $\approx 9.76$ steps. Not asymptotically stable: the impulse response oscillates forever without decaying (marginal stability, §5.3.4).
-- **5.14** $\alpha = 1 - K$ with $K = P/(P+1)$ and $P = (\rho + \sqrt{\rho^2+4\rho})/2$ (in units of $r$). As $\rho\to0$, $\alpha\to1$ (average forever); as $\rho\to\infty$, $\alpha\to0$ (trust only the newest reading).
+- **5.5** $\lambda=0.8\pm0.6i$, $|\lambda|=1$: $A$ is a pure rotation by $\arctan(0.6/0.8)\approx0.6435$ rad, with period $\approx9.76$ steps. The homogeneous state is bounded but not asymptotically stable. Any coupled impulse component oscillates without decay (marginal stability, §5.3.4).
+- **5.14** $\alpha=1-K$ with $K=P/(P+1)$ and $P=(\rho+\sqrt{\rho^2+4\rho})/2$ in units of $r$. The requested values are $0.99005$, $0.90488$ and $0.38197$. As $\rho\to0$, $\alpha\to1$ (trust a slowly changing state); as $\rho\to\infty$, $\alpha\to0$ (trust the newest measurement).
 
 ## Further study
 
@@ -75,6 +77,8 @@ Difficulty: ★ routine application · ★★ requires combining ideas · ★★
 **State-space models and linear attention.**
 [Gu et al. 2020](/references/#gu-2020) (HiPPO) → [Gu et al. 2022a](/references/#gu-2022) (S4) → [Gu & Dao 2024](/references/#gu-2024) (Mamba) → [Dao & Gu 2024](/references/#dao-2024) (state-space duality): read in this order to see the ideas of §5.3.9–§5.3.10 and §5.5.4 develop.
 [Katharopoulos et al. 2020](/references/#katharopoulos-2020); [Schlag et al. 2021](/references/#schlag-2021) — linear attention as recurrence and as a fast-weight memory.
+[Yang et al. 2025](/references/#gated-deltanet-2025); [Kimi Team 2025](/references/#kimi-linear-2025) — gated delta updates and a later large-scale hybrid; compare their write rules before comparing headline scores.
+[Sun et al. 2024](/references/#ttt-2024); [Behrouz et al. 2025](/references/#titans-2025) — the state as an online-learned model; track what is updated at inference and what the update costs.
 
 **Limits.**
 [Arora et al. 2024](/references/#arora-2024); [Jelassi et al. 2024](/references/#jelassi-2024) — the evidence behind §5.7.1, and a model of how to test a memory claim.
