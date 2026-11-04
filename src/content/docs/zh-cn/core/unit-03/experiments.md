@@ -66,6 +66,6 @@ sidebar: { label: "3.9 实验", order: 9 }
 
 **检验：** §3.3.5(c)、§3.3.8。**预测：** 在主干语料上，$W = 0$ 的神经二元语法的初始损失，以及 1,000 步 Adam 之后的训练损失相对于计数式最大似然二元语法的差距。
 
-**步骤。** 执行 `python spine/stage03_neural_bigram.py`；阅读 `loss_and_grad`，逐列与 $\bar s = p - e_y$ 以及 $W$ 各行的分散累加（扇出）规则比对。执行 `python -m pytest spine`。
+**步骤。** 执行 `python spine/stage03_neural_bigram.py`；阅读 `loss_and_grad`，逐行与 $\bar s = p - e_y$ 以及 $W$ 各行的分散累加（扇出）规则比对。执行 `python -m pytest spine`。
 
 **观察：** 初始损失恰好为 $\ln V$（单元 01 的均匀基线）；训练损失永远不低于计数式最优值，并在 0.01 nats 内接近它；有限差分检查通过。
