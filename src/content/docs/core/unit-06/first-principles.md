@@ -37,7 +37,7 @@ Take a linear layer $Y=XW$. Let $X\in\mathbb{R}^{S\times d_{\text{in}}}$ contain
 The forward product has dimensions
 
 $$
-(S\times d_{\text{in}})(d_{\text{in}}\times d_{\text{out}})ightarrow(S\times d_{\text{out}}),
+(S\times d_{\text{in}})(d_{\text{in}}\times d_{\text{out}})\rightarrow(S\times d_{\text{out}}),
 $$
 
 and therefore costs $2S d_{\text{in}}d_{\text{out}}$ FLOPs. Write $P=d_{\text{in}}d_{\text{out}}$ for the number of matrix weights. Then **forward = $2SP$ FLOPs**, or **$2P$ per token row**. Biases, if present, add only $Sd_{\text{out}}$ scalar additions; we keep them outside the matrix-product count.

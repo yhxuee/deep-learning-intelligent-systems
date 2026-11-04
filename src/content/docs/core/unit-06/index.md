@@ -7,7 +7,7 @@ unit:
   part: 2
   question: When is additional model capacity worth its data, memory, energy, and latency costs?
   anchor: Exact FLOP and memory accounting for the spine Transformer — verified by an instrumented counter — and a scaling-law fit over five model sizes with a pre-registered prediction for a sixth.
-  spine: "Stage 06 — verify that measured training FLOPs equal 6N + 12LTd per token exactly; train five spine-model widths on a fixed token budget, fit L(N) = E + A·N^(−α), write the prediction for a sixth width to disk, then train it and compare."
+  spine: "Stage 06 — verify that the instrumented matrix-product count equals 6N_mm + 12LTd per token under the declared convention; train five spine-model widths on a fixed token budget, fit L(N) = E + A·N^(−α), write the prediction for a sixth width to disk, then train it and compare."
   checkpoint: Derive the 6N rule and the training-memory budget of a Transformer without AI; explain with arithmetic intensity why batch-1 decoding runs far below peak FLOP/s; derive the compute-optimal split of a fixed budget between parameters and data.
   status: draft
   atlas: [method-scaling-law-fit, arch-transformer-block, mech-kv-cache, opt-adamw]

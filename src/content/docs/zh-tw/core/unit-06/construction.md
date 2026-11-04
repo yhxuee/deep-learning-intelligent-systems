@@ -1,6 +1,6 @@
 ---
 title: "6.3 數學建構"
-description: Transformer 區塊的精確 FLOP 計算，並證明植入的計數恰好等於每詞元 6N + 12LTd；激活值記憶體與重算；矩陣乘積與解碼的算術強度；屋頂線；以及把 KV 快取看成記憶體流量問題。
+description: Transformer 區塊的精確 FLOP 計算，並證明植入的矩陣乘積計數恰好等於每詞元 6N_mm + 12LTd；激活值記憶體與重算；矩陣乘積與解碼的算術強度；roofline（屋頂線）；以及把 KV 快取看成記憶體流量問題。
 sidebar: { label: "6.3 數學建構", order: 3 }
 ---
 

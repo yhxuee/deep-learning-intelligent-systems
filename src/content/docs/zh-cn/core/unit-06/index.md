@@ -7,7 +7,7 @@ unit:
   part: 2
   question: 额外的模型容量何时值得它在数据、内存、能源与延迟上的成本？
   anchor: 主干 Transformer 精确的 FLOP 与内存计算——由一个植入程序的计数器验证——以及以五种模型大小拟合的缩放定律，并为第六种大小预注册预测。
-  spine: "阶段 06——验证测得的训练 FLOPs 每个词元恰好等于 6N + 12LTd；在固定的词元预算下训练五种宽度的主干模型，拟合 L(N) = E + A·N^(−α)，把第六种宽度的预测写入磁碟，然后训练它并比较。"
+  spine: "阶段 06——验证植入的矩阵乘积计数在声明的惯例下，每词元恰好等于 6N_mm + 12LTd；在固定的词元预算下训练五种宽度的主干模型，拟合 L(N) = E + A·N^(−α)，把第六种宽度的预测写入磁碟，然后训练它并比较。"
   checkpoint: 不使用 AI，推导 6N 法则与 Transformer 的训练内存预算；以算术强度解释为什么批量为 1 的解码远低于峰值 FLOP/s；推导固定预算在参数与数据之间的计算最适分配。
   status: draft
   atlas: [method-scaling-law-fit, arch-transformer-block, mech-kv-cache, opt-adamw]

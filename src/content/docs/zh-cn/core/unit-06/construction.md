@@ -1,6 +1,6 @@
 ---
 title: "6.3 数学构建"
-description: Transformer 区块的精确 FLOP 计算，并证明植入的计数恰好等于每词元 6N + 12LTd；激活值内存与重算；矩阵乘积与解码的算术强度；屋顶线；以及把 KV 缓存看成内存流量问题。
+description: Transformer 区块的精确 FLOP 计算，并证明植入的矩阵乘积计数恰好等于每词元 6N_mm + 12LTd；激活值内存与重算；矩阵乘积与解码的算术强度；roofline（屋顶线）；以及把 KV 缓存看成内存流量问题。
 sidebar: { label: "6.3 数学构建", order: 3 }
 ---
 

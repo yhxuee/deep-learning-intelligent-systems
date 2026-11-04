@@ -1,6 +1,6 @@
 ---
 title: "6.3 Mathematical construction"
-description: Exact FLOP accounting for a Transformer block with a proof that the instrumented count equals 6N + 12LTd per token, activation memory and recomputation, arithmetic intensity of matrix products and decoding, the roofline, and the KV cache as a memory-traffic problem.
+description: Exact FLOP accounting for a Transformer block with a proof that the instrumented matrix-product count equals 6N_mm + 12LTd per token, activation memory and recomputation, arithmetic intensity of matrix products and decoding, the roofline, and the KV cache as a memory-traffic problem.
 sidebar: { label: "6.3 Construction", order: 3 }
 ---
 

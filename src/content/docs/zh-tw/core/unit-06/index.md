@@ -7,7 +7,7 @@ unit:
   part: 2
   question: 額外的模型容量何時值得它在資料、記憶體、能源與延遲上的成本？
   anchor: 主幹 Transformer 精確的 FLOP 與記憶體計算——由一個植入程式的計數器驗證——以及以五種模型大小擬合的縮放定律，並為第六種大小預先登記預測。
-  spine: "階段 06——驗證量測到的訓練 FLOPs 每個詞元恰好等於 6N + 12LTd；在固定的詞元預算下訓練五種寬度的主幹模型，擬合 L(N) = E + A·N^(−α)，把第六種寬度的預測寫入磁碟，然後訓練它並比較。"
+  spine: "階段 06——驗證植入的矩陣乘積計數在聲明的慣例下，每詞元恰好等於 6N_mm + 12LTd；在固定的詞元預算下訓練五種寬度的主幹模型，擬合 L(N) = E + A·N^(−α)，把第六種寬度的預測寫入磁碟，然後訓練它並比較。"
   checkpoint: 不使用 AI，推導 6N 法則與 Transformer 的訓練記憶體預算；以算術強度解釋為什麼批次為 1 的解碼遠低於峰值 FLOP/s；推導固定預算在參數與資料之間的計算最適分配。
   status: draft
   atlas: [method-scaling-law-fit, arch-transformer-block, mech-kv-cache, opt-adamw]
