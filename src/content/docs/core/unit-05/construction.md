@@ -4,7 +4,7 @@ description: Vector states, eigen-modes, stability, transient growth, recurrent 
 sidebar: { label: "5.3 Construction", order: 3 }
 ---
 
-Section 5.2 built a memory with one timescale. This section generalizes it step by step. Each subsection fixes a limitation of the previous one; together they lead from the EMA to the architectures used in current sequence models.
+Section 5.2 built a memory with one timescale. This section generalizes it step by step. Keep four questions beside every equation: **what is written into the state, how an old input reaches the present, how the state is read, and how a learning signal travels backward.** Each subsection changes one of those answers; together they lead from the EMA to modern sequence architectures.
 
 ## 5.3.1 Many timescales: a vector of memories
 
@@ -23,7 +23,7 @@ A = \begin{pmatrix} 0.5 & 0 \\ 0 & 0.95 \end{pmatrix}, \qquad
 B = \begin{pmatrix} 0.5 \\ 0.05 \end{pmatrix}.
 $$
 
-The first component is a fast EMA (half-life 1 step), the second a slow one (half-life 13.5 steps). A readout can use them separately or together. For instance $C = (1, -1)$ outputs *fast minus slow* — near zero when the signal is steady, large just after a change. With one line of linear algebra, the device now detects change, which no single EMA can do.
+The first component is a fast EMA (half-life 1 step), the second a slow one (half-life 13.5 steps). A readout can use them separately or together. For instance $C=(1,-1)$ outputs *fast minus slow*—near zero when the signal is steady and large just after a change. This supplies an explicit comparison of two timescales, which a readout of one scalar EMA alone does not contain. (A system that also reads the current input directly could compare that input with one slow EMA.)
 
 When $A$ is diagonal the components do not interact. The general case allows $A$ to mix them. The next subsections show that, under a mild condition, every linear recurrence is secretly a bank of independent memories — in the right coordinates.
 
@@ -47,7 +47,7 @@ Three consequences:
    $$y_t = \sum_{k=1}^{t} K_{t-k}\, x_k .$$
    The output is the input **convolved** with the kernel $K$. A linear time-invariant recurrence and a causal convolution with kernel $K_j = CA^jB$ are two ways of computing the same function.
 
-The convolution view matters for computation. The recurrence produces outputs one at a time, which is ideal for streaming inference. The convolution can be computed for all $t$ at once — in $O(T\log T)$ time with the fast Fourier transform — which is ideal for training on a whole sequence in parallel. Structured state-space models (§5.3.9) exploit exactly this duality.
+The convolution view matters for computation. The recurrence produces outputs one at a time, which is ideal for streaming inference. Once a length-$T$ kernel has been formed, the time-axis convolution can be evaluated for all $t$ with FFTs in $O(T\log T)$ operations per input/output channel pair, instead of a sequential time loop. Kernel construction and channel mixing add dimension-dependent costs that this notation suppresses. Structured state-space models (§5.3.9) exploit this recurrence--convolution duality.
 
 ## 5.3.3 Eigenvalues are memory modes
 
@@ -95,33 +95,33 @@ Oscillating modes are not a curiosity. They let a linear memory represent *perio
 
 **Definition.** The spectral radius of $A$ is $\rho(A) = \max_i |\lambda_i|$, the largest eigenvalue modulus.
 
-**Theorem 5.1.** Let $A$ be diagonalizable. Then $A^t \to 0$ as $t\to\infty$ if and only if $\rho(A) < 1$. Moreover, for any submultiplicative matrix norm,
+**Theorem 5.1.** Let $A$ be diagonalizable. Then $A^t\to0$ as $t\to\infty$ if and only if $\rho(A)<1$. In the operator 2-norm,
 
 $$
-\|A^t\| \;\le\; \kappa(V)\,\rho(A)^t, \qquad \kappa(V) = \|V\|\,\|V^{-1}\|.
+\|A^t\|_2 \;\le\; \kappa_2(V)\,\rho(A)^t, \qquad \kappa_2(V)=\|V\|_2\,\|V^{-1}\|_2.
 $$
 
-*Proof.* $A^t = V\Lambda^tV^{-1}$, and $\Lambda^t$ is diagonal with entries $\lambda_i^t$, so in the spectral norm $\|\Lambda^t\|_2 = \rho(A)^t$. Hence $\|A^t\| \le \|V\|\,\rho(A)^t\,\|V^{-1}\|$, which tends to 0 if $\rho < 1$. Conversely, if some $|\lambda_i| \ge 1$, then $A^tv_i = \lambda_i^t v_i$ does not tend to 0, so neither does $A^t$. $\blacksquare$
+*Proof.* $A^t=V\Lambda^tV^{-1}$, and $\Lambda^t$ is diagonal with entries $\lambda_i^t$, so $\|\Lambda^t\|_2=\rho(A)^t$. Submultiplicativity of the operator 2-norm gives the displayed bound, which tends to 0 if $\rho<1$. Conversely, if some $|\lambda_i|\ge1$, then $A^tv_i=\lambda_i^tv_i$ does not tend to 0, so neither does $A^t$. $\blacksquare$ Other finite-dimensional norms give the same convergence conclusion, but the displayed constant need not remain valid unchanged for an arbitrary norm.
 
 **Bounded input, bounded state.** If $\rho(A)<1$ and all inputs satisfy $\|x_k\| \le X$, the closed form gives
 
 $$
-\|h_t\| \le \|A^t\|\,\|h_0\| + \sum_{j=0}^{t-1}\|A^j\|\,\|B\|\,X \le \kappa(V)\Bigl(\|h_0\| + \frac{\|B\|X}{1-\rho}\Bigr),
+\|h_t\|_2 \le \|A^t\|_2\,\|h_0\|_2 + \sum_{j=0}^{t-1}\|A^j\|_2\,\|B\|_2\,X \le \kappa_2(V)\Bigl(\|h_0\|_2 + \frac{\|B\|_2X}{1-\rho}\Bigr),
 $$
 
-using the geometric series. The state stays bounded forever. If $\rho \ge 1$, some bounded input makes the state grow without bound (feed the input that excites the mode with $|\lambda|\ge1$).
+using the geometric series. Thus $\rho(A)<1$ guarantees a bounded state for every bounded input. The converse needs reachability: if $\rho(A)\ge1$ and the initial state or $Bx_t$ excites a marginal or unstable mode, the state need not decay and may grow; a particular $B$ can be orthogonal to that mode and never excite it.
 
 So for a linear memory there are three regimes:
 
 | $\rho(A)$ | behaviour | as a memory |
 |---|---|---|
 | $<1$ | every mode decays | forgets gradually; stable |
-| $=1$ | some mode neither decays nor grows (if not defective) | perfect but fragile memory of that mode; noise accumulates |
+| $=1$ | some mode neither decays nor grows if its unit-modulus part is non-defective | persistent but fragile memory of that mode; excited noise can accumulate |
 | $>1$ | some mode grows geometrically | unstable; numbers overflow |
 
-Useful memories live just inside the unit circle: eigenvalues of modulus slightly below 1 give long, stable half-lives.
+Stable **fading** memories often place modes just inside the unit circle: eigenvalues of modulus slightly below 1 give long half-lives. Unit-modulus modes can also be useful, but require separate control of defects, noise and numerical error.
 
-**★ Advanced: the non-diagonalizable case.** Not every matrix is diagonalizable, but every square matrix has a Jordan form, and Gelfand's formula $\lim_{t\to\infty}\|A^t\|^{1/t} = \rho(A)$ holds for every matrix and every norm. Hence $A^t\to0 \iff \rho(A)<1$ in general; only the constant in front of $\rho^t$ changes (it may grow polynomially in $t$, as the next subsection shows).
+**★ Advanced: the non-diagonalizable case.** Not every matrix is diagonalizable, but every square complex matrix has a Jordan form, and Gelfand's formula $\lim_{t\to\infty}\|A^t\|^{1/t}=\rho(A)$ holds for every matrix norm. Hence $A^t\to0\iff\rho(A)<1$ in general. A Jordan block contributes polynomial factors such as $t^r\rho^t$, so one cannot always bound it by a fixed constant times exactly $\rho^t$; for every $r_0>\rho(A)$ there is instead a constant $C_{r_0}$ with $\|A^t\|\le C_{r_0}r_0^t$.
 
 ## 5.3.5 ★ When eigenvalues mislead: transient growth
 
@@ -145,7 +145,7 @@ The off-diagonal entry $5t\,0.9^{t-1}$ first **grows** linearly with $t$ before 
 
 <div class="dlis-widget not-content" data-widget="eigen-modes">Interactive figure — requires JavaScript. The static figure and tables above contain the same information.</div>
 
-The phenomenon is called **non-normal transient growth**: it occurs whenever $A$ does not commute with its transpose, and is strongest when eigenvectors are nearly parallel (large $\kappa(V)$). It is a standard topic in numerical analysis ([Trefethen & Embree 2005](/references/#trefethen-2005)). For memory design the lesson is concrete: *"$\rho(A) < 1$" guarantees eventual forgetting, not gentle forgetting.* This is one reason state-space models (§5.3.9) restrict $A$ to diagonal or other well-conditioned forms.
+This is **non-normal transient growth**. A real matrix is non-normal when it does not commute with its transpose; non-normality permits large transients but does not force every initial direction to grow. Nearly parallel eigenvectors (large $\kappa_2(V)$) are one warning sign. The phenomenon is a standard topic in numerical analysis ([Trefethen & Embree 2005](/references/#trefethen-2005)). For memory design the lesson is concrete: *“$\rho(A)<1$” guarantees eventual forgetting, not gentle forgetting.* This motivates diagonal, normal or explicitly well-conditioned parameterizations in some state-space models (§5.3.9); structure alone must still be checked rather than assumed safe.
 
 ## 5.3.6 Nonlinear memory: the recurrent neural network
 
@@ -202,9 +202,9 @@ $$
 \Bigl\|\frac{\partial L_t}{\partial h_k}\Bigr\| \le \Bigl\|\frac{\partial L_t}{\partial h_t}\Bigr\|\;\|W\|^{\,t-k}.
 $$
 
-If the largest singular value of $W$ is below 1, the signal from a loss $t-k$ steps later **vanishes geometrically** — the learning signal that would teach the network to keep information over long spans is exponentially small ([Bengio et al. 1994](/references/#bengio-1994); [Pascanu et al. 2013](/references/#pascanu-2013)). If $\rho(W) > 1$, products can instead **explode**, and a single update can throw the parameters far away.
+If the largest singular value of $W$ is below 1, this upper bound decays geometrically, so a loss $t-k$ steps later cannot send a large direct signal through that path ([Bengio et al. 1994](/references/#bengio-1994); [Pascanu et al. 2013](/references/#pascanu-2013)). In a near-linear regime with expanding directions, products can instead **explode**, and a single update can throw the parameters far away. Neither $\rho(W)>1$ nor a large singular value alone guarantees explosion after the state-dependent $\tanh'$ factors are included.
 
-For the *linear* recurrence the connection is exact: $\partial h_t/\partial h_k = A^{t-k}$, the very matrix that measures how much $h_k$ is remembered in $h_t$ (§5.3.2). **Memory decay and gradient decay are the same object.** A network can only learn to use a dependency that its current dynamics already preserve long enough for the gradient to arrive.
+For the *linear* recurrence the connection is exact: $\partial h_t/\partial h_k=A^{t-k}$, the very matrix that carries $h_k$ into $h_t$ (§5.3.2). **Forward influence and backward sensitivity use the same transition powers.** In nonlinear recurrences both use products of the same local state Jacobians, evaluated along the trajectory. If those products are already tiny, direct long-range credit assignment is difficult—not logically impossible, but poorly conditioned.
 
 ![Log of the norm of the product of Jacobians ∂h_t/∂h_k for a tanh RNN with 64 units, against the time lag, for recurrent matrices scaled to spectral radius 0.5, 1.0 and 1.5. All three decline; ρ = 0.5 fastest, reaching about 10^-29 at lag 60.](/figures/u05-bptt-gradient-decay.svg)
 
@@ -213,7 +213,7 @@ For the *linear* recurrence the connection is exact: $\partial h_t/\partial h_k 
 **Two standard remedies, and what they do not fix.**
 
 - **Gradient clipping**: if $\|g\| > c$, replace $g$ by $c\,g/\|g\|$ ([Pascanu et al. 2013](/references/#pascanu-2013)). It prevents explosive updates; it does nothing for vanishing gradients.
-- **Truncated BPTT**: run the backward recursion for at most $k$ steps. It bounds memory and compute, but by construction it cannot learn dependencies longer than $k$.
+- **Truncated BPTT**: run the backward recursion for at most $k$ steps. It bounds memory and compute and removes direct credit-assignment paths longer than $k$. A model can still exhibit longer behaviour through carried state or learn it from shorter/local signals, so the truncation length is not a strict upper bound on behaviour; it is a bound on the gradient path used by that update.
 
 To learn long dependencies, the dynamics themselves must preserve information. That is the job of gates.
 
@@ -227,7 +227,7 @@ f_t = \sigma\bigl(W_f[h_{t-1}; x_t] + b_f\bigr) \in (0,1)^N,
 h_t = f_t \odot h_{t-1} + (1 - f_t)\odot \tilde h_t ,
 $$
 
-where $\sigma(z) = 1/(1+e^{-z})$ is the logistic function, $[\,\cdot\,;\,\cdot\,]$ concatenates vectors, $\odot$ is elementwise multiplication, and $\tilde h_t$ is a proposed new content (for example $\tanh(W_h[h_{t-1};x_t] + b_h)$). Component by component, this is an EMA whose $\alpha$ is chosen anew at every step: $f_t \approx 1$ means *hold*, $f_t \approx 0$ means *overwrite*. The instantaneous half-life of component $i$ is $\ln 2/(-\ln f_{t,i})$, now under the network's control.
+where $\sigma(z)=1/(1+e^{-z})$ is the logistic function, $[\,\cdot\,;\,\cdot\,]$ concatenates vectors, $\odot$ is elementwise multiplication, and $\tilde h_t$ is proposed new content (for example $\tanh(W_h[h_{t-1};x_t]+b_h)$). Component by component, this is an EMA whose $\alpha$ is chosen anew at every step: $f_t\approx1$ means *hold*, $f_t\approx0$ means *overwrite*. If a component's gate were held at a constant value $f$, its half-life would be $\ln2/(-\ln f)$; when gates vary, retention over several steps is the product $\prod_j f_j$, not one instantaneous half-life.
 
 **Why gates help learning.** Ignoring the (smaller) paths through $f_t$ and $\tilde h_t$, the Jacobian of the direct path is
 
@@ -273,16 +273,16 @@ h(t_0+\Delta) = e^{A\Delta}h(t_0) + \Bigl(\int_0^{\Delta} e^{As}\,ds\Bigr)B\,x
               = \underbrace{e^{A\Delta}}_{\bar A}\,h(t_0) + \underbrace{A^{-1}\bigl(e^{A\Delta} - I\bigr)B}_{\bar B}\,x ,
 $$
 
-where the integral was evaluated assuming $A$ is invertible. The discrete system $h_t = \bar Ah_{t-1} + \bar Bx_t$ is the exact sampled version.
+where the final $A^{-1}$ expression assumes $A$ is invertible. The integral expression itself is valid even when $A$ is singular and can be evaluated by a series or an augmented matrix exponential. The discrete system $h_t=\bar Ah_{t-1}+\bar Bx_t$ is exact for these continuous dynamics under the zero-order-hold assumption.
 
 **Check: this is the EMA.** Take $N = 1$, $A = -1/\tau$, $B = 1/\tau$ (the cooling law $\tau\dot h = x - h$). Then $\bar A = e^{-\Delta/\tau}$ and $\bar B = (-\tau)\bigl(e^{-\Delta/\tau}-1\bigr)\tfrac1\tau = 1 - e^{-\Delta/\tau}$: exactly $\alpha$ and $1-\alpha$ from §5.2.7. *The EMA is a one-dimensional state-space model.*
 
 **What makes these models work** is the choice of $A$ and the dual computation:
 
-- **Stable, well-conditioned $A$.** If the eigenvalues of $A$ have negative real parts, those of $\bar A = e^{A\Delta}$ have modulus $e^{\Delta\,\mathrm{Re}\lambda} < 1$ for every $\Delta > 0$: exact discretization never produces the instability of Euler (§5.2.8). Diagonal or diagonal-plus-low-rank $A$ avoids the transient growth of §5.3.5 and makes $\bar A$ cheap to compute. A diagonal $A$ with negative real parts is exactly the bank of continuous-time EMAs of §5.3.1, each with its own time constant ([Gu et al. 2022b](/references/#gu-2022b)).
-- **Designed long memory.** HiPPO ([Gu et al. 2020](/references/#gu-2020)) derives specific matrices $A$ for which the state $h(t)$ holds the coefficients of the best polynomial approximation of the input history — a principled answer to "what should a fixed-size state store?".
+- **Stable, controlled $A$.** If the eigenvalues of $A$ have negative real parts, those of $\bar A=e^{A\Delta}$ have modulus $e^{\Delta\,\mathrm{Re}\lambda}<1$ for every $\Delta>0$: exact ZOH discretization does not introduce Euler's step-size instability (§5.2.8). A diagonal normal $A$ also eliminates non-normal transient growth and makes $\bar A$ cheap to compute. Diagonal-plus-low-rank and other structured forms can be efficient, but do not automatically guarantee good conditioning. A diagonal $A$ with negative real parts is a bank of continuous-time decaying modes, each with its own time constant ([Gu et al. 2022b](/references/#gu-2022b)).
+- **Designed long memory.** Under its specified measure, basis and time rescaling, HiPPO ([Gu et al. 2020](/references/#gu-2020)) derives dynamics whose state tracks coefficients of an online polynomial projection of the input history—a principled answer to “what should a fixed-size state store?”.
 - **Two computations of one function.** Because the system is linear and time-invariant, training computes all outputs at once as a convolution with kernel $K_j = C\bar A^{j}\bar B$; inference runs the recurrence with constant memory per step. The S4 model made this practical for very long sequences ([Gu et al. 2022a](/references/#gu-2022)).
-- **Learned timescales.** $\Delta$ is a learned parameter (one per channel): the network learns how fast each memory should forget.
+- **Learned timescales.** In common parameterizations, $\Delta$ is learned per feature or channel, so the model learns how fast different modes should evolve.
 
 ## 5.3.10 Selectivity: letting the input choose what to remember
 
@@ -296,9 +296,9 @@ $$
 and $h_t = \bar A_t h_{t-1} + \bar B_t x_t$ ([Gu & Dao 2024](/references/#gu-2024); the simplified $\bar B_t$ is the one used there). For a single real channel with $A = -1$: $\bar A_t = e^{-\Delta_t}$.
 
 - $\Delta_t \to 0$: $\bar A_t \to 1$ and $\bar B_t \to 0$ — **hold** the state and ignore this input.
-- $\Delta_t$ large: $\bar A_t \to 0$ — **reset** and write the current input.
+- $\Delta_t$ large: $\bar A_t \to 0$ — strongly forget the previous state; the amount written still depends on the chosen $\bar B_t$ parameterization.
 
-This is a gate, $f_t = e^{-\Delta_t}$, derived from the continuous-time view rather than added by hand. The price is that the system is no longer time-invariant, so the convolution form of §5.3.2 is lost.
+The retention factor $f_t=e^{-\Delta_t}$ behaves like a gate derived from the continuous-time view rather than inserted as a convex blend by hand. With exact scalar ZOH and a matching input coefficient, the write weight is $1-f_t$ and the update is an EMA; with the simplified $\bar B_t\approx\Delta_tB(x_t)$ above, it is not a convex combination. The price of input-dependent coefficients is that the system is no longer time-invariant, so the fixed convolution form of §5.3.2 is lost.
 
 **Recovering parallelism: the scan.** The recurrence $h_t = a_th_{t-1} + b_t$ (with $a_t$ diagonal, here written as scalars) can still be computed in parallel. Represent one step by the pair $(a_t, b_t)$, meaning the map $h \mapsto a_th + b_t$. Applying step 1 and then step 2 gives $h \mapsto a_2(a_1h + b_1) + b_2$, so define the composition
 
@@ -310,23 +310,23 @@ $$
 
 Because the operator is associative, all prefix compositions $h_1,\dots,h_T$ can be computed by a **parallel prefix scan** in $O(\log T)$ parallel steps and $O(T)$ total work ([Blelloch 1990](/references/#blelloch-1990)). Worked Example 5.8 does a four-step scan by hand. Selective SSMs combine this scan with careful use of fast on-chip memory to train efficiently.
 
-## 5.3.11 The opposite strategy: store everything
+## 5.3.11 A different strategy: growing per-token memory
 
-Every memory so far compresses: the state has a fixed size $N$ however long the stream. Unit 04's **attention** takes the opposite route. At step $t$ it keeps the key and value of *every* previous token — the **KV cache** — and reads by content:
+Every memory so far compresses time into a fixed-size state. Unit 04's cached **attention** takes a different route: at step $t$ it retains one learned key and value vector for every cached token and reads those records by content:
 
 $$
-y_t = \sum_{j\le t} \frac{\exp(q_t^{\top}k_j/\sqrt{d})}{\sum_{j'\le t}\exp(q_t^{\top}k_{j'}/\sqrt{d})}\; v_j .
+y_t = \sum_{j\le t} \frac{\exp(q_t^{\top}k_j/\sqrt{d_k})}{\sum_{j'\le t}\exp(q_t^{\top}k_{j'}/\sqrt{d_k})}\; v_j .
 $$
 
-In the language of §5.2.1, the "state" is the whole cache $\{(k_j, v_j)\}_{j\le t}$, the shift register of the fourth row of the table, extended to the full history. Consequences:
+In the language of §5.2.1, the operational state includes the cache $\{(k_j,v_j)\}_{j\le t}$ (plus positions and any other decoding state). It grows like a sequence buffer, but each record is a learned projection of a token representation, not a lossless copy of the raw token or all earlier activations. Consequences:
 
-- **Exact retrieval at any distance.** A token 10 000 steps back is as accessible as the previous one, provided the query matches its key.
-- **No decision at write time.** Nothing has to be forgotten when a token arrives; the choice of what matters is made at **read** time, by the query. This sidesteps the dilemma of §5.2.6 completely.
+- **A direct path at any cached distance.** A record 10,000 steps back can be scored in one attention operation just like the previous record; there is no compulsory geometric decay with distance. Finite softmax is still a weighted blend, so exact selection is not guaranteed: keys can collide, scores can be insufficiently separated, and the context may have been truncated.
+- **No forced merger with the previous temporal state.** Each new token receives its own cache slot, and the query decides at **read** time how to combine slots. The projections still decide what is written, and a finite context or cache-eviction policy can discard records, so write-time information loss has not disappeared completely.
 - **Cost grows with the history.** Memory and per-step compute are $O(t\,d)$; over a sequence of length $T$, total attention compute is $O(T^2 d)$ (Unit 04, §4.5.6). The memory of the KV cache is computed exactly in the [KV cache Atlas node](/atlas/nodes/mech-kv-cache/).
 
 ## 5.3.12 In between: linear attention is a recurrence with a matrix state
 
-Is there a design that reads by content, like attention, but keeps a fixed-size state, like a recurrence? Remove the softmax and use any feature map $\phi$ with non-negative outputs ([Katharopoulos et al. 2020](/references/#katharopoulos-2020)):
+Is there a design that reads by content, like attention, but keeps a fixed-size state, like a recurrence? Replace the exponential softmax kernel by a factorized kernel with a feature map $\phi:\mathbb R^{d_k}\to\mathbb R^r$, often chosen with non-negative outputs ([Katharopoulos et al. 2020](/references/#katharopoulos-2020)):
 
 $$
 y_t = \frac{\sum_{j\le t} v_j\,\phi(k_j)^{\top}\phi(q_t)}{\sum_{j\le t}\phi(k_j)^{\top}\phi(q_t)} .
@@ -335,31 +335,31 @@ $$
 The sums over $j$ do not involve $q_t$, so they can be accumulated as a recurrence:
 
 $$
-S_t = S_{t-1} + v_t\,\phi(k_t)^{\top} \in \mathbb{R}^{d_v\times d_k}, \qquad
+S_t = S_{t-1} + v_t\,\phi(k_t)^{\top} \in \mathbb{R}^{d_v\times r}, \qquad
 z_t = z_{t-1} + \phi(k_t), \qquad
 y_t = \frac{S_t\,\phi(q_t)}{z_t^{\top}\phi(q_t)} .
 $$
 
-This is a linear recurrence whose state is a **matrix**: writing stores the outer product $v_t\phi(k_t)^\top$; reading multiplies by a query. It is an **associative memory**: a key retrieves its value by matrix–vector multiplication.
+This is a linear recurrence whose state is a **matrix** plus a length-$r$ normalizer: writing stores the outer product $v_t\phi(k_t)^\top$; reading multiplies by a query. The denominator must be nonzero (implementations add safeguards). It is an **associative memory**: a key retrieves a blend of stored values by matrix--vector multiplication.
 
 How much can it hold? Drop $\phi$ and the normalizer to see the mechanism: $S = \sum_j v_jk_j^{\top}$, read with $Sq$.
 
 - **Orthonormal keys: exact recall up to $d_k$ pairs.** If $k_1,\dots,k_n$ are orthonormal ($n\le d_k$), then $Sk_i = \sum_j v_j(k_j^\top k_i) = v_i$, because $k_j^\top k_i$ is 1 for $j = i$ and 0 otherwise.
 - **More pairs than dimensions: interference.** At most $d_k$ vectors can be mutually orthogonal in $\mathbb{R}^{d_k}$. Beyond that, $Sk_i = v_i + \sum_{j\ne i}(k_j^{\top}k_i)\,v_j$: every other stored value leaks into the answer. §5.5.3 computes the size of this *cross-talk*.
 
-So linear attention trades the KV cache's exact, growing memory for a fixed $d_v\times d_k$ memory with bounded capacity. Recent variants add a decay factor ($S_t = \gamma S_{t-1} + \dots$, as in retention-style models; [Sun et al. 2023](/references/#sun-2023)) or **overwrite** instead of accumulate with the *delta rule* $S_t = S_{t-1} + \beta_t\,(v_t - S_{t-1}k_t)\,k_t^{\top}$ ([Schlag et al. 2021](/references/#schlag-2021); [Yang et al. 2024](/references/#yang-2024)), which replaces the value currently stored under $k_t$ rather than adding a second copy.
+So linear attention trades a growing per-token cache for a fixed $d_v\times r$ matrix whose records interfere when their feature vectors are not orthogonal. Recent variants add a decay factor ($S_t=\gamma S_{t-1}+\dots$, as in retention-style models; [Sun et al. 2023](/references/#sun-2023)) or update toward a new association with the *delta rule* $S_t=S_{t-1}+\beta_t(v_t-S_{t-1}k_t)k_t^{\top}$ ([Schlag et al. 2021](/references/#schlag-2021); [Yang et al. 2024](/references/#yang-2024)). For a normalized, isolated key direction this overwrites rather than adds; with non-orthogonal keys, cross-talk remains.
 
 ## 5.3.13 The landscape, in one table
 
 | Design | State at step $t$ | Per-step cost | Write decision | Exact recall at distance $T$? |
 |---|---|---|---|---|
 | Fixed window $W$ | last $W$ inputs | $O(Wd)$ | none (FIFO) | only if $T\le W$ |
-| EMA / LTI recurrence / LTI SSM | $N$ numbers | $O(N)$ | fixed decay | no — geometric decay |
+| stable fading EMA / LTI recurrence / LTI SSM | $N$ numbers | $O(N)$ | fixed dynamics | not generally; protected unit modes are a special case |
 | Gated RNN (LSTM, GRU) | $N$ numbers | $O(N^2)$ | input-dependent gates | only what the gates chose to keep |
 | Selective SSM | $N$ per channel | $O(N)$ per channel | input-dependent $\Delta_t$ | only what $\Delta_t$ chose to keep |
-| Linear attention | $d_v\times d_k$ matrix | $O(d_vd_k)$ | additive (or delta rule) | up to $\approx d_k$ items, then interference |
-| Softmax attention + KV cache | $2td$ numbers | $O(td)$ | none (store all) | yes, within the context window |
+| Linear attention | $d_v\times r$ matrix plus normalizer | $O(d_vr)$ | additive (or delta rule) | idealized exact recall for at most $r$ orthogonal features; otherwise interference |
+| Softmax attention + KV cache | $2td$ numbers (ordinary MHA) | $O(td)$ | one learned record per cached token | direct access within the cache; exact selection is not guaranteed |
 
-Every row answers §5.1's question differently. Moving down the table buys recall with memory and compute; moving up buys efficiency with forgetting. §5.5.4 shows that all of these layers can be written in one common matrix form, which makes the comparison precise.
+Every row answers §5.1's question differently; the table is a map of trade-offs, not a quality ranking. Growing memory buys direct access but not guaranteed retrieval, while fixed memory buys bounded cost by merging or selectively retaining information. §5.5.4 writes these layers in one common matrix form so the comparison can be made precisely.
 
 **Next:** [§5.4 Worked examples](/core/unit-05/worked-examples/) computes each mechanism by hand.
