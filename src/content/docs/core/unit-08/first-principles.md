@@ -1,47 +1,209 @@
 ---
 title: "8.2 First principles"
-description: Sampling one categorical by inverting its cumulative distribution, ancestral sampling of sequences, temperature and truncation, and generating continuous data by moving noise along a velocity field.
+description: Build categorical and ancestral sampling from intervals, derive temperature and truncation as new conditional distributions, and explain why flow matching learns an averaged transport field rather than remembered noise–data pairs.
 sidebar: { label: "8.2 First principles", order: 2 }
 ---
 
-## 8.2.1 Drawing one sample from a categorical distribution
+## 8.2.1 Sampling means allocating probability mass to random events
 
-A model outputs probabilities $p = (p_1,\dots,p_V)$ for the next symbol. To draw a sample, form the cumulative sums $c_k = p_1 + \dots + p_k$, draw $u$ uniformly from $[0, 1)$, and return the first $k$ with $c_k > u$. Each symbol $k$ owns an interval of length $p_k$ in $[0, 1)$, so it is returned with probability exactly $p_k$. This **inverse-CDF** method is all the randomness a language model needs; `spine/stage08_sampling.py` implements it in one line (`draw`), and the spine test checks that 20 000 draws reproduce the probabilities to within 0.012.
-
-## 8.2.2 Sampling a sequence: one conditional at a time
-
-The chain rule writes a sequence distribution as a product of conditionals (Unit 07, §7.2.2). **Ancestral sampling** follows it literally: draw $x_1\sim q(x_1)$, then $x_2\sim q(x_2\mid x_1)$, and so on, appending each sample to the context. The probability of producing a particular sequence is the product of the probabilities of its steps — exactly $q(x_{1:T})$ (Proposition 8.1). **Ancestral sampling draws exactly from the model**; nothing is approximated. Each step costs one forward pass over the new token, which is why the KV cache of Unit 04 (§4.3.10) and the memory-bound arithmetic of Unit 06 (§6.3.4) govern generation speed.
-
-Exactness is a double-edged property. If the model is a perfect copy of the data distribution, its samples are as good as the data — including its errors. If the model has put a little probability on bad continuations everywhere, sampling will eventually pick some of them, and in a long sequence "eventually" arrives.
-
-## 8.2.3 Temperature: sharpening and flattening
-
-Divide the scores by a **temperature** $\tau > 0$ before the softmax:
+Start with a categorical distribution over $V$ symbols,
 
 $$
-p_\tau(k) = \frac{e^{z_k/\tau}}{\sum_j e^{z_j/\tau}} .
+p=(p_1,\ldots,p_V),
+\qquad p_k\ge0,
+\qquad \sum_{k=1}^{V}p_k=1.
 $$
 
-$\tau = 1$ is the model; $\tau\to0$ puts all probability on the largest score (**greedy** decoding); $\tau\to\infty$ approaches uniform. For probabilities $(0.5, 0.3, 0.15, 0.05)$, temperature 0.5 gives $(0.685, 0.247, 0.062, 0.007)$ and temperature 2 gives $(0.379, 0.294, 0.208, 0.120)$; the entropy moves from 1.142 nats to 0.810 and 1.308 (Worked Example 8.2). Unit 04 met the same operation as the inverse temperature $\beta$ of attention.
+Place consecutive intervals of lengths $p_1,p_2,\ldots,p_V$ on $[0,1)$. Draw $U\sim\operatorname{Uniform}[0,1)$ and return the symbol whose interval contains $U$. Equivalently, with cumulative sums $c_k=\sum_{j\le k}p_j$, return the first $k$ for which $U<c_k$.
 
-Low temperature trades diversity for reliability: the model's most confident guesses are usually its best. But the limit, greedy decoding, is not "the most likely sequence" — choosing the best next token at every step does not maximize the product of probabilities — and it is prone to **loops**: once a phrase has been produced, the context makes the same continuation even more likely. The spine model's greedy output repeats "had a good idea and they fixed it together" for this reason.
+Why does it work? Symbol $k$ owns interval $[c_{k-1},c_k)$, whose length is
 
-## 8.2.4 Truncation: cut the unreliable tail
+$$
+c_k-c_{k-1}=p_k.
+$$
 
-A model trained on a large corpus assigns small probabilities to many continuations that are individually unlikely and collectively frequent. **Truncated sampling** removes them: **top-$k$** keeps the $k$ most likely symbols; **nucleus** (top-$p$) sampling keeps the smallest set of most-likely symbols whose total probability reaches $p$, and renormalizes ([Holtzman et al. 2020](/references/#holtzman-2020)). Nucleus sampling adapts to the model's confidence: after "Now Ben has " the nucleus may be one digit; after "One windy day Ben went to " it contains several places. Both are modifications of the model's distribution, made at sampling time, that the training objective never saw.
+Because a uniform draw lands in an interval with probability equal to its length, $P(\text{return }k)=p_k$. This is **inverse-CDF sampling** for a discrete distribution.
 
-## 8.2.5 Continuous data: transform noise
+Two implementation details matter:
 
-For a continuous variable there is no table of probabilities to invert — but the inverse-CDF idea still works in one dimension: if $u$ is uniform and $F$ is the cumulative distribution of the target, $F^{-1}(u)$ has the target distribution. More generally, any sample can be made by drawing **noise** from a simple distribution (uniform, Gaussian) and applying a **transformation**. A shift and scale $x = \mu + \sigma z$ turns a standard Gaussian into any Gaussian. A learned, flexible transformation can turn a Gaussian into an image distribution.
+- cumulative floating-point sums may end at $0.999999999$ or $1.000000001$, so robust code clips the returned index to the final category;
+- zero-probability symbols own zero-length intervals and should never be drawn.
 
-There are three ways to learn such a transformation, and this unit develops all three:
+`stage08_sampling.py` implements one draw per probability row. The test's 20,000 repetitions do not prove exactness; the interval argument does. The frequency test checks that the implementation behaves like the proof within sampling error.
 
-1. **In one step, invertibly** — a *normalizing flow* computes the exact likelihood of data through the change-of-variables formula (§8.3.2).
-2. **Through a latent variable** — a *variational autoencoder* maps noise to data with a decoder and is trained through a lower bound on the likelihood (§8.3.3).
-3. **In many small steps** — move a sample from noise toward data along a learned direction field, as a particle moves in a flow. *Diffusion* and *flow matching* learn the field (§8.3.4–§8.3.6). This is now the dominant approach for images, audio and video.
+## 8.2.2 Ancestral sampling turns local conditionals into a joint sample
 
-## 8.2.6 Transport along straight lines: the idea of flow matching
+For a fixed-length sequence, the model distribution is
 
-Pair each noise sample $x_0$ with a data sample $x_1$ and connect them by a straight line, $x_t = (1-t)x_0 + tx_1$ for $t$ from 0 to 1. A particle on that line moves with constant velocity $x_1 - x_0$. Now look at all such lines at once: at a point $x$ and time $t$, many lines pass, with different velocities. Their *average* velocity defines a field $v(x, t)$. **Flow matching** trains a network $v_\theta(x, t)$ to predict $x_1 - x_0$ from $(x_t, t)$ by least squares; the least-squares optimum is exactly that average ([Lipman et al. 2023](/references/#lipman-2023); [Liu et al. 2023](/references/#liu-2023)). To generate, start at noise and follow the field: solve $\dot x = v_\theta(x, t)$ from $t = 0$ to $t = 1$ with an ODE solver.
+$$
+q_\theta(x_{1:T})=
+\prod_{t=1}^{T}q_\theta(x_t\mid x_{<t}).
+$$
 
-Two features make this attractive. Training is ordinary regression — no adversarial game, no likelihood to compute. And the ODE is the same object as the continuous-time memory of Unit 05: the number of solver steps trades accuracy for cost, and too few steps distort the samples in predictable ways (Worked Example 8.7). For Gaussian data the average velocity can be computed in closed form, which gives the spine a ground truth to test against.
+Ancestral sampling mirrors this factorization:
+
+1. draw $X_1\sim q_\theta(\cdot)$;
+2. append the realized value $x_1$;
+3. draw $X_2\sim q_\theta(\cdot\mid x_1)$;
+4. continue until $T$ positions have been drawn.
+
+The probability of following one particular path $x_{1:T}$ is the product of its branch probabilities, exactly $q_\theta(x_{1:T})$. If length is variable, the end-of-sequence symbol must also be sampled; stopping by an unrelated rule changes the sequence distribution.
+
+“Exact” has a narrow meaning here: given exact conditionals and an exact categorical sampler, the algorithm samples from **the model distribution**. It does not say that the model equals the data distribution, that numerical logits are exact, or that the sample satisfies a user's goal.
+
+The risk of a small bad tail compounds with length. If, only as a simplified calculation, every step independently places probability $\varepsilon$ on an unacceptable event, the probability of at least one such event in $T$ steps is
+
+$$
+1-(1-\varepsilon)^T\approx T\varepsilon
+\quad\text{when }T\varepsilon\text{ is small}.
+$$
+
+Real token events are neither independent nor assigned one constant $\varepsilon$, so this is intuition, not a language-model theorem. A general upper bound is the union bound: the probability of at least one declared failure is at most the sum of its per-step conditional probabilities along the relevant process.
+
+Generation is sequential even though training scores all shifted positions in parallel. With a KV cache, each new token reuses earlier keys and values; without it, the model recomputes the entire prefix. Sampling theory and serving cost are separate questions.
+
+## 8.2.3 Temperature defines a new local distribution
+
+Given logits $z_k$ and temperature $\tau>0$,
+
+$$
+p_\tau(k)
+=\frac{e^{z_k/\tau}}{\sum_j e^{z_j/\tau}}.
+$$
+
+If $p_1(k)=\operatorname{softmax}(z)_k$, then
+
+$$
+p_\tau(k)=
+\frac{p_1(k)^{1/\tau}}
+{\sum_j p_1(j)^{1/\tau}}.
+$$
+
+So temperature changes probability **ratios**:
+
+$$
+\frac{p_\tau(i)}{p_\tau(j)}
+=\left(\frac{p_1(i)}{p_1(j)}\right)^{1/\tau}.
+$$
+
+- $	au=1$ leaves the conditional unchanged;
+- $0<\tau<1$ magnifies odds and lowers entropy in typical non-tied cases;
+- $	au>1$ compresses odds and moves toward uniformity;
+- as $\tau\to0$, mass concentrates on the maximum-logit set—one token only when the maximum is unique;
+- as $\tau\to\infty$, a finite vocabulary approaches uniform probability.
+
+For $p=(0.5,0.3,0.15,0.05)$, $	au=0.5$ gives approximately $(0.685,0.247,0.062,0.007)$; $	au=2$ gives $(0.379,0.294,0.208,0.120)$. Worked Example 8.2 computes the entropies.
+
+Lower temperature is often used to reduce low-probability surprises, but “higher model probability” is not synonymous with truth or utility. It can amplify a confident misconception or repetitive template. Temperature is a decoder control, not a correctness knob.
+
+### Greedy is local, not globally most probable
+
+Greedy decoding takes the largest conditional at every step. Consider two-step sequences:
+
+$$
+q(A)=0.6,
+\quad q(B)=0.4,
+\qquad
+q(a\mid A)=0.5,
+\quad q(b\mid B)=0.99.
+$$
+
+Greedy starts with $A$ and produces a best $A$-continuation of probability $0.6\times0.5=0.30$. But sequence $Bb$ has probability $0.4\times0.99=0.396$. Local argmax choices do not solve the global sequence search problem.
+
+## 8.2.4 Truncation discards mass, then renormalizes
+
+Sort the next-token probabilities so $p_{(1)}\ge p_{(2)}\ge\cdots$.
+
+- **top-$k$:** retain the first $k$ symbols;
+- **nucleus / top-$p$:** retain the smallest prefix $S_p$ whose cumulative mass is at least threshold $p$ ([Holtzman et al. 2020](/references/#holtzman-2020)).
+
+For either retained set $S$, the new distribution is
+
+$$
+\widetilde p(k)
+=\frac{p(k)\mathbf 1\{k\in S\}}
+{\sum_{j\in S}p(j)}.
+$$
+
+This equation makes the intervention explicit: discarded symbols become impossible and retained symbols become more likely. Top-$p$ adapts its set size to concentration. If one symbol has probability $0.95$, a $p=0.9$ nucleus can contain one symbol; if 100 symbols are nearly tied, the same threshold retains many.
+
+Truncation can remove incoherent low-probability continuations, but it can also remove a rare correct name, number or minority-language token. The threshold is therefore validated on a use and distribution, not derived from probability theory alone.
+
+Temperature and truncation act at every prefix. The resulting sequence law is
+
+$$
+\widetilde q(x_{1:T})=
+\prod_t\widetilde q(x_t\mid x_{<t}),
+$$
+
+not the original $q_\theta$, and generally not the globally tempered distribution proportional to $q_\theta(x_{1:T})^{1/\tau}$.
+
+## 8.2.5 Continuous generation also begins with a source of randomness
+
+In one dimension, if $U\sim\operatorname{Uniform}[0,1]$ and the target CDF $F$ is suitably inverted, $F^{-1}(U)$ follows the target distribution. A Gaussian example is even simpler:
+
+$$
+Z\sim N(0,1),
+\qquad X=\mu+\sigma Z
+\quad\Longrightarrow\quad
+X\sim N(\mu,\sigma^2).
+$$
+
+This suggests the transport view: choose a simple **base distribution** $p_0$, sample $X_0\sim p_0$, and learn a transformation whose output distribution is the data distribution $p_1$.
+
+There is no single mandatory construction. This unit studies three representative families:
+
+1. **invertible maps:** normalizing flows transform a same-dimensional base variable and track the Jacobian;
+2. **stochastic latent decoders:** VAEs sample a latent and then sample or decode an observation;
+3. **time-dependent transport:** diffusion and flow models move noise through many steps.
+
+Autoregression remains a fourth option for continuous or discretized data. The choice trades likelihood access, architectural restrictions, sampling speed, memory and inductive bias.
+
+## 8.2.6 Flow matching: regress local motion, then solve a global transport
+
+Draw independently
+
+$$
+X_0\sim p_0,
+\qquad X_1\sim p_{\text{data}},
+$$
+
+and define a straight conditional path
+
+$$
+X_t=(1-t)X_0+tX_1,
+\qquad \dot X_t=X_1-X_0.
+$$
+
+Training samples $t$, $X_0$ and $X_1$, constructs $X_t$, and minimizes
+
+$$
+\mathbb E\left[
+\left\|v_\theta(X_t,t)-(X_1-X_0)\right\|^2
+\right].
+$$
+
+At one observed $(x,t)$, many sampled lines may cross with different velocities. Squared-error regression therefore learns their conditional mean,
+
+$$
+v^\star(x,t)=
+\mathbb E[X_1-X_0\mid X_t=x].
+$$
+
+This is the most important conceptual step: the model does **not** memorize which training endpoint was paired with a generated noise point. At generation time there is no paired $X_1$. Fresh noise follows the averaged field by solving
+
+$$
+\dot x(t)=v_\theta(x(t),t),
+\qquad x(0)\sim p_0.
+$$
+
+Under the conditions developed in §8.3, the exact marginal field transports the whole density along the intended intermediate marginals and reaches $p_{\text{data}}$ at $t=1$ ([Lipman et al. 2023](/references/#lipman-2023); [Liu et al. 2023](/references/#liu-2023)). Individual ODE trajectories generally are not the original independently paired straight lines.
+
+Two approximations enter in practice:
+
+- **learning:** the finite network and optimizer approximate $v^\star$;
+- **integration:** a finite-step numerical solver approximates the learned ODE.
+
+Training uses ordinary regression and does not require likelihood evaluation. The resulting continuous normalizing flow can, under additional regularity and divergence computation, define a likelihood; that is a separate calculation. For Gaussian endpoints the ideal field is available in closed form, letting Stage 08 test integration without confusing it with learning error.
+
+**Next:** [§8.3 Mathematical construction](/core/unit-08/construction/) proves these statements and connects flows to VAEs, denoising and scores.
