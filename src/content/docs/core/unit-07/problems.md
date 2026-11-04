@@ -86,7 +86,7 @@ Repeat the final line when negatives come from $\nu(y)$.
 
 ### 7.11 ★★ InfoNCE gradients
 
-For scores $s_1,ldots,s_K$ with candidate 1 positive, let
+For scores $s_1,\ldots,s_K$ with candidate 1 positive, let
 
 $$
 \ell=-s_1+\log\sum_{k=1}^{K}e^{s_k}.

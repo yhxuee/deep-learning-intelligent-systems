@@ -45,7 +45,7 @@ The objective also depends on the corruption or candidate process. Masking 15% r
 
 ## 7.2.3 Why next-token prediction defines a generator
 
-Start with a finite sequence $x_{1:T}=(x_1,ldots,x_T)$. Repeated use of $p(a,b)=p(a)p(b\mid a)$ gives the **probability chain rule**:
+Start with a finite sequence $x_{1:T}=(x_1,\ldots,x_T)$. Repeated use of $p(a,b)=p(a)p(b\mid a)$ gives the **probability chain rule**:
 
 $$
 p(x_{1:T})

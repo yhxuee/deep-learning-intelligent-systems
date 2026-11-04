@@ -72,7 +72,7 @@ The useful corruption rate lies between these extremes and depends on the object
 Let $(X,Y)$ be a positive pair drawn from a joint distribution $p(x,y)$: two augmentations of one image, an image and its caption, or two related spans. Given $X=x$, draw
 
 $$
-Y_1\sim p(y\mid x),\qquad Y_2,ldots,Y_K\overset{\text{iid}}{\sim}p(y).
+Y_1\sim p(y\mid x),\qquad Y_2,\ldots,Y_K\overset{\text{iid}}{\sim}p(y).
 $$
 
 There are $K$ candidates: one positive and $K-1$ negatives. A critic $f(x,y)$ scores each pair. The InfoNCE loss is the cross-entropy for identifying candidate 1:

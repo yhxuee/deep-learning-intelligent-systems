@@ -13,7 +13,7 @@ Use the same five-line worksheet as before: **given; find; governing equation; s
 **Given.** A model assigns
 
 $$
-q(\texttt a)=0.5,qquad q(\texttt b\mid\texttt a)=0.4,qquad
+q(\texttt a)=0.5,\qquad q(\texttt b\mid\texttt a)=0.4,\qquad
 q(\texttt c\mid\texttt{ab})=0.9.
 $$
 
@@ -22,13 +22,13 @@ $$
 **Computation.** The token losses are
 
 $$
--\ln0.5=0.6931,quad -\ln0.4=0.9163,quad -\ln0.9=0.1054.
+-\ln0.5=0.6931,\quad -\ln0.4=0.9163,\quad -\ln0.9=0.1054.
 $$
 
 Their sum is $1.7148$ nats and their mean is $0.5716$ nats/token. The chain rule gives
 
 $$
-q(\texttt{abc})=(0.5)(0.4)(0.9)=0.18,qquad -\ln0.18=1.7148.
+q(\texttt{abc})=(0.5)(0.4)(0.9)=0.18,\qquad -\ln0.18=1.7148.
 $$
 
 **Interpretation.** The equality is exact: summed token NLL is sequence NLL. Token `b` contributes most because its assigned conditional probability is smallest. The mean is convenient for comparing different lengths, but it is not the probability of the average token; exponentiating it gives a geometric-mean probability under these conditionals.
@@ -128,7 +128,7 @@ $$
 **Computation.** Since
 
 $$
-I(X;Y)\ge\ln K-\mathcal L_{\text{NCE}},qquad
+I(X;Y)\ge\ln K-\mathcal L_{\text{NCE}},\qquad
 \mathcal L_{\text{NCE}}\ge0,
 $$
 
@@ -151,6 +151,8 @@ this particular lower bound cannot exceed $\ln K$.
 | Stage 04 | 0.336 | [0.327, 0.345] |
 | Stage 07 | 0.230 | [0.222, 0.240] |
 | paired Stage 04 − Stage 07 | 0.106 | [0.101, 0.110] |
+
+These are Stage 10's per-story scores, which reset context at each held-out story and then average stories. The Stage 07 checkpoint metadata reports about $0.242$ nats/character from fixed non-overlapping windows of the concatenated held-out stream. The two values use the same checkpoint but estimate differently weighted quantities (§7.3.1); neither should silently replace the other.
 
 **Interpretation.** On this fixed held-out set, the two saved artifacts have a clearly resolved paired difference. “Real difference between artifacts” is not “effect of deduplication.” Stage 07 also has context 128 rather than 64, three layers rather than two, and 4,000 rather than 1,500 steps. Four bundled changes—data cleaning included—produce one comparison.
 
