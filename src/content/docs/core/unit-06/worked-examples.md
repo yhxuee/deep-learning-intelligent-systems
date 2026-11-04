@@ -6,75 +6,165 @@ sidebar: { label: "6.4 Worked examples", order: 4 }
 
 Exact numbers are recomputed by `labs/test_worked_examples_u06_u08.py`; the FLOP identity is asserted by `spine/test_model.py`; the scaling fit comes from `spine/stage06_scaling.py`.
 
+Use the same five-line worksheet for every example:
+
+1. **Given:** copy the quantities with units.
+2. **Find:** name one requested quantity.
+3. **Model:** write the formula and its assumptions.
+4. **Compute:** substitute before using a calculator.
+5. **Interpret:** state what the result does *and does not* establish.
+
+Several examples deliberately use optimistic lower bounds. A lower bound on time is not a promise that an implementation will attain it.
+
 ## Worked Example 6.1 — Every FLOP of the spine model
 
-**Setting.** The Stage 07 model: $V = 50$, $d = 64$, $L = 3$, $h = 4$, $T = 128$, batch $B = 16$.
+**Given.** The configuration later used in Stage 07: $V=50$, $d=64$, $L=3$, $h=4$, $T=128$, batch $B=16$. **Find:** counted training FLOPs per token, per step and over 4,000 steps.
 
-**Counting.** $N_{\text{mm}} = 12Ld^2 + Vd = 147\,456 + 3\,200 = 150\,656$. Per token (Proposition 6.1): $6N_{\text{mm}} + 12LTd = 903\,936 + 294\,912 = 1\,198\,848$ FLOPs. Per step ($BT = 2\,048$ tokens): $2\,455\,240\,704$ — exactly what the instrumented counter reports. The 4 000-step run: $9.82\times10^{12}$ FLOPs.
+**Try first.** Compute $BT$. Then estimate whether $6N_{\mathrm{mm}}$ or $12LTd$ is larger; this predicts whether weight products or attention products dominate.
 
-**Reading.** Attention is 24.6% of the training FLOPs here because the context (128) is large relative to the width (64): $T/(T + 6d) = 0.25$ for the blocks. The model has 160 704 parameters (149 312 excluding embeddings); its training state at 16 bytes per parameter is 2.6 MB. This answers the prediction prompt of §6.1: about 2.5 billion FLOPs per step.
+**Model and computation.** Proposition 6.1 counts the declared matrix products:
+
+$$
+N_{\mathrm{mm}}=12Ld^2+Vd
+=12(3)(64^2)+50(64)
+=147{,}456+3{,}200=150{,}656.
+$$
+
+Per token,
+
+$$
+6N_{\mathrm{mm}}+12LTd
+=903{,}936+294{,}912
+=1{,}198{,}848\ \text{FLOPs/token}.
+$$
+
+One step contains $BT=16\cdot128=2{,}048$ tokens, so
+
+$$
+F_{\mathrm{step}}=2{,}048(1{,}198{,}848)
+=2{,}455{,}240{,}704\ \text{FLOPs}.
+$$
+
+This is exactly the instrumented matrix-product counter. Over 4,000 steps the same convention gives $9.82\times10^{12}$ FLOPs.
+
+**Interpretation.** Attention contributes $294{,}912/1{,}198{,}848=24.6\%$ of the total counted FLOPs. If the readout is excluded, the block-only shortcut gives $T/(T+6d)=128/(128+384)=25\%$. The model has 160,704 parameters in total; the 16-byte recipe estimates $2{,}571{,}264$ bytes, about 2.57 MB of parameter, gradient and optimizer state. It does not include activations or workspaces. The prediction prompt's answer is therefore about 2.5 billion **counted matrix-product FLOPs** per step, not 2.5 billion machine instructions.
 
 ## Worked Example 6.2 — The 6N rule for GPT-3
 
-**Setting.** 175 billion parameters, 300 billion training tokens.
+**Given.** 175 billion parameters and 300 billion training tokens. **Find:** the $6ND$ training estimate and the idealized A100 time at 40% useful-FLOP utilization.
 
-**Computation.** $6\times1.75\times10^{11}\times3\times10^{11} = 3.15\times10^{23}$ FLOPs. The paper reports $3.14\times10^{23}$ ([Brown et al. 2020](/references/#brown-2020)).
+**Model and computation.** Treat the dense model's active matrix weights as $N$:
 
-**Reading.** Two numbers and a constant reproduce the published training compute to within 0.3%. At 40% utilization of A100s it is about 700 000 GPU-hours ($3.15\times10^{23}/(0.4\times3.12\times10^{14})$ s).
+$$
+C\approx6ND
+=6(1.75\times10^{11})(3\times10^{11})
+=3.15\times10^{23}\ \text{FLOPs}.
+$$
+
+The reported figure is $3.14\times10^{23}$ ([Brown et al. 2020](/references/#brown-2020)). At $0.4(3.12\times10^{14})$ useful FLOP/s per A100-equivalent device,
+
+$$
+t=\frac{3.15\times10^{23}}{0.4(3.12\times10^{14})}
+=2.52\times10^9\ \text{device-seconds}
+\approx7.01\times10^5\ \text{device-hours}.
+$$
+
+**Interpretation.** Two scale variables and the factor 6 reproduce the published compute within about 0.3%; that is why the rule is useful. The device-hour result is an equivalence, not a proposed schedule: 1,000 such devices would ideally take about 701 hours before communication losses, failures and data-centre overheads. It also does not claim GPT-3 was trained on A100s.
 
 ## Worked Example 6.3 — What a 7B model needs to train
 
-**Setting.** $N = 7\times10^9$, mixed precision, Adam.
+**Given.** $N=7\times10^9$, using the §6.2.4 mixed-precision Adam recipe. **Find:** model-state capacity before activations.
 
-**Computation.** 16 bytes per parameter → 112 GB for weights, gradients and optimizer state, before activations.
+**Model and computation.** Write the byte ledger before multiplying:
 
-**Reading.** More than one 80 GB device. Sharding the state across 8 devices brings it to 14 GB each, leaving room for activations — the motivation for the sharded optimizers of §6.5.5.
+| item | bytes/parameter |
+|---|---:|
+| 16-bit model weight | 2 |
+| 16-bit gradient | 2 |
+| 32-bit master weight | 4 |
+| Adam first moment | 4 |
+| Adam second moment | 4 |
+| **total** | **16** |
+
+Therefore $7\times10^9\times16=112\times10^9$ bytes = 112 GB (decimal), or about 104 GiB.
+
+**Interpretation.** The model state alone exceeds one 80 GB device. Perfectly sharding all 112 GB across eight devices would average 14 GB per device, but that is only the partitioned state: activations, temporary buffers, allocator fragmentation and any replicated tensors still require space. The example motivates sharding (§6.5.5); it does not prove that every 7B training configuration fits on eight devices.
 
 ## Worked Example 6.4 — Arithmetic intensity
 
-**Setting.** A100: 312 TFLOP/s, 2.039 TB/s; ratio 153 FLOP/byte.
+**Given.** The illustrative A100 roofline: 312 TFLOP/s and 2.039 TB/s, hence a balance point of 153 FLOP/byte. **Find:** which roof bounds two idealized product shapes.
 
-**Square product, $n = 4\,096$, 16-bit.** $I = n/3 = 1\,365$ FLOP/byte: compute-bound with a factor of 9 to spare.
+**Large square product, $n=4{,}096$, 16-bit.** The optimistic intensity is $I=n/3=1{,}365$ FLOP/byte. Because $1{,}365>153$, the roofline bound is the compute roof: a well-tiled implementation has enough reuse to *be capable of* becoming compute-bound.
 
-**Matrix–vector product.** $I\approx1$: memory-bound, at most $1/153$ of peak.
+**Matrix--vector product, 16-bit.** $I\approx1$ FLOP/byte, so the bandwidth roof is $\beta I\approx2.039$ TFLOP/s, about $1/153=0.65\%$ of the 312-TFLOP/s arithmetic peak.
 
-**Reading.** The same hardware is either 99% or 0.7% "fast" depending on the shape of the product. Batching turns matrix–vector products into matrix–matrix products.
+**Interpretation.** Shape changes the *ceiling*: the square product may be compute-bound, while the matrix--vector product cannot approach peak arithmetic rate if each weight comes from high-bandwidth memory only once. Nothing here guarantees that the square kernel reaches 99% of peak; launch overhead, tiling and problem size still matter. Batching creates reuse and moves decoding from the second case toward the first.
 
 ## Worked Example 6.5 — Why decoding is slow
 
-**Setting.** A 7-billion-parameter model in 16-bit precision, batch 1, short context, one A100.
+**Given.** A dense 7-billion-parameter model, 16-bit weights, batch 1, short context, one illustrative A100. **Find:** compute-only and weight-bandwidth lower bounds per generated token.
 
-**Computation.** Compute time per token: $1.4\times10^{10}/3.12\times10^{14} = 0.045$ ms. Memory time per token (read all weights): $1.4\times10^{10}/2.039\times10^{12} = 6.87$ ms. The step takes at least 6.87 ms: at most 146 tokens per second.
+**Model and computation.** Ignore cache traffic and all overheads to obtain optimistic bounds:
 
-**Reading.** The arithmetic is 150 times faster than the memory. This answers Question 2 of §6.1: the 22 000 tokens per second suggested by FLOPs was the wrong limit. Batch 64 would raise throughput nearly 64-fold at almost the same latency per step.
+$$
+t_{\mathrm{compute}}\ge
+\frac{1.4\times10^{10}}{3.12\times10^{14}}
+=0.045\ \text{ms/token},
+$$
+
+$$
+t_{\mathrm{weights}}\ge
+\frac{1.4\times10^{10}\ \text{bytes}}{2.039\times10^{12}\ \text{bytes/s}}
+=6.87\ \text{ms/token}.
+$$
+
+The roofline lower bound is the larger value, 6.87 ms/token, corresponding to an upper bound of about 146 tokens/s.
+
+**Interpretation.** The compute-only time is about 150 times smaller than the weight-streaming time. The 22,000-token/s estimate used the wrong roof. Actual generation will be slower because the calculation omitted KV-cache reads, non-matrix kernels and imperfect bandwidth. A batch of 64 can reuse weights and may raise throughput substantially while the workload remains memory-bound; a 64-fold gain and unchanged step latency are optimistic limits, not guarantees. Waiting to assemble that batch may also worsen request latency.
 
 ## Worked Example 6.6 — A pre-registered scaling fit that missed
 
-**Setting.** Spine model, 2 layers, widths 8–32, each trained for 2 000 steps of 16 × 64 characters (2.05 million tokens). Fit $L = E + AN^{-\alpha}$ to the five results; write the prediction for width 48 to disk; then train width 48.
+**Given.** A 2-layer spine model at widths 8–32, each trained for 2,000 steps of $16\times64$ characters: $2{,}048{,}000$ training tokens per run. **Protocol:** fit $L=E+AN^{-\alpha}$ to those five completed runs, save the width-48 prediction, and only then train width 48. **Find:** the prediction error and what can legitimately be learned from it.
 
 | width $d$ | 8 | 12 | 16 | 24 | 32 | **48** |
 |---|---|---|---|---|---|---|
 | non-embedding parameters $N$ | 1 696 | 3 696 | 6 464 | 14 304 | 25 216 | 56 256 |
 | held-out NLL | 2.04 | 1.74 | 1.04 | 0.50 | 0.39 | **0.35** |
 
-**Fit on all five:** $E = 0.00$, $\alpha = 0.67$; prediction for width 48: **0.23**. Observed: **0.35** — off by 0.12 nats, far outside any reasonable noise.
+**Registered fit.** Fitting all five points gives $E=0.00$ and $\alpha=0.67$, with a saved width-48 prediction of **0.23 nats/token**. The observed value is **0.35**, a residual of $+0.12$ nats/token. Because this demonstration uses one deterministic training configuration rather than repeated independent runs, the residual is evidence of predictive failure for this run; it is not by itself an estimate of a noise distribution.
 
-**Diagnosis.** The losses do not follow one power law: between widths 12 and 16 the model crosses a capacity threshold below which it cannot represent the story templates at all. Fitted through the transition, the curve plunges and the floor is driven to zero. Fitting only the three widths past the transition gives $E = 0.33$ and predicts 0.34 for width 48 — within 0.01 of the observation.
+**Post-hoc diagnosis.** The five losses show strong curvature on the proposed scale, especially between widths 12 and 16. This is consistent with a change of regime—perhaps representational capacity, optimization, or both—rather than one power law over all widths. Fitting only the three larger completed widths gives $E=0.33$ and a width-48 value of 0.34, within 0.01 of the observation. That second fit is a useful description made *after* seeing the failure; it is not an independently validated prediction.
 
-**Reading.** The law was fine; the choice of points was not. And that choice is exactly the kind of decision that must be made *before* seeing the result — choosing it afterwards to rescue the prediction would be the analytic flexibility Unit 12 warns against. The honest report is: the registered prediction failed; the failure revealed a regime change; a new prediction, with the point-selection rule registered, is needed for width 64. The floor of 0.33 is not the entropy of the stories — it is the best a 2-layer model reaches with 2 million tokens.
+**Interpretation.** The honest result is not “the law was right after all.” It is: the registered model missed; inspecting the residual suggested a narrower regime; that new choice must be registered and tested on another unseen width, such as 64. Selecting points after seeing width 48 and then counting width 48 as confirmation would be the analytic flexibility Unit 12 warns about. Finally, the fitted $E=0.33$ is not automatically the corpus entropy: with finite data, a fixed optimizer and a 2-layer architecture, it is merely an asymptote parameter in this local fit.
 
 ## Worked Example 6.7 — The flat compute-optimal optimum
 
-**Setting.** Hoffmann et al.'s approach-3 law: $E = 1.69$, $A = 406.4$, $B = 410.7$, $\alpha = 0.34$, $\beta = 0.28$; budget $C = 5.76\times10^{23}$ FLOPs.
+**Given.** Hoffmann et al.'s approach-3 fit: $E=1.69$, $A=406.4$, $B=410.7$, $\alpha=0.34$, $\beta=0.28$; training budget $C=5.76\times10^{23}$ FLOPs. **Find:** the optimum predicted by this fit and the penalty for using the 70B/1.4T allocation instead.
 
-**Computation.** Proposition 6.2: $N^\star = 3.22\times10^{10}$, $D^\star = 2.98\times10^{12}$ (93 tokens per parameter), predicted loss 1.9307. The model actually trained, 70 billion parameters on 1.4 trillion tokens: predicted loss 1.9366.
+**Computation.** Substitution into Proposition 6.2 gives
 
-**Reading.** A factor of 2.2 in model size costs 0.006 nats under this fit. The location of the optimum is sensitive to the fitted constants; its depth is not. This is why different estimation methods (and a later replication, [Besiroglu et al. 2024](/references/#besiroglu-2024)) could disagree about the optimal size by a factor of two without anyone's model being badly trained.
+$$
+N^\star=3.22\times10^{10},\qquad
+D^\star=2.98\times10^{12},
+$$
+
+or about 93 tokens per parameter, with predicted loss 1.9307 nats/token. Evaluating the *same fitted surface* at 70 billion parameters and 1.4 trillion tokens gives 1.9366 nats/token. The predicted difference is only 0.0059.
+
+**Interpretation.** Under this particular fit, increasing model size by a factor of about 2.2 while reducing tokens costs only 0.006 nats/token. The valley is shallow: the exact location of its minimum can move substantially when fitted constants change, while nearby allocations have almost indistinguishable predicted losses. This is why alternative estimation methods and a later reanalysis ([Besiroglu et al. 2024](/references/#besiroglu-2024)) can disagree about the optimal size without implying a comparably large performance penalty. The calculation compares predictions from one fitted surface; it is not a theorem that every twofold allocation error is cheap.
 
 ## Worked Example 6.8 — Energy per FLOP, and what Landauer's limit does not say
 
-**Setting.** A100 at 400 W and 40% utilization of 312 TFLOP/s.
+**Given.** An illustrative A100 drawing 400 W while delivering useful model FLOPs at 40% of 312 TFLOP/s. **Find:** accelerator joules per useful FLOP and the corresponding GPT-3 accelerator-energy estimate.
 
-**Computation.** $e = 400/(0.4\times3.12\times10^{14}) = 3.2\times10^{-12}$ J per FLOP. GPT-3's $3.14\times10^{23}$ FLOPs → $1.0\times10^{12}$ J ≈ 280 MWh of accelerator energy. [Patterson et al. (2021)](/references/#patterson-2021) estimate 1 287 MWh for the actual run (older V100 hardware, whole data centre). The Landauer limit at 300 K is $kT\ln2 = 2.87\times10^{-21}$ J per bit erased.
+**Computation.**
 
-**Reading.** Hardware generation and data-centre overheads change the answer by a factor of four. The Landauer figure is *per bit erased*, not per FLOP: turning it into a floor per operation would need a model of how many bits a floating-point multiply–add irreversibly erases in a given circuit, so the ratio of the two numbers is not a measure of how much improvement physics permits. Energy per useful FLOP is an engineering variable, and arithmetic intensity is one of its main levers.
+$$
+e=\frac{400\ \mathrm{J/s}}{0.4(3.12\times10^{14})\ \mathrm{FLOP/s}}
+=3.2\times10^{-12}\ \mathrm{J/FLOP}.
+$$
+
+Multiplying by GPT-3's reported $3.14\times10^{23}$ FLOPs gives $1.0\times10^{12}$ J. Since $1\ \mathrm{MWh}=3.6\times10^9$ J, this is about 280 MWh of accelerator energy under the illustrative assumptions. [Patterson et al. (2021)](/references/#patterson-2021) estimate 1,287 MWh for the actual run on older V100 hardware and with whole-data-centre effects. At 300 K, Landauer's limit is $kT\ln2=2.87\times10^{-21}$ J **per bit irreversibly erased**.
+
+**Interpretation.** The factor-of-four gap is not one clean “overhead factor”: the hardware generation, achieved utilization, power model and system boundary all differ. Landauer's number cannot simply be divided into joules per FLOP, because a floating-point multiply--add is not identical to erasing one bit; a circuit-level account of irreversible erasures would be required. The useful conclusion is narrower: present energy per useful model FLOP depends strongly on hardware, utilization and data movement. Arithmetic intensity is one lever, not a thermodynamic conversion formula.
+
+**Next:** [§6.5 General theory](/core/unit-06/theory/) turns the compute ledger into a constrained optimization problem and asks how much trust to place in the fitted loss surface.
