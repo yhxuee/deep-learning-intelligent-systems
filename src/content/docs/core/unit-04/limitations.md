@@ -46,7 +46,7 @@ Jain & Wallace found that attention weights often correlate weakly with gradient
 
 Five plausible implementation errors — softmax over the wrong axis, a missing $1/\sqrt{d_k}$, masking after softmax, an off-by-one mask and a wrong head reshape — all produce code that runs, has plausible shapes and trains to *some* loss. Visual inspection therefore supplies weak evidence.
 
-The lab's bug hunt (`labs/unit-04-attention/buggy_variants.py`) records which invariant catches each error. Within this test suite, the wrong head reshape passes every tested symmetry and is exposed only by comparison with an independently written reference implementation. **[E]** (measured by `test_bug_hunt.py`). The claim is deliberately local: another test could catch it too. The general lesson for AI-written as well as human-written code is stronger: **reading is not verification; check mathematical invariants, boundary cases and an independent reference.**
+The lab's bug hunt (`labs/unit-04-attention/buggy_variants.py`) records which invariant catches each error. Within this test suite, the wrong head reshape passes every tested symmetry but fails KV-cache equivalence and comparison with an independently written reference implementation. **[E]** (measured by `test_bug_hunt.py`). The claim is deliberately local: another test could catch it too. The general lesson for AI-written as well as human-written code is stronger: **reading is not verification; check mathematical invariants, boundary cases and an independent reference.**
 
 ## 4.7.8 Numerical range in low precision
 
