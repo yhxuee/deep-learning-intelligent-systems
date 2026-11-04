@@ -18,7 +18,7 @@ The remedies solve different parts of the problem. IO-aware exact attention (§4
 
 By Proposition 4.2, unmasked self-attention without positional information is permutation equivariant: reordering the input merely reorders the output. Thus "dog bites man" and "man bites dog" produce the same multiset of output vectors, even though their meanings differ. **[D]** Content alone says *what* tokens are present, not *where* they occur.
 
-A causal mask breaks this symmetry only partially. Position $i$ can see $i+1$ tokens, so the size and contents of its prefix provide an indirect position signal. Haviv et al. found that causal language models without an explicit positional encoding learned usable implicit absolute-position information in their experimental settings ([Haviv et al. 2022](/references/#haviv-2022)). **[E]** This is evidence that position can emerge, not a theorem that every architecture, dataset and optimizer will recover it at no cost. Explicit absolute or relative encodings make the intended positional bias available directly and controllably.
+A causal mask breaks this symmetry only partially. With the one-based indexing used here, position $i$ can see $i$ tokens, so the size and contents of its prefix provide an indirect position signal. Haviv et al. found that causal language models without an explicit positional encoding learned usable implicit absolute-position information in their experimental settings ([Haviv et al. 2022](/references/#haviv-2022)). **[E]** This is evidence that position can emerge, not a theorem that every architecture, dataset and optimizer will recover it at no cost. Explicit absolute or relative encodings make the intended positional bias available directly and controllably.
 
 ## 4.7.3 Length generalization
 

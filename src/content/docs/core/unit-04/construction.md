@@ -98,7 +98,7 @@ $$
 \bigl(R(m\theta)q\bigr)^{\top}\bigl(R(n\theta)k\bigr) = q^{\top}R(m\theta)^{\top}R(n\theta)\,k = q^{\top}R\bigl((n-m)\theta\bigr)\,k ,
 $$
 
-using $R(a)^{\top} = R(-a)$ and $R(-a)R(b) = R(b-a)$. **The score depends on the positions only through their difference $n - m$.** Worked Example 4.5 checks this numerically. RoPE is applied to queries and keys, not to values, and rotations preserve norms, so it changes *which* keys match, not the scale of the scores.
+using $R(a)^{\top} = R(-a)$ and $R(-a)R(b) = R(b-a)$. **The score depends on the positions only through their difference $n - m$.** Worked Example 4.5 checks this numerically. RoPE is applied to queries and keys, not to values. Each rotation preserves the query and key norms; relative angles change their dot product without rescaling either vector.
 
 ## 4.3.5 Multiple heads
 

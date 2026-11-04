@@ -106,6 +106,6 @@ For a sequence of length $T$, width $d$, $H$ heads and $L$ layers:
 | scores + mixing | $\approx4T^2d$ FLOPs | attention, quadratic in $T$ |
 | attention weights, if stored | $HT^2$ numbers | quadratic in $T$ |
 | KV cache (decoding, ordinary MHA) | $2Td$ numbers | linear in $T$ |
-| one decoding step at length $t$ | $\approx2\cdot12d^2 + 4td$ FLOPs | weights for short $t$, cache for long $t$ |
+| one decoding step at length $t$ | $\approx2\cdot12d^2 + 4td$ FLOPs | projections/MLP for short $t$; attention over cached positions for long $t$ |
 
 Under this matrix-multiplication-only accounting, the quadratic prefill terms cross the linear projection/MLP terms at $T=6d$ (Worked Example 4.8). This is not a universal wall-clock crossover: kernels, precision, batch size, and hardware all matter. In particular, **memory traffic** can dominate when an implementation materializes $T\times T$ score or weight matrices in slower memory and reads them back. IO-aware exact-attention kernels target that traffic without changing the quadratic arithmetic count (§4.8.1); Unit 06 develops the broader model through arithmetic intensity and the roofline.
