@@ -27,6 +27,7 @@ def test_committed_edition_matches_a_fresh_conversion():
     ("字典的每個欄向量", "字典的每个列向量"),                     # Taiwan column terminology
     ("每一列由樣本索引，每一欄由特徵索引", "每一行由样本索引，每一列由特征索引"),
     ("序列的排列與執行", "序列的排列与执行"),                     # not rows or columns
+    ("逐行核對推導", "逐行核对推导"),                           # prose lines, not matrix columns
     ("只用一行線性代數", "只用一行线性代数"),                     # a line of text
     ("資料的變異數與共變異數", "数据的方差与协方差"),
     ("全域最小值與全域平均", "全局最小值与全局平均"),

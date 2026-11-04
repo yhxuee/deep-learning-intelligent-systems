@@ -4,7 +4,9 @@ description: Nine fully computed examples — designing a filter, a change detec
 sidebar: { label: "5.4 Worked examples", order: 4 }
 ---
 
-Each example is computed completely, with every intermediate number. Work it on paper before reading the solution. All numbers are reproduced by `labs/unit-05-memory` or by the short scripts noted.
+These examples turn the mechanisms of §5.2--§5.3 into calculations you can audit. For each one, first write down **state, update, readout, and requested quantity**; then try the next line on paper before revealing the solution. A wrong intermediate value is useful evidence: it tells you whether the difficulty is algebra, indexing, or the model itself. The numerical results are reproduced by `labs/test_worked_examples.py` or `labs/unit-05-memory`.
+
+The examples use idealized real-number arithmetic unless a precision limit is stated. “Exact recall” therefore always refers to the stated model and assumptions—not to floating-point hardware or to arbitrary keys that were never promised to be distinguishable.
 
 ## Worked Example 5.1 — Designing the sensor filter
 
@@ -34,7 +36,7 @@ $$
 |---|---|---|---|---|---|---|---|
 | $y_t$ | 0.450 | 0.653 | 0.732 | **0.752** | 0.743 | 0.358 | 0.077 |
 
-The output rises quickly (the fast memory catches up), peaks at $t = 4$, and then decays as the slow memory catches up too. It is large *only shortly after a change* and near zero when the input is steady: a change detector. No single EMA can produce this response — it needs two timescales and a readout that compares them.
+The output rises quickly (the fast memory catches up), peaks at $t=4$, and then decays as the slow memory catches up too. It is large *only shortly after a change* and near zero when the input is steady: a change detector. A readout of one scalar EMA alone cannot form this fast-minus-slow response; it needs two stored timescales. If the current raw input were also available to the readout, one slow EMA plus that skip path could form a different change detector.
 
 ## Worked Example 5.3 — A kernel by diagonalization
 
@@ -80,7 +82,17 @@ $$
 A^{10} = \begin{pmatrix}0.3487 & 19.371\\0 & 0.3487\end{pmatrix}.
 $$
 
-A unit vector $u$ is amplified by $\|A^{10}u\|$; the maximum over unit vectors is the spectral norm $\|A^{10}\|_2 \approx 19.38$, attained near $u = (0, 1)^{\top}$ (exactly: the top right singular vector). An input that enters the *second* component appears almost twentyfold larger in the *first* component ten steps later — although both eigenvalues are 0.9 and the "half-life" suggested by the eigenvalues is 6.6 steps. The lab test `test_non_normal_transient_growth` checks the peak.
+To find the most amplified direction rather than guess it, write $M=A^{10}$ and diagonalize $M^\top M$:
+
+$$
+M^\top M \approx
+\begin{pmatrix}
+0.12158 & 6.75426\\
+6.75426 & 375.35817
+\end{pmatrix}.
+$$
+
+Its largest eigenvalue is $375.47970$, so $\|A^{10}\|_2=\sqrt{375.47970}\approx19.3773$. A corresponding unit eigenvector is $u\approx(0.01799,\ 0.99984)^\top$: nearly, but not exactly, $(0,1)^\top$. Thus an input entering mostly through the *second* component appears almost twentyfold larger ten steps later—although both eigenvalues are 0.9 and their scalar half-life is 6.6 steps. This is the distinction between an eigenvector calculation and a worst-case singular-vector calculation. The lab test `test_non_normal_transient_growth` checks the peak.
 
 ## Worked Example 5.6 — Backpropagation through time by hand
 
@@ -127,7 +139,7 @@ S = \begin{pmatrix}2\\0\end{pmatrix}(1,\ 0) + \begin{pmatrix}0\\3\end{pmatrix}(0
 \qquad Sk_1 = (2,0)^{\top} = v_1,\quad Sk_2 = (0,3)^{\top} = v_2 .
 $$
 
-Exact recall — the memory is "full" at $d_k = 2$ orthonormal keys. Now add the third pair: $v_3k_3^{\top} = \tfrac1{\sqrt2}\begin{pmatrix}1&1\\1&1\end{pmatrix}$, so
+Exact recall under this outer-product rule. The two orthogonal directions of $\mathbb R^2$ are now occupied. Add the third pair: $v_3k_3^{\top}=\tfrac1{\sqrt2}\begin{pmatrix}1&1\\1&1\end{pmatrix}$, so
 
 $$
 S' = \begin{pmatrix}2.7071 & 0.7071\\ 0.7071 & 3.7071\end{pmatrix}.
@@ -139,7 +151,7 @@ $$
 | $k_2$ | $(0.707,\ 3.707)$ | $(0, 3)$ | 0.33 |
 | $k_3$ | $(2.414,\ 3.121)$ | $(1, 1)$ | 1.80 |
 
-Every read is now contaminated by the values stored under overlapping keys: reading $k_1$ adds $(k_3^{\top}k_1)v_3 = 0.707\,v_3$; reading $k_3$ adds $0.707v_1 + 0.707v_2$, which swamps $v_3$. A third pair cannot fit into a $2\times2$ memory without interference.
+Every read is now contaminated by the values stored under overlapping keys: reading $k_1$ adds $(k_3^{\top}k_1)v_3=0.707\,v_3$; reading $k_3$ adds $0.707v_1+0.707v_2$, which swamps $v_3$. This particular additive memory cannot guarantee exact recall for a third arbitrary association in two key dimensions. Special, mutually consistent values could still happen to give zero error; the claim is about arbitrary associations, not every possible dataset.
 
 ## Worked Example 5.8 — A parallel scan by hand
 
@@ -164,14 +176,14 @@ Then combine the two results: $(0.4, 2.8)\bullet(0.45, 3.5) = (0.18,\ 0.45\cdot2
 
 1. Smooth a sensor whose noise must drop 4× with a 60 s response (Example 5.1).
 2. Detect that a reading has changed within the last ~5 s.
-3. Answer "what was the reading exactly 3600 s ago?" with 0.1 °C precision.
-4. Given a sequence of 2 000 key–value pairs and then a key, return its value.
+3. Answer “what was the reading exactly 3,600 s ago?” to 0.1 °C, assuming quantized readings can vary independently.
+4. Given 2,000 arbitrary key--value pairs and then one of those keys, return its value exactly.
 
 **Solution.**
 
 1. **One EMA**, $\alpha \in [0.88, 0.95]$ — 1 number of state (Example 5.1).
 2. **Two EMAs and a difference** (Example 5.2), 2 numbers; the peak at 4 steps matches the 5 s window. A selective or gated model would also work but is unnecessary.
-3. **A window of 3 600 values** (or attention over them). No decaying memory can do it: the influence of a 3600-step-old input in an EMA with $\alpha = 0.999$ is $0.999^{3600} \approx 0.027$, mixed with 3 599 other readings; and §5.5.2 proves any exact solution needs state proportional to the window.
-4. **Softmax attention with a KV cache** of 2 000 entries; or a linear-attention memory with $d_k \gtrsim 2000$ (Example 5.7 and §5.5.3 show interference otherwise). A fixed-size recurrent state of a few hundred numbers cannot store 2 000 arbitrary associations exactly (§5.5.2).
+3. **A 3,600-step delay line or ring buffer** is the direct solution. If the data structure includes both the current sample $x_t$ and $x_{t-3600}$ at the instant of reading, that is a 3,601-sample window; an implementation that reads the oldest slot before overwriting it needs 3,600 stored past values. An EMA with $\alpha=0.999$ gives the old input weight only $(1-\alpha)\alpha^{3599}\approx2.7\times10^{-5}$ and mixes it with every other reading, so it cannot recover an independently varying old sample. The finite-precision lower bound in §5.5.2 explains why exact arbitrary delay requires storage growing with the delay.
+4. **An explicit content-addressed table of 2,000 entries** is required for literal exactness; a KV cache supplies the growing storage, but ordinary finite-temperature softmax is only a differentiable approximate read. It becomes arbitrarily sharp only when the promised keys are well separated and scores can be scaled enough. The additive linear-attention memory has exact recall in the ideal orthogonal construction only when its feature dimension is at least the number of independent keys; $r\ge2,000$ is therefore a best-case construction, not a guarantee for arbitrary learned keys. A few-hundred-number finite-precision recurrent state cannot losslessly store 2,000 arbitrary associations (§5.5.2).
 
-The general lesson: **compute the memory requirement of the task first**, then pick the design whose capacity matches.
+The general lesson: **state the precision and retrieval guarantee, compute the task's memory requirement, and only then choose an architecture.** “There is a path to an old record,” “the model usually retrieves it,” and “the answer is exact” are three different specifications.
