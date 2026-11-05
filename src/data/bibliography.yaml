@@ -95,6 +95,8 @@ lipton-2019: { authors: "Lipton, Z. C., and Steinhardt, J.", year: 2019, title: 
 romera-paredes-2024: { authors: "Romera-Paredes, B., Barekatain, M., Novikov, A., et al.", year: 2024, title: "Mathematical discoveries from program search with large language models", venue: "Nature 625, 468–475", url: "https://doi.org/10.1038/s41586-023-06924-6" }
 novikov-2025: { authors: "Novikov, A., Vũ, N., Eisenberger, M., et al.", year: 2025, title: "AlphaEvolve: A coding agent for scientific and algorithmic discovery", venue: "arXiv:2506.13131", url: "https://arxiv.org/abs/2506.13131" }
 lu-2024: { authors: "Lu, C., Lu, C., Lange, R. T., Foerster, J., Clune, J., and Ha, D.", year: 2024, title: "The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery", venue: "arXiv:2408.06292", url: "https://arxiv.org/abs/2408.06292" }
+yamada-2025: { authors: "Yamada, Y., Lange, R. T., Lu, C., Hu, S., Lu, C., Foerster, J., Clune, J., and Ha, D.", year: 2025, title: "The AI Scientist-v2: Workshop-Level Automated Scientific Discovery via Agentic Tree Search", venue: "arXiv:2504.08066", url: "https://arxiv.org/abs/2504.08066" }
+reizinger-2026: { authors: "Reizinger, P., and Brendel, W.", year: 2026, title: "Skills, Benchmarks, and Verification Are What AI-Assisted Research Needs", venue: "ICLR", url: "https://openreview.net/forum?id=svFHXBd2wq" }
 
 # --- Learning science and AI in education ------------------------------------------
 bloom-1984: { authors: "Bloom, B. S.", year: 1984, title: "The 2 Sigma Problem: The Search for Methods of Group Instruction as Effective as One-to-One Tutoring", venue: "Educational Researcher 13(6), 4–16", url: "https://doi.org/10.3102/0013189X013006004" }
