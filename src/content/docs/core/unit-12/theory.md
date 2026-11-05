@@ -1,49 +1,168 @@
 ---
 title: "12.5 General theory"
-description: Why a large share of published findings can be false, the positive predictive value of a significant result, falsification and strong inference, and what AI systems can and cannot do in the research loop.
+description: Evidence as error-correcting inquiry: positive predictive value, selection, falsification, strong inference, Bayesian updating, replication, cumulative evidence, and bounded roles for AI.
 sidebar: { label: "12.5 General theory", order: 5 }
 ---
 
-## 12.5.1 How many significant findings are true?
+The practical rules of §§12.2–12.4 rest on a deeper idea: science is not a machine that converts one significant result into truth. It is an **error-correcting process** in which claims remain exposed to alternative explanations and new tests.
 
-Suppose a fraction $\pi$ of the hypotheses a field tests are true, experiments have power $1 - \beta$, and the significance level is $\alpha$. Among significant results, the fraction that are true — the **positive predictive value** — is
+## 12.5.1 Why a significant result need not be true
+
+Suppose a fraction $\pi$ of tested hypotheses are true, a valid test has power $1-\beta$ when the hypothesis is true, and false-positive rate $\alpha$ when it is false. Among significant results, the positive predictive value is
 
 $$
-\mathrm{PPV} = \frac{(1-\beta)\,\pi}{(1-\beta)\,\pi + \alpha(1-\pi)} .
+\operatorname{PPV}
+=\Pr(H\text{ true}\mid +)
+=\frac{(1-\beta)\pi}
+{(1-\beta)\pi+\alpha(1-\pi)}.
 $$
 
-*Derivation.* True hypotheses produce significant results at rate $1 - \beta$, false ones at rate $\alpha$; Bayes' rule gives the fraction. $\blacksquare$
+The numerator counts true positives; the denominator counts all positives.
 
-With $\pi = 0.1$, $\alpha = 0.05$ and power 0.8, $\mathrm{PPV} = 0.08/(0.08 + 0.045) = 0.64$: a third of significant results are false. With power 0.2 — typical of experiments with few seeds — it falls to $0.02/(0.02 + 0.045) = 0.31$. Bias (forking paths, selective reporting) lowers it further. This is the arithmetic behind the claim that most published findings can be false in fields with small effects, low power and flexible analysis ([Ioannidis 2005](/references/#ioannidis-2005)) **[D]**. Every term is under the researcher's control: test plausible hypotheses, compute power, fix the analysis.
+For $\pi=0.1$, $\alpha=0.05$, and power $0.8$,
 
-## 12.5.2 Falsification and strong inference
+$$
+\operatorname{PPV}=\frac{0.08}{0.08+0.045}=0.64.
+$$
 
-Popper's criterion — a scientific claim must be capable of being refuted by observation ([Popper 1959](/references/#popper-1959)) — becomes operational in a registered prediction with a decision rule. [Platt (1964)](/references/#platt-1964) turned it into a method, **strong inference**: for each question, write down *alternative* hypotheses, design an experiment whose outcomes discriminate between them, run it, and recurse on what survives. Unit 11's Experiment 11.4 is posed this way: the induction account and a positional account predict different results for gap-shuffled patching; whichever prediction fails is eliminated. Strong inference is efficient because each experiment is designed to kill a hypothesis, not to collect evidence for a favourite one.
+At power $0.2$ it falls to
 
-## 12.5.3 What counts as a finding
+$$
+\frac{0.02}{0.02+0.045}\approx0.31.
+$$
 
-Putting the units together, a claim about a model or a method is a **finding** when:
+This stylized calculation explains how low power, low base rates of correct ideas, and flexible selection can make a literature unreliable ([Ioannidis 2005](/references/#ioannidis-2005)). It is not an estimate that “36% of ML papers are false.” Its assumptions are strong:
 
-1. it is stated as a falsifiable prediction with a threshold that matters (§12.2.1);
-2. the experiment changes one factor with appropriate controls (§12.2.2; Unit 11's controls for interventions);
-3. the analysis, sample size and decision rule were fixed in advance (§12.2.5, §12.3.2);
-4. its uncertainty is reported with the right unit of resampling — items, and seeds for methods (Unit 10);
-5. it survives an independent replication (§12.2.6);
-6. what it does *not* establish is stated: the population it was tested on, the range of scales, the alternatives not ruled out.
+- every true hypothesis is assigned the same power;
+- every false hypothesis has valid type-I error $\alpha$;
+- hypotheses and studies are independent;
+- there is no selective reporting, p-hacking, or measurement error;
+- “true” is binary and well defined.
 
-None of these is new; all are routinely skipped. The spine capstone does all six for a small question and reports "inconclusive" — which satisfies the standard as fully as a positive result would.
+In real research, effect sizes vary and claims are rarely simply true or false. Treat the formula as a causal diagram for reliability, not a census.
 
-## 12.5.4 AI in the research loop
+## 12.5.2 Selection acts like an extra likelihood term
 
-AI systems can now take part in every step: proposing hypotheses, writing experiment code, running searches over programs, analysing results and drafting papers. In some domains, systems that combine a language model proposer with an automatic evaluator have produced verifiable new results — better constructions in combinatorics ([Romera-Paredes et al. 2024](/references/#romera-paredes-2024)), faster matrix multiplication algorithms ([Fawzi et al. 2022](/references/#fawzi-2022)) — and protein structure prediction reached experimental accuracy ([Jumper et al. 2021](/references/#jumper-2021)) **[E]**. In a large blinded study, research ideas generated by a language model were judged *more novel* than experts' ideas but slightly less feasible ([Si et al. 2024](/references/#si-2024)) **[E]**. Fully automated research pipelines produce papers whose quality is uneven and whose errors are hard to see ([Lu et al. 2024](/references/#lu-2024)) **[O]**.
+Let $S$ mean “the result was selected for reporting.” Readers observe not just a positive result $+$, but $(+,S)$. The relevant probability is
 
-The common factor in the verified successes is an **evaluator that cannot be fooled** — a program that checks the construction, an experimental structure to compare against. Where such an evaluator exists, AI can search far faster than people; where it does not, AI makes the forking-paths problem worse, because it can produce more paths, more analyses and more convincing prose per hour. This is the book's central proposition at its last step: *you can delegate only what you can verify*. The methods of Units 10–12 are what make verification possible.
+$$
+\Pr(H\mid +,S),
+$$
 
-## 12.5.5 Summary
+not $\Pr(H\mid +)$. If surprising positives are much more likely to be selected than nulls, selection changes the evidence.
 
-| Result | Says |
+This is why “we tried 20 analyses and report the significant one” cannot be interpreted as one pre-specified 5% test. Pre-registration, complete result tables, registered reports, and publication of null results reduce uncertainty about the selection mechanism.
+
+## 12.5.3 Falsification is a direction, not a mechanical verdict
+
+A scientific claim must expose itself to observations that would count against it ([Popper 1959](/references/#popper-1959)). But probabilistic models are rarely destroyed by one noisy contradiction. When a prediction fails, at least four explanations compete:
+
+1. the hypothesis is wrong;
+2. an auxiliary assumption is wrong;
+3. the measurement is invalid;
+4. an unlikely random outcome occurred.
+
+Therefore a refuter must specify which assumptions are being tested and which controls make measurement failure unlikely. Unit 06's scaling miss did not logically prove a regime change; it made the old extrapolation inadequate and motivated a new, testable regime-change account.
+
+## 12.5.4 Strong inference compares rivals
+
+Strong inference asks researchers to formulate alternative hypotheses and choose experiments on which they disagree ([Platt 1964](/references/#platt-1964)). For the trained copying model:
+
+- relative-position mechanism predicts transfer across absolute shifts;
+- absolute-position template predicts failure after shifts;
+- value-subspace mechanism predicts that QK inspection alone will miss the transferable content.
+
+The best next experiment maximizes separation among these predictions. Evidence usually changes their relative plausibility rather than instantly “eliminating” all but one. Unit 11, Experiment 11.6 follows this structure.
+
+## 12.5.5 Frequentist error control and Bayesian updating answer different questions
+
+A confidence procedure controls long-run coverage under repeated datasets. It does not assign a probability that this fixed interval contains the parameter. A Bayesian posterior begins with prior $p(H)$ and updates by a likelihood:
+
+$$
+p(H\mid D)
+=\frac{p(D\mid H)p(H)}{p(D)}.
+$$
+
+Neither framework removes design problems. A posterior based on a misspecified likelihood or a confidence interval over pseudoreplicated tokens can both be precise and wrong. Randomization, valid measurement, and transparent selection come first.
+
+The PPV calculation is itself Bayesian in form, while its $alpha$ and power inputs come from frequentist operating characteristics. The frameworks can illuminate different parts of one workflow.
+
+## 12.5.6 Evidence accumulates across different kinds of independence
+
+Confidence increases when a claim survives tests whose errors are not shared:
+
+- new seeds challenge chance training outcomes;
+- new data challenge item selection and contamination;
+- new code challenges implementation bugs;
+- new teams challenge analyst expectations;
+- new models challenge architecture-specific explanations;
+- new interventions challenge merely correlational stories.
+
+Ten replications using the same buggy helper are not equivalent to one clean-room implementation. “Replication count” matters less than **independence from the suspected failure mode**.
+
+Evidence can be synthesized quantitatively when studies estimate compatible quantities, but heterogeneity is scientific information. If effects differ by model size or training time, a single pooled mean can hide the mechanism.
+
+## 12.5.7 A finding is bounded and graded
+
+A defensible finding states:
+
+1. the system, distribution, intervention, and estimand;
+2. the experimental units and uncertainty;
+3. whether analysis was confirmatory or exploratory;
+4. the estimate and decision without binary hype;
+5. implementation and data audits;
+6. replications and the dimensions in which they were independent;
+7. alternatives and domains not tested.
+
+Replication strengthens a finding; it is not a magical threshold between “result” and “knowledge.” The capstone supports a finding about the experiment's resolution and broken pairing. It does not support a directional finding about positional embeddings.
+
+## 12.5.8 AI changes the speed and shape of the search
+
+AI can propose hypotheses, write code, search program spaces, summarize literature, analyse outputs, and draft reports. Systems coupled to machine-checkable objectives have contributed verifiable constructions in combinatorics ([Romera-Paredes et al. 2024](/references/#romera-paredes-2024)) and matrix multiplication ([Fawzi et al. 2022](/references/#fawzi-2022)); learned systems have also transformed scientific prediction such as protein structure ([Jumper et al. 2021](/references/#jumper-2021)). These are different achievements and should not be merged into “AI autonomously does science.”
+
+AI also multiplies researcher degrees of freedom. It can generate a hundred plausible hypotheses, metrics, exclusions, and narratives before lunch. If only the best-looking output is reported, selection bias grows with productivity.
+
+### Delegate according to verifier strength
+
+| Verifier | Suitable AI role | Required safeguard |
+|---|---|---|
+| exact checker or proof assistant | broad candidate search | checker integrity and specification audit |
+| deterministic test suite | code generation and repair | adversarial tests and hidden cases |
+| noisy experiment | hypothesis and protocol drafting | pre-registration, controls, replication |
+| expert judgement | literature synthesis and idea generation | blinded review, source verification, disagreement records |
+
+No evaluator is literally “unable to be fooled.” A program can encode the wrong objective; a wet-lab assay can be biased; a human rubric can reward fluency. Verification itself must be audited.
+
+The practical rule is:
+
+> The weaker and more gameable the evaluator, the less autonomy should be granted to search, select, and report within the same loop.
+
+Keep proposer, executor, evaluator, and reporter roles separable. Preserve prompts, code diffs, tool outputs, exclusions, and human overrides so that AI assistance remains auditable.
+
+## 12.5.9 Science as a loop back to generalization
+
+Every study observes a finite sample of seeds, data, models, and interventions, then asks about unobserved cases. This is Unit 01 again:
+
+$$
+\text{finite evidence}
+\longrightarrow
+\text{bounded generalization}
+\longrightarrow
+\text{new counterexample search}.
+$$
+
+No method ends the loop. Good methodology makes the leap visible, measures some of its uncertainty, and creates artifacts that let others challenge it.
+
+## 12.5.10 Summary
+
+| Principle | Practical consequence |
 |---|---|
-| PPV formula (§12.5.1) | low power and low prior make significant results unreliable |
-| Strong inference (§12.5.2) | design experiments to eliminate alternatives |
-| Six criteria (§12.5.3) | what turns a result into a finding |
-| AI in the loop (§12.5.4) | acceleration where an evaluator exists; amplified error where it does not |
+| PPV depends on base rate, power, and error rate | significance alone is weak evidence |
+| selection changes the observed evidence | preserve all searches and distinguish exploration |
+| falsification tests a bundle of assumptions | use controls and diagnose failures |
+| strong inference compares rivals | choose experiments with divergent predictions |
+| replication must target shared errors | seek independence along likely failure modes |
+| findings are bounded and graded | state scope, uncertainty, and unresolved alternatives |
+| AI accelerates both discovery and selection bias | scale autonomy with verifier strength |
+
+Verifiable knowledge is not certainty. It is a claim placed in an error-correcting system strong enough to discover when the claim stops working.
