@@ -15,6 +15,26 @@ The Atlas is **not an encyclopedia**. AI systems already explain well; what they
 - **common bugs** and which invariant catches each;
 - primary sources by stable bibliography key.
 
+The Atlas is also **not the recommended first explanation** of a new concept. Learn the motivation and derivation in the Core; use the corresponding node when you need a compact check while writing code, reviewing an AI answer, or planning an experiment. A short node may look abrupt precisely because it is a field card, not a chapter.
+
+## A three-step way to use a node
+
+1. **Predict the invariant.** Before reading the list, write one property any correct implementation must satisfy. For cross-entropy, a uniform predictor over $V$ outcomes should score $\ln V$ nats.
+2. **Run the smallest known value.** Reproduce one number by hand, then in code. If they disagree, stop before scaling up.
+3. **Plant a bug.** Break one thing deliberately and verify that the advertised invariant detects it. A test that has never failed may be checking the wrong property.
+
+The sections have distinct roles:
+
+| Section | Question it answers |
+|---|---|
+| definition / in one paragraph | what object is being checked? |
+| invariants | what must remain true for every valid input in scope? |
+| known values | what exact or near-exact number can anchor an implementation? |
+| common bugs / where it lies | when can a plausible implementation or even the check mislead? |
+| references | where does the mechanism or evidence come from? |
+
+“Invariant” does not mean a universal law outside the node's assumptions. For example, initialization loss is near $\ln V$ only when initial logits are near equal; the node should state such conditions.
+
 Nodes are connected by typed links — *prerequisite*, *related*, *historical predecessor*, *alternative mechanism* — and the site build **fails** if any link, unit number or citation key is dangling. The Atlas is capped at about 150 nodes; adding one should usually mean merging or retiring another.
 
 <AtlasTable />
