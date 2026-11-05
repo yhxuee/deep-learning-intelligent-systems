@@ -139,6 +139,19 @@ def integrate(velocity, x0, n_steps=100):
     return x
 
 
+def integrate_midpoint(velocity, x0, n_steps=100):
+    """Explicit midpoint (second-order Runge--Kutta) integration on t in [0, 1]."""
+    x = x0.copy()
+    h = 1.0 / n_steps
+    for k in range(n_steps):
+        t = np.full(len(x), k * h)
+        k1 = velocity(x, t)
+        t_mid = t + 0.5 * h
+        k2 = velocity(x + 0.5 * h * k1, t_mid)
+        x = x + h * k2
+    return x
+
+
 def gaussian_velocity(mu, sigma):
     """Exact marginal velocity for x0 ~ N(0, I), x1 ~ N(mu, sigma^2 I) and straight paths:
     v*(x, t) = E[x1 - x0 | x_t = x] = mu + (t sigma^2 - (1 - t)) / s_t^2 (x - t mu),

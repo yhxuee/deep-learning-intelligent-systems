@@ -1,64 +1,241 @@
 ---
 title: "8.9 Experiments"
-description: Six experiments — samplers on the spine model, degeneration measured, the exact Gaussian flow and its step-count error, flow matching on a ring, a VAE on the same data, and spine Stage 08.
+description: Seven reproducible studies separate decoder effects, sequence degeneration, field error, solver error, model-family choices, implementation correctness, and scientific mode coverage.
 sidebar: { label: "8.9 Experiments", order: 9 }
 ---
 
-Write the prediction first. Code: [`spine/stage08_sampling.py`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/spine) and its tests in `spine/test_spine.py`.
+An experiment should be able to surprise you. If its conclusion is written before the measurements are taken, it is a demonstration at best and confirmation bias at worst.
 
-## Experiment 8.1 — Samplers on the spine model
+For every experiment below:
 
-**Tests:** §8.2.3–§8.2.4, Worked Example 8.4. **Predict:** for greedy, $\tau = 0.7$, $\tau = 1.5$ and top-$p = 0.9$, which produce loops, which produce non-words, and which produce varied, well-formed stories.
+1. write a directional prediction and a reason before running code;
+2. freeze the checkpoint, prompt or dataset split, seed list, sample count, and metric definitions;
+3. change one factor at a time;
+4. save raw per-seed results, not only their average;
+5. report observations separately from explanations.
 
-**Procedure.** `python stage08_sampling.py` prints three 90-character continuations of "Lily had a " per sampler. Then generate 200 continuations per sampler and count (a) distinct continuations, (b) non-words (strings not in the training vocabulary of words).
+Core code lives in \`spine/stage08_sampling.py\`; exact synthetic-data properties are checked in \`labs/test_beyond_language.py\`; numerical claims from the worked examples are checked in \`labs/test_worked_examples_u06_u08.py\`.
 
-**Look for:** greedy has one continuation; $\tau = 1.5$ has the most non-words; top-$p$ and $\tau = 0.7$ trade the two.
+## Experiment 8.1 — A decoder changes a distribution, not a creativity dial
 
-## Experiment 8.2 — Measuring degeneration
+**Question.** How do greedy, temperature, and nucleus decoding change measurable sequence behavior for one fixed language model?
 
-**Tests:** §8.7.1. **Predict:** the fraction of 400-character greedy generations that contain a repeated 30-character substring.
+**Pre-register.**
 
-**Procedure.** Generate from 50 different prompts with greedy and with top-$p = 0.9$; detect repeated substrings; also compute the model's own NLL of each generation.
+- Checkpoint: the provided Stage 07 checkpoint.
+- Prompts: choose 20 corpus prefixes of the same character length *before* inspecting outputs; include story, dialogue, and arithmetic prefixes.
+- Decoders: greedy, $\tau\in\{0.7,1.0,1.5\}$, and top-$p\in\{0.8,0.9,0.95\}$ at $\tau=1$.
+- Random seeds: 10 per stochastic decoder.
+- Generation length: 200 characters after each prompt.
 
-**Look for:** greedy generations have very low NLL and high repetition — the likelihood trap in miniature.
+Greedy has no random seed after tie-breaking, so generate it once per prompt. Do not count repeated greedy calls as independent samples.
 
-## Experiment 8.3 — The exact Gaussian flow and its step-count error
+**Metrics.**
 
-**Tests:** §8.3.6–§8.3.7, Worked Example 8.7. **Predict:** the sample standard deviation after Euler integration with 1, 2, 5, 20, 200 steps (target 0.5).
+1. **Distinct completion rate:** unique full continuations divided by draws.
+2. **Character 4-gram diversity:** unique generated 4-grams divided by total generated 4-grams.
+3. **Repetition rate:** fraction containing a repeated 30-character substring.
+4. **Original-model NLL:** evaluate every output under the *unmodified* Stage 07 conditionals.
+5. **Format validity:** define deterministic corpus-specific rules, such as a complete arithmetic sentence. Do not use an undefined “non-word” counter on a character model.
+6. **Entity consistency:** blind manual rating on a declared rubric; hide decoder labels from the rater.
 
-**Procedure.** Integrate `gaussian_velocity([1, -2], 0.5)` from 20 000 standard-normal samples; then replace Euler by the midpoint (second-order) method and repeat.
+**Controls.** Use the same prompts for every decoder. For paired stochastic comparisons, reuse the seed identifiers but remember that different distributions do not receive identical token-level randomness after their first divergence.
 
-**Look for:** 0, 0.20, 0.37, 0.47, 0.50 for Euler; the midpoint method reaches 0.49 in far fewer steps. Explain why the mean is nearly exact at every step count while the spread is not.
+**Analysis.** Plot each metric against empirical next-token entropy, not merely against the label “creative.” Report medians and per-prompt intervals because a few prompts may dominate repetition.
 
-## Experiment 8.4 — Flow matching on a ring
+**Supported conclusion.** The study can describe decoder effects for this checkpoint, prompt set, and length. It cannot rank decoders for all language models or infer human preference from diversity alone.
 
-**Tests:** Proposition 8.2, Worked Example 8.8. **Predict:** the final training loss (not zero — why?) and the fraction of samples within 0.5 of a mode.
+## Experiment 8.2 — Does low model NLL predict degeneration?
 
-**Procedure.** `fm_train` for 3 000 steps; sample with 5, 20 and 100 Euler steps; plot samples and count covered modes.
+**Question.** Greedy text often has low NLL and high repetition. Is that relationship present after controlling for prompt?
 
-**Look for:** loss falling from about 5.3 to about 3.8; nearly all samples near the eight modes with 100 steps, fewer and more smeared with 5.
+**Design.** Reuse Experiment 8.1's 20 prompts. For each prompt, generate 400 characters with greedy, top-$p=0.9$ at $\tau=1$ using 20 seeds, and unconstrained $\tau=1$ sampling using the same seed identifiers.
 
-## Experiment 8.5 — A VAE on the same ring
+For every output, record
 
-**Tests:** §8.3.3, §8.5.4. **Predict:** whether a VAE with a 2-D latent and the same MLP size covers all eight modes, and how sharp its samples are compared with flow matching.
+$$
+\text{mean NLL}
+=
+-\frac{1}{T}\sum_{t=1}^{T}
+\ln p_\theta(x_t\mid x_{<t}),
+$$
 
-**Procedure.** Implement the encoder, decoder and ELBO with the reparameterization (AI-off for the gradient of the KL term); train; sample.
+the repeated-30-character indicator, longest repeated substring, and character 4-gram diversity.
 
-**Look for:** samples smeared between modes (the Gaussian decoder averages) — the blur of §8.5.4 — and the trade-off as the weight of the KL term changes.
+**Two comparisons.**
 
-## Experiment 8.6 — Spine Stage 08
+1. **Within prompt:** does the decoder with lower mean NLL also repeat more?
+2. **Within one stochastic decoder:** across seeds, is NLL correlated with repetition?
 
-**Tests:** the [spine](/spine/) verification targets. **Predict:** whether top-$k$ with $k = 1$ equals greedy; whether 20 000 draws match their probabilities to within 0.012.
+These answer different questions. The first includes the decoder intervention; the second tests association among samples from one decoder.
 
-**Procedure.** `cd spine && python -m pytest test_spine.py -k stage08 -v`.
+**Avoid a circular metric.** Greedy explicitly selects high local probability, so finding low NLL is partly guaranteed by construction. Repetition is the independent outcome. Add a blind coherence rating or a corpus-format score if the claim concerns quality.
 
-**Look for:** samplers reduce to each other in their limits; the exact Gaussian field transports noise onto the target; the flow-matching gradient matches finite differences.
+**Report.** Give a paired prompt-level difference, a bootstrap interval over prompts, and a scatterplot. Do not call correlation causal. If greedy is not more repetitive for this small model, report the null result; the experiment is not required to reproduce large-model literature.
 
+## Experiment 8.3 — Measure convergence against an analytic endpoint
 
-## Experiment 8.7 — Beyond language: a density from physics
+**Question.** How do first- and second-order solvers approach the exact Gaussian transport?
 
-**Tests:** §8.3.5, Worked Example 8.8. **Predict:** whether a flow-matching model trained on samples of the double-well Boltzmann density $p\propto e^{-\beta U}$, $U = (x^2 - 1)^2 + y^2/2$, $\beta = 3$, puts half of its samples in each well, and how that changes with 10 versus 100 integration steps.
+**Reference.** Use
 
-**Procedure.** Draw training samples with `double_well_samples`; reuse the ring experiment's MLP and training loop; compare the fraction of generated samples with $x > 0$ and the mass near the barrier $|x| < 0.2$ with the data (about 50% and under 5%).
+$$
+\mu=(1,-2),\qquad \sigma=0.5,
+$$
 
-**Look for:** correct mode weights with enough steps, mass leaking onto the barrier with few — the "wrong in a predictable direction" of §8.7.3 in a scientific setting where the weights of the modes are the quantity of interest (the populations of two states). A generator that drops or reweights a mode is wrong here in a way an image's visual quality would hide.
+and the exact solution from §8.3.6:
+
+$$
+x(1)=\mu+\sigma x(0).
+$$
+
+Draw one fixed array of 20,000 initial samples with seed 0. Reuse those exact samples for every solver and step count; otherwise Monte Carlo noise obscures numerical error.
+
+**Procedure.**
+
+- Euler: \`integrate\`.
+- Explicit midpoint: \`integrate_midpoint\`.
+- Step counts: $n\in\{1,2,5,10,20,50,100,200\}$.
+
+For each run, compare the numerical endpoint with the analytic endpoint sample by sample:
+
+$$
+\operatorname{RMSE}_{\mathrm{path}}
+=
+\sqrt{
+\frac{1}{N}
+\sum_i
+\|x_i^{\mathrm{num}}(1)-x_i^{\mathrm{exact}}(1)\|^2
+}.
+$$
+
+Also record mean error and per-coordinate standard-deviation error. Distribution moments can look correct while individual paths remain wrong, so keep both diagnostics.
+
+**Verified anchors.** For seed 0, Euler's mean coordinate standard deviations at $1,2,5,20,200$ steps are approximately
+
+$$
+0.000,\;0.200,\;0.370,\;0.465,\;0.497.
+$$
+
+Midpoint gives approximately $0.401$, $0.495$, and $0.500$ at $1,2,5$ steps. These values are executable regression checks, not values to fit.
+
+**Analysis.** On a log–log plot, fit endpoint error versus $h=1/n$ only in the asymptotic region where a power law is visible. Expected slopes are near $1$ for Euler and $2$ for midpoint. A fitted slope from two coarse points is not evidence of convergence order.
+
+## Experiment 8.4 — Separate training seed from solver step count on the ring
+
+**Question.** When ring samples improve with more Euler steps, how much variation comes from solver error and how much from learning a different field?
+
+**Stage A: solver sweep on a fixed field.**
+
+1. Train once with \`fm_train(steps=3000, seed=0)\`.
+2. Freeze the resulting parameters.
+3. Draw one set of 10,000 base-noise points and reuse it.
+4. Integrate with $n\in\{1,2,5,10,20,50,100,500\}$ Euler steps.
+5. Treat 2,000 midpoint steps as a high-accuracy reference for the *learned* field, not as ground-truth data.
+
+Record the fraction within $0.5$ of a mode; number of modes with at least 20 nearby samples; total-variation distance between the eight empirical mode frequencies and uniform $1/8$; mean and standard deviation of radius; and distance from each Euler endpoint to the reference endpoint using the same base seed.
+
+Only the last item isolates pathwise solver error. The others mix solver error with field error.
+
+**Stage B: training variability.** Repeat training for seeds $0$–$4$, always evaluate with the same evaluation base-noise seed, and report all metrics at 100 Euler steps. Do not average loss curves across seeds without retaining their individual endpoints.
+
+**Verified anchor.** Seed 0 with the provided configuration has mean loss $5.272\to3.807$ over the first and last 100 training steps; with the command-line demo's declared random stream, $96\%$ of 2,000 samples are within $0.5$ of a mode and all eight modes receive a nearby sample.
+
+**Interpretation boundary.** A positive flow-matching loss is not itself a sample-quality failure, and $8/8$ coverage does not prove correct mode weights. Use the full metric set.
+
+## Experiment 8.5 — A fair VAE–flow comparison on the same data
+
+**Status:** reader extension; no VAE implementation is supplied by Stage 08. Record that fact rather than presenting an unrun result as evidence.
+
+**Question.** Which observed differences come from the model family, and which come from likelihood choice, parameter count, or training budget?
+
+**VAE specification.**
+
+- Two-dimensional Gaussian latent with $p(z)=N(0,I)$.
+- Encoder outputs $\mu_\phi(x)$ and $\log\sigma_\phi^2(x)$.
+- Decoder uses an isotropic Gaussian observation model
+
+  $$
+  p_\theta(x\mid z)=N(f_\theta(z),s^2I).
+  $$
+
+- Run two declared variants: fixed $s=0.15$ and learned global $s$.
+- Train the standard ELBO first; treat $\beta$-VAE weights $\beta\in\{0.1,1,5\}$ as a separate ablation, not the same objective.
+
+**Fairness controls.** Match parameter count within 10%, use the same number of training examples, optimizer updates, batch size, and five seeds. Report wall-clock separately: equal updates do not imply equal compute.
+
+**Metrics.** Use the same ring metrics as Experiment 8.4. For the VAE, additionally report reconstruction log-likelihood and KL per datum; for the flow, report regression loss but do not compare the raw magnitudes of these different objectives.
+
+**Hypotheses to test, not assume.**
+
+- A fixed broad Gaussian decoder may place more mass between modes.
+- A small KL may signal posterior collapse or simply an easy decoder; inspect latent use and reconstructions.
+- Changing $\beta$ can trade aggregate-prior match against reconstruction, but the direction of every sample metric is empirical.
+
+The conclusion should name the exact decoder likelihood and budget. “VAEs are blurry” is not an acceptable model-family explanation.
+
+## Experiment 8.6 — Verification before interpretation
+
+**Question.** Do the primitive operations satisfy the identities the chapter assumes?
+
+Run \`cd spine && python -m pytest test_spine.py -k stage08 -v\`. Then, from the repository root, run \`python -m pytest labs/test_worked_examples_u06_u08.py -q\`.
+
+The tests check different layers:
+
+| Check | Failure would mean |
+|---|---|
+| top-$k$ with $k=1$ equals greedy | decoder limit or tie handling is wrong |
+| temperature $1$ frequencies match $(0.5,0.3,0.15,0.05)$ within tolerance | inverse-CDF sampling or normalization is wrong |
+| nucleus retains at least $p$ and is minimal | crossing-token mask is wrong |
+| analytic Gaussian field reaches target moments with a fine solver | field formula or integrator is wrong |
+| midpoint reaches the target spread faster in the analytic case | second-order implementation is wrong |
+| MLP gradient matches finite differences | hand-derived backpropagation is wrong |
+
+Passing these tests validates declared invariants at specified seeds and tolerances. It does not validate text quality, ring distribution equality, or performance on another machine.
+
+**Failure protocol.** Stop at the first violated primitive. Save the seed, expected and observed values, and smallest reproducing case. Do not tune the scientific experiment until the implementation test passes.
+
+## Experiment 8.7 — A scientific distribution where mode weights are the result
+
+**Question.** Can the same flow-matching pipeline preserve both wells and their equilibrium weights for
+
+$$
+p(x,y)\propto e^{-\beta U(x,y)},
+\qquad
+U(x,y)=(x^2-1)^2+\frac{y^2}{2},
+\qquad
+\beta=3?
+$$
+
+This target is symmetric, so the exact probability of $x>0$ is $1/2$. The barrier near $x=0$ has low density.
+
+**Data verification.** \`labs/beyond_language.py\` supplies \`double_well_samples\`, an acceptance–rejection sampler that is exact up to ordinary pseudorandom and floating-point computation. Before training, draw 20,000 points and verify:
+
+- $\Pr(x>0)$ is within $0.02$ of $0.5$;
+- $\mathbb E|x|$ is near $0.93$ within the declared test tolerance;
+- fewer than $5\%$ satisfy $|x|<0.2$.
+
+These checks validate the data generator, not the learned flow.
+
+**Training design.** Reuse the ring MLP and optimizer, replacing only the data sampler. Train seeds $0$–$4$. For every trained field, reuse one fixed base-noise array and compare Euler step counts $10,20,50,100,500$ with a high-accuracy midpoint reference.
+
+**Primary outcomes.**
+
+$$
+\widehat{\Pr}(x>0),
+\qquad
+\widehat{\Pr}(|x|<0.2),
+\qquad
+\widehat{\mathbb E}[U(X,Y)].
+$$
+
+Also report one-dimensional Wasserstein distances for the $x$ and $y$ marginals. The first metric tests relative state populations, the second tests artificial barrier mass, and the energy tests whether samples occupy physically plausible regions.
+
+**Interpretation.**
+
+- If the high-accuracy learned-flow reference already has wrong well weights, the main problem is the learned field.
+- If the reference is accurate but 10-step Euler is not, the main problem is discretization.
+- If all seeds fail in the same way, inspect objective, capacity, and coupling.
+- If seeds disagree, report training instability rather than selecting the best run.
+
+Do not assume few steps must leak mass toward the barrier; §8.7.3 showed that solver error has no universal direction. This experiment measures the direction for this field.

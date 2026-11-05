@@ -168,6 +168,12 @@ def test_we_8_7_euler_step_count_and_spread():
         assert x.mean(0) == pytest.approx([1.0, -2.0], abs=0.003)
         assert x.std(0).mean() == pytest.approx(want, abs=0.005)
 
+    midpoint_expected = {1: 0.40, 2: 0.495, 5: 0.500}
+    for steps, want in midpoint_expected.items():
+        x = S8.integrate_midpoint(velocity, x0, steps)
+        assert x.mean(0) == pytest.approx([1.0, -2.0], abs=0.003)
+        assert x.std(0).mean() == pytest.approx(want, abs=0.005)
+
 
 def test_we_8_8_flow_matching_ring():
     field, history = S8.fm_train(steps=3000, seed=0)

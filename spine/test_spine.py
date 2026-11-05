@@ -264,6 +264,16 @@ def test_stage08_exact_gaussian_velocity_transports_noise_to_data():
     assert np.allclose(x.std(0), [0.5, 0.5], atol=0.02)
 
 
+def test_stage08_midpoint_reaches_gaussian_spread_in_fewer_steps():
+    rng = np.random.default_rng(2)
+    v = S8.gaussian_velocity([1.0, -2.0], 0.5)
+    x0 = rng.standard_normal((20_000, 2))
+    euler = S8.integrate(v, x0, n_steps=5)
+    midpoint = S8.integrate_midpoint(v, x0, n_steps=2)
+    assert np.allclose(euler.std(0), [0.37, 0.37], atol=0.02)
+    assert np.allclose(midpoint.std(0), [0.5, 0.5], atol=0.02)
+
+
 def test_stage08_flow_matching_gradient_matches_finite_differences():
     rng = np.random.default_rng(3)
     p = S8.mlp_init(hidden=8, seed=1)
