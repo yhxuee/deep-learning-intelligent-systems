@@ -345,6 +345,14 @@ li-2023: { authors: "Li, K., Hopkins, A. K., Bau, D., Viégas, F., Pfister, H., 
 lipton-2018: { authors: "Lipton, Z. C.", year: 2018, title: "The Mythos of Model Interpretability", venue: "Communications of the ACM 61(10), 36–43", url: "https://doi.org/10.1145/3233231" }
 makelov-2024: { authors: "Makelov, A., Lange, G., and Nanda, N.", year: 2024, title: "Is This the Subspace You Are Looking for? An Interpretability Illusion for Subspace Activation Patching", venue: "ICLR", url: "https://arxiv.org/abs/2311.17030" }
 heimersheim-2024: { authors: "Heimersheim, S., and Nanda, N.", year: 2024, title: "How to use and interpret activation patching", venue: "arXiv:2404.15255", url: "https://arxiv.org/abs/2404.15255" }
+dunefsky-2024: { authors: "Dunefsky, J., Chlenski, P., and Nanda, N.", year: 2024, title: "Transcoders Find Interpretable LLM Feature Circuits", venue: "arXiv:2406.11944", url: "https://arxiv.org/abs/2406.11944" }
+paulo-2025: { authors: "Paulo, G., Shabalin, S., and Belrose, N.", year: 2025, title: "Transcoders Beat Sparse Autoencoders for Interpretability", venue: "ICML", url: "https://arxiv.org/abs/2501.18823" }
+ameisen-2025: { authors: "Ameisen, E., Lindsey, J., Pearce, A., et al.", year: 2025, title: "Circuit Tracing: Revealing Computational Graphs in Language Models", venue: "Transformer Circuits Thread", url: "https://transformer-circuits.pub/2025/attribution-graphs/methods.html" }
+lindsey-2025: { authors: "Lindsey, J., Gurnee, W., Ameisen, E., et al.", year: 2025, title: "On the Biology of a Large Language Model", venue: "Transformer Circuits Thread", url: "https://transformer-circuits.pub/2025/attribution-graphs/biology.html" }
+kamath-2025: { authors: "Kamath, H., Ameisen, E., Kauvar, I., et al.", year: 2025, title: "Tracing Attention Computation Through Feature Interactions", venue: "Transformer Circuits Thread", url: "https://transformer-circuits.pub/2025/attention-qk/index.html" }
+mueller-2025-mib: { authors: "Mueller, A., Geiger, A., Wiegreffe, S., et al.", year: 2025, title: "MIB: A Mechanistic Interpretability Benchmark", venue: "ICML", url: "https://proceedings.mlr.press/v267/mueller25a.html" }
+gao-2025-sparse: { authors: "Gao, L., Rajaram, A., Coxon, J., et al.", year: 2025, title: "Weight-sparse transformers have interpretable circuits", venue: "arXiv:2511.13653", url: "https://arxiv.org/abs/2511.13653" }
+hadad-2026: { authors: "Hadad, I., Katz, G., and Bassan, S.", year: 2026, title: "Formal Mechanistic Interpretability: Automated Circuit Discovery with Provable Guarantees", venue: "ICLR", url: "https://openreview.net/forum?id=Timsb74vIY" }
 
 # ---- Unit 12: discovery
 ioannidis-2005: { authors: "Ioannidis, J. P. A.", year: 2005, title: "Why Most Published Research Findings Are False", venue: "PLOS Medicine 2(8), e124", url: "https://doi.org/10.1371/journal.pmed.0020124" }
