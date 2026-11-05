@@ -136,3 +136,18 @@ def test_k14_split_conformal_marginal_coverage():
         hits += s[-1] <= conformal_threshold(s[:-1], alpha)
     # exact coverage for continuous scores: ceil((n+1)(1-alpha)) / (n+1) = 18/20
     assert hits / trials == pytest.approx(18 / 20, abs=0.01)
+
+
+# ----------------------------------------------------------------------------- Unit 10 §10.5.1 and §10.5.4
+def test_unit10_brier_honesty_identity_and_bh_example():
+    p = 0.3
+    for q in np.linspace(0, 1, 101):
+        expected_brier = p * (q - 1) ** 2 + (1 - p) * q**2
+        assert expected_brier == pytest.approx((q - p) ** 2 + p * (1 - p))
+        assert expected_brier >= p * (1 - p) - 1e-12
+
+    p_values = np.array([0.003, 0.012, 0.021, 0.080, 0.200])
+    thresholds = np.arange(1, 6) * 0.05 / 5
+    passing = np.flatnonzero(p_values <= thresholds)
+    assert passing[-1] + 1 == 3
+    assert np.sum(p_values <= 0.05 / 5) == 1
