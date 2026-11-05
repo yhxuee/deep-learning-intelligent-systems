@@ -74,6 +74,16 @@ def test_unit_09_selected_answers():
     assert 1 / (1 - 0.9) == pytest.approx(10) and 1 / (1 - 0.99) == pytest.approx(100)
     assert softplus_neg(0.1) == pytest.approx(0.644, abs=1e-3) and softplus_neg(1.0) == pytest.approx(0.313, abs=1e-3)
     assert 1 - (1 - 1e-6) ** 64 == pytest.approx(6.4e-5, rel=1e-4)
+    # Problems 9.2 and 9.6-9.8.
+    assert math.exp(4) / (math.exp(4) + 1) == pytest.approx(0.982, abs=1e-3)
+    group = np.array([1.0, 0.0, 0.0, 0.0])
+    mean_adv = group - group.mean()
+    loo_adv = group - (group.sum() - group) / 3
+    assert mean_adv == pytest.approx(0.75 * loo_adv)
+    q = 1 - (1 - 1e-4) ** 64
+    assert q == pytest.approx(0.00638, abs=1e-5)
+    assert math.ceil(math.log(0.5) / (64 * math.log(1 - 1e-4))) == 109
+    assert 2 / 3 == pytest.approx((4 / 27) / (2 / 9))
 
 
 # ----------------------------------------------------------------------------- Unit 10
