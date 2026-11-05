@@ -177,7 +177,7 @@ All four losses exceed the clean 0.26, so each zero-ablation damages the behavio
 
 **Supported claim.** This trained model copies on the tested distribution, the canonical single-head attention score does not locate that behaviour, and all four zero-ablation interventions damage it.
 
-**Remaining alternative.** These results do not yet reveal the actual algorithm. It may use distributed position-dependent paths, several weak matches, or another feature basis. Nor do the ablations prove that every head is uniquely necessary under natural interventions. Experiment 11.4 must distinguish candidate mechanisms.
+**Remaining alternative.** These results do not yet reveal the actual algorithm. It may use distributed position-dependent paths, several weak matches, or another feature basis. Nor do the ablations prove that every head is uniquely necessary under natural interventions. Experiment 11.6 must distinguish candidate mechanisms.
 
 This is a counterexample to two shortcuts:
 
@@ -268,7 +268,7 @@ A mechanistic hypothesis makes a sharper prediction:
 
 **Supported claim.** Similar scalar KL can accompany opposite task outcomes, so KL magnitude alone cannot identify what computation changed.
 
-**Remaining alternative.** The prompt-independent-bias story is still a hypothesis until direct-logit changes and interventions are measured. Experiment 11.6 is designed to risk that hypothesis.
+**Remaining alternative.** The prompt-independent-bias story is still a hypothesis until direct-logit changes and interventions are measured. Experiment 11.7 is designed to risk that hypothesis.
 
 ## Evidence ledger
 
