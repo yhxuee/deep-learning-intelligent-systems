@@ -96,13 +96,24 @@ def test_we_10_1_ece_by_hand():
 
 def test_we_10_3_paired_vs_unpaired_widths():
     assert 0.327 - 0.240 == pytest.approx(0.087)
-    assert math.hypot(0.018, 0.018) == pytest.approx(0.025, abs=5e-4)
+    marginal_half_04 = (0.345 - 0.327) / 2
+    marginal_half_07 = (0.240 - 0.222) / 2
+    rough_unpaired_half = math.hypot(marginal_half_04, marginal_half_07)
+    rough_unpaired_full = 2 * rough_unpaired_half
+    paired_full = 0.110 - 0.101
+    assert rough_unpaired_half == pytest.approx(0.0127, abs=5e-5)
+    assert rough_unpaired_full == pytest.approx(0.0255, abs=5e-5)
+    assert paired_full / rough_unpaired_full == pytest.approx(0.354, abs=5e-4)
 
 
 def test_we_10_8_prompts_needed():
     v = 0.82 * 0.18 + 0.78 * 0.22
     assert v == pytest.approx(0.3192)
     assert v * (1.96 / 0.04) ** 2 == pytest.approx(766.4, abs=0.1)
+    assert (1.96 + 0.84) ** 2 * v / 0.04**2 == pytest.approx(1564.08)
+    se_400 = math.sqrt(v / 400)
+    assert se_400 == pytest.approx(0.02825, abs=5e-6)
+    assert (0.04 - 1.96 * se_400, 0.04 + 1.96 * se_400) == pytest.approx((-0.015, 0.095), abs=5e-4)
 
 
 def test_unit_10_selected_answers():
@@ -116,6 +127,13 @@ def test_unit_10_selected_answers():
     assert math.ceil(100 * 0.9) == 90
     assert 0.2 * 0.30 + 0.8 * 0.05 == pytest.approx(0.10) and 0.1 * 0.30 + 0.9 * 0.05 == pytest.approx(0.075)
     assert 0.8 / 0.9 == pytest.approx(0.889, abs=5e-4)
+    counts = np.array([118, 140, 149, 70, 90, 57, 54, 53, 4389])
+    mean_conf = np.array([0.165, 0.256, 0.344, 0.444, 0.547, 0.651, 0.753, 0.854, 0.998])
+    bin_acc = np.array([0.110, 0.207, 0.282, 0.357, 0.511, 0.561, 0.574, 0.792, 0.998])
+    rounded_table_ece = np.sum(counts * np.abs(mean_conf - bin_acc)) / counts.sum()
+    assert counts.sum() == 5120
+    assert rounded_table_ece == pytest.approx(0.00977, abs=5e-6)
+    assert counts[-1] / counts.sum() == pytest.approx(0.8572, abs=5e-5)
 
 
 # ----------------------------------------------------------------------------- Unit 11

@@ -47,9 +47,9 @@ Evaluate three sets of 140 stories:
 | fresh | newly sampled from the same generator | 0.228 |
 | shifted | same templates, but eight unseen human names | **1.506** |
 
-The fresh set supports the original, narrow claim: the held-out estimate generalizes to more stories from the same generator. The unseen-name set asks a different question and is about 6.5 times worse. Neither result contradicts the other.
+The fresh set supports the original, narrow claim: the held-out estimate generalizes to more stories from the same generator. The unseen-name set asks a different question, and its mean NLL is about 6.5 times as large. That is a ratio of logarithmic losses, not “6.5 times as inaccurate.” Neither result contradicts the other.
 
-The model learned regularities such as “after `Ma` comes `x`,” because *Max* was the only familiar name beginning that way. *Mateo* breaks that regularity. The standard test split preserved the same finite list of names, so it could not reveal whether the model learned a reusable copying skill or memorized that list.
+One behavior compatible with the result is reliance on corpus-specific regularities such as “after `Ma` comes `x`”: *Max* was familiar, whereas *Mateo* breaks that pattern. The standard test split preserved the same finite list of names, so it could not reveal whether the model learned a reusable copying skill or relied on that list. The shifted test identifies the transfer failure; it does not by itself prove the internal mechanism.
 
 This is the first lesson of evaluation:
 
