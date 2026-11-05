@@ -104,11 +104,14 @@ $$
 q(A)=0.6,
 \quad q(B)=0.4,
 \qquad
-q(a\mid A)=0.5,
-\quad q(b\mid B)=0.99.
+q(a\mid A)=0.6,
+\quad q(a'\mid A)=0.4,
+\qquad
+q(b\mid B)=0.99,
+\quad q(b'\mid B)=0.01.
 $$
 
-Greedy starts with $A$ and produces a best $A$-continuation of probability $0.6\times0.5=0.30$. But sequence $Bb$ has probability $0.4\times0.99=0.396$. Local argmax choices do not solve the global sequence search problem.
+Greedy starts with $A$ and produces $Aa$ with probability $0.6\times0.6=0.36$. But sequence $Bb$ has probability $0.4\times0.99=0.396$. Local argmax choices do not solve the global sequence search problem. Listing both possible continuations also makes this a complete probability distribution rather than an isolated pair of scores.
 
 ## 8.2.4 Truncation discards mass, then renormalizes
 
@@ -183,7 +186,7 @@ $$
 \right].
 $$
 
-At one observed $(x,t)$, many sampled lines may cross with different velocities. Squared-error regression therefore learns their conditional mean,
+At one observed $(x,t)$, sampled lines may meet. When the meeting lines carry different velocities, squared-error regression cannot reproduce every conditional target separately and therefore learns their conditional mean,
 
 $$
 v^\star(x,t)=

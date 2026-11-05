@@ -66,12 +66,12 @@ $$
 \qquad t:0\rightarrow1.
 $$
 
-This introduces two independent errors:
+This introduces two conceptually distinct error sources:
 
 1. **field error:** $v_\theta$ differs from the ideal velocity;
 2. **solver error:** finite Euler steps differ from the exact ODE trajectory.
 
-The Gaussian case supplies an exact velocity field, so we can remove field error and study the solver alone. The learned ring experiment then puts both errors back.
+The Gaussian case supplies an exact velocity field, so we can remove field error and study the solver alone. The learned ring experiment then puts both errors back. The two errors need not be statistically independent: a field can be easier or harder for a particular solver to integrate.
 
 :::note[Predict before reading on]
 Noise is drawn from a standard 2-D Gaussian and moved by the *exact* velocity field whose final distribution is Gaussian with standard deviation $0.5$. Euler integration uses 1, 2, 5, 20 and 200 equal steps. Does one exact field evaluation imply one exact sampling step? Predict the output standard deviation before reading Worked Example 8.7.
@@ -105,8 +105,8 @@ Exact arithmetic is recomputed by `labs/test_worked_examples_u06_u08.py`; sample
 | [8.3 Mathematical construction](/core/unit-08/construction/) | flows, VAEs, diffusion and flow matching | 2–3 h |
 | [8.4 Worked examples](/core/unit-08/worked-examples/) | eight fully interpreted calculations | 90 min |
 | [8.5 General theory](/core/unit-08/theory/) | transport, scores, discretization and evaluation | 90 min |
-| [8.6 Connections](/core/unit-08/connections/) | statistics, numerical analysis, Monte Carlo and optimal transport | 45 min |
+| [8.6 Connections](/core/unit-08/connections/) | statistical physics, Monte Carlo, numerical analysis, fluids, transport and coding | 45 min |
 | [8.7 Limitations and counterexamples](/core/unit-08/limitations/) | degeneration, likelihood, mode loss and few-step error | 50 min |
-| [8.8 Modern developments](/core/unit-08/modern/) | rectified flows, guidance, distillation and faster decoding | 50 min |
-| [8.9 Experiments](/core/unit-08/experiments/) | six controlled investigations | lab time |
-| [8.10 Problems and further study](/core/unit-08/problems/) | graded practice and source-guided reading | — |
+| [8.8 Modern developments](/core/unit-08/modern/) | rectified and mean flows, guidance, few-step generation, speculative decoding and discrete diffusion | 50 min |
+| [8.9 Experiments](/core/unit-08/experiments/) | seven controlled investigations | lab time |
+| [8.10 Problems and further study](/core/unit-08/problems/) | 22 graded problems, first-move hints, answer checks and source-guided reading | — |
