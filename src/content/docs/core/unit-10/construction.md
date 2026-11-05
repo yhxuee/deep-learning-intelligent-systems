@@ -1,71 +1,266 @@
 ---
 title: "10.3 Mathematical construction"
-description: Covariate, label and concept shift with importance weighting; detecting shift with a classifier; leakage paths; reliability tables, ECE, the Brier score and temperature scaling; the percentile bootstrap and paired comparison; multiple comparisons.
+description: Derive deployment risk under shift, density ratios from a domain classifier, calibration measures, proper probability scores, bootstrap and paired intervals, and correct control of multiple comparisons.
 sidebar: { label: "10.3 Construction", order: 3 }
 ---
 
-## 10.3.1 Kinds of distribution shift
+## 10.3.1 One target risk, two distributions
 
-Write the joint distribution of inputs and outputs as $p(x, y) = p(x)p(y\mid x) = p(y)p(x\mid y)$. Shift between training ($p$) and deployment ($q$) is classified by which factor changes ([Quiñonero-Candela et al. 2009](/references/#quinonero-2009)):
+Let $p(x,y)$ denote the distribution that produced the evaluation data we already have, and $q(x,y)$ the deployment distribution we care about. For loss $\ell(f(x),y)$, the deployment risk is
 
-- **Covariate shift**: $q(x)\ne p(x)$ but $q(y\mid x) = p(y\mid x)$. The task is the same; the inputs are different — new names, new hospitals, new writing styles.
-- **Label shift**: $q(y)\ne p(y)$ but $q(x\mid y) = p(x\mid y)$. The classes keep their appearance; their frequencies change — a disease becomes more prevalent.
-- **Concept shift**: $q(y\mid x)\ne p(y\mid x)$. The correct answer itself changes — a fact goes out of date.
-
-**Importance weighting.** Under covariate shift, the deployment risk can in principle be estimated from training-distribution samples:
 $$
-\mathbb{E}_{q}[\ell(x, y)] = \mathbb{E}_{p}\Big[\frac{q(x)}{p(x)}\,\ell(x, y)\Big],
+R_q(f)=\mathbb E_{(X,Y)\sim q}[\ell(f(X),Y)].
 $$
-because $q(x, y)/p(x, y) = q(x)/p(x)$ when the conditional is unchanged. The weights are unknown and, where $p(x)$ is small but $q(x)$ is not, enormous — the estimate's variance explodes. When deployment contains inputs the training distribution essentially never produced (no story with "Mateo"), no reweighting of training data can say how the model will behave: only data from the new region can. That is why **shifted test sets** are built rather than estimated.
 
-## 10.3.2 Detecting shift with a classifier
+A held-out mean from $p$ estimates $R_p(f)$, not $R_q(f)$. The two are equal only under additional conditions. Writing
 
-Is a new sample drawn from the same distribution as the test set? Train a classifier to distinguish the two samples. If the samples are exchangeable, no classifier can beat chance on held-out data; accuracy significantly above 50% is evidence of shift, and the classifier's features show *what* shifted. This **classifier two-sample test** is the contrastive density-ratio idea of Unit 07 (§7.6.4) used for evaluation; its output also estimates $q(x)/p(x)$ for importance weighting.
+$$
+p(x,y)=p(x)p(y\mid x)=p(y)p(x\mid y)
+$$
 
-## 10.3.3 Leakage paths
+suggests a useful shift taxonomy ([Quiñonero-Candela et al. 2009](/references/#quinonero-2009)):
 
-Leakage is any path by which information about the test labels reaches the model or the model-selection process. The common ones:
+| name | assumed stable | changes | example |
+|---|---|---|---|
+| covariate shift | $q(y\mid x)=p(y\mid x)$ | $q(x)\ne p(x)$ | same task, new input mix |
+| label shift | $q(x\mid y)=p(x\mid y)$ | $q(y)\ne p(y)$ | disease prevalence changes |
+| concept shift | neither conditional is assumed stable | $q(y\mid x)\ne p(y\mid x)$ | the correct answer or policy changes |
 
-| Path | Example | Check |
+These are assumptions for choosing an estimator, not labels that can always be read directly from data. More than one factor may change. Without deployment labels, covariate shift and concept shift can be observationally hard to distinguish.
+
+### Importance weighting under covariate shift
+
+Assume $q(y\mid x)=p(y\mid x)$ and **overlap**: wherever $q(x)>0$, also $p(x)>0$. Then
+
+$$
+\begin{aligned}
+R_q(f)
+&=\int q(x)q(y\mid x)\ell(f(x),y)\,dx\,dy\\
+&=\int p(x)p(y\mid x)
+\frac{q(x)}{p(x)}\ell(f(x),y)\,dx\,dy\\
+&=\mathbb E_p[w(X)\ell(f(X),Y)],
+\qquad w(x)=\frac{q(x)}{p(x)}.
+\end{aligned}
+$$
+
+The derivation says exactly what must hold. If deployment includes a region with $q(x)>0$ but $p(x)=0$, the ratio is undefined and no reweighting of old samples can evaluate that region. New data or stronger structural assumptions are required.
+
+Even with overlap, large weights create high variance. A common diagnostic is the weight-based effective sample size
+
+$$
+n_{\mathrm{eff}}
+=\frac{(\sum_iw_i)^2}{\sum_iw_i^2},
+$$
+
+which equals $n$ for equal weights and approaches 1 when one item dominates. It is a diagnostic, not a universal replacement for a sampling-design calculation. Clipping weights reduces variance but biases the target; report the clipping rule and both weighted and unweighted results.
+
+### Label shift has a different correction
+
+Under label shift, $q(x\mid y)=p(x\mid y)$ but class frequencies change. The relevant weights are $q(y)/p(y)$, not $q(x)/p(x)$. Estimating them usually needs a labelled source set, an unlabelled target set and a classifier whose confusion behaviour transfers. If the appearance of a class changes too, the label-shift correction is misspecified.
+
+## 10.3.2 Detecting input shift with a domain classifier
+
+Combine source inputs from $p(x)$ and target inputs from $q(x)$. Give source examples domain label $D=0$ and target examples $D=1$. Train a classifier $h(x)\approx P(D=1\mid x)$ and evaluate it on held-out domain examples.
+
+With equal domain priors,
+
+$$
+P(D=1\mid x)
+=\frac{q(x)}{p(x)+q(x)},
+$$
+
+so, if $h$ is a calibrated probability estimate,
+
+$$
+\frac{q(x)}{p(x)}
+\approx\frac{h(x)}{1-h(x)}.
+$$
+
+With unequal priors $\rho=P(D=1)$, the correction is
+
+$$
+\frac{q(x)}{p(x)}
+\approx
+\frac{1-\rho}{\rho}\frac{h(x)}{1-h(x)}.
+$$
+
+This shows why domain-classifier **accuracy alone is not a density ratio**. The classifier must be evaluated out of sample; its probability calibration and domain sampling priors matter.
+
+### What can be concluded?
+
+- On a balanced held-out domain set, accuracy reliably above 50% is evidence that the represented input distributions differ.
+- Chance accuracy does not prove equality: the classifier family or sample may be too weak.
+- High accuracy does not prove task performance fell: the shifted feature may be irrelevant to $Y$.
+- Features or examples with high domain odds can help locate the shift, but explanation methods need their own validation.
+
+A two-sample permutation test can calibrate the domain accuracy under exchangeability: shuffle domain labels, refit the entire classifier pipeline and compare observed accuracy with the permutation distribution. Reusing training accuracy would test memorization, not shift.
+
+## 10.3.3 Leakage as an information path
+
+Leakage is best defined causally: information unavailable at the intended prediction time reaches model fitting, preprocessing, selection or evaluation.
+
+| path | example | prevention or audit |
 |---|---|---|
-| duplicate or near-duplicate items | a held-out story copied into training | n-gram overlap, MinHash (Unit 07) |
-| split by dependent unit | characters of one story on both sides | split by story, patient, user, time |
-| features encoding the label | scanner model correlated with hospital and diagnosis | ablate the feature; test across sites |
-| preprocessing fitted on all data | normalization statistics computed before splitting | fit every transform on training data only |
-| adaptive reuse | hyperparameters tuned on the test set | a test set used once; fresh data for claims |
-| contamination of pretraining | benchmark answers on the web | canaries; post-cutoff test sets; likelihood tests |
+| duplicate items | a test story or paraphrase occurs in training | exact and near-duplicate search |
+| dependent-unit split | images from one patient appear on both sides | split by patient, user, story or time |
+| target leakage | a post-outcome code is used as a predictor | timestamp and feature-availability audit |
+| global preprocessing | scaler or vocabulary fitted before the split | split first; fit transforms on training only |
+| adaptive reuse | test score selects prompts, checkpoints or metrics | validation set for choices; fresh final test |
+| public contamination | benchmark solutions appear in pretraining | provenance, canaries, post-cutoff or hidden tests |
 
-## 10.3.4 Calibration
+### Why random splitting can be wrong
 
-Let a classifier output a confidence $c\in[0,1]$ for its predicted class. It is **calibrated** if $P(\text{correct}\mid c) = c$ for all $c$. Partition $[0, 1]$ into bins $B_1,\dots,B_M$; with $n_b$ predictions in bin $b$, mean confidence $\overline{c}_b$ and accuracy $\overline{a}_b$,
+Suppose one patient contributes ten scans. A scan-level random split puts correlated images from that patient in both training and test. The rows are distinct, but the intended unit—patient—is shared. The model may recognize patient- or scanner-specific features instead of disease.
+
+The rule is:
 
 $$
-\mathrm{ECE} = \sum_{b=1}^{M}\frac{n_b}{n}\,\big|\overline{a}_b - \overline{c}_b\big| .
+\boxed{\text{split at the unit to which the generalization claim refers.}}
 $$
 
-([Naeini et al. 2015](/references/#naeini-2015); [Guo et al. 2017](/references/#guo-2017).) The **reliability table** lists $(\overline{c}_b, \overline{a}_b, n_b)$; plotting $\overline{a}_b$ against $\overline{c}_b$ gives the reliability diagram, whose diagonal is perfect calibration. ECE depends on the binning and is biased upward for small $n_b$ (a perfectly calibrated predictor has positive expected ECE from sampling noise alone).
+For future deployment, a chronological split can be more informative than a random split. But time introduces real concept changes, so a lower score may reflect the correct difficulty rather than a flawed evaluation.
 
-**The Brier score.** For a forecast $p_i = (p_{i1},\dots,p_{iK})$ over $K$ classes and realized class $y_i$, the **multiclass Brier score** is
+## 10.3.4 Calibration: definition and estimation
+
+Let $\hat Y$ be the predicted class, $C=\max_kP(Y=k\mid X)$ its reported top-class confidence, and $A=\mathbf1\{\hat Y=Y\}$. **Top-label calibration** requires
+
 $$
-\mathrm{BS} = \frac1n\sum_i\sum_{k=1}^{K}\big(p_{ik} - \mathbb{1}[y_i = k]\big)^2 ,
+P(A=1\mid C=c)=c.
 $$
-a strictly proper score for the whole probability vector ([Gneiting & Raftery 2007](/references/#gneiting-2007)); some authors divide by $K$. A different quantity is often reported under the same name: the **top-label Brier score** $\frac1n\sum_i(c_i - \mathbb{1}[\text{correct}_i])^2$ with $c_i = \max_kp_{ik}$, the binary Brier score of the derived event "the top class is correct". It assesses top-label confidence only, which is what ECE also measures; it says nothing about how probability is spread over the other classes. *Example:* $p = (0.6, 0.2, 0.2)$ and $p' = (0.6, 0.4, 0)$ with true class 1 have the same top-label Brier score, $0.16$, but multiclass scores $0.24$ and $0.32$. Both versions, unlike ECE, also reward *resolution* — being confident when right and unsure when wrong (§10.5.1, stated there for binary outcomes).
 
-**Temperature scaling.** Dividing all logits by a single $\tau$ fitted on validation data by minimizing NLL does not change any prediction's argmax — accuracy is unchanged — but can correct systematic over- or under-confidence; for modern networks it is a strong baseline ([Guo et al. 2017](/references/#guo-2017)). It cannot fix confidence that is wrong in different directions for different inputs.
+With continuous confidence, exact values rarely repeat. A reliability table partitions $[0,1]$ into bins $B_1,\ldots,B_M$. For bin $b$, define
 
-## 10.3.5 The bootstrap and paired comparison
+$$
+n_b=\sum_i\mathbf1{c_i\in B_b},\qquad
+\bar c_b=\frac1{n_b}\sum_{i:c_i\in B_b}c_i,qquad
+\bar a_b=\frac1{n_b}\sum_{i:c_i\in B_b}a_i.
+$$
 
-Let $z_1,\dots,z_n$ be per-unit scores (per-story NLL, per-prompt correctness) from independent units, and $\hat\theta = \bar z$. The **percentile bootstrap** ([Efron & Tibshirani 1993](/references/#efron-1993)):
+The common binned expected calibration error is
 
-1. For $k = 1,\dots,K$: draw $n$ indices uniformly with replacement; compute $\hat\theta^{(k)}$ from the resampled scores.
-2. Report $[\hat\theta_{(0.025)}, \hat\theta_{(0.975)}]$, the empirical quantiles of $\hat\theta^{(1)},\dots,\hat\theta^{(K)}$.
+$$
+\mathrm{ECE}
+=\sum_{b:n_b>0}\frac{n_b}{n}|\bar a_b-\bar c_b|
+$$
 
-The resampling imitates drawing a new test set from the same population, using the empirical distribution as a stand-in. It works for statistics with no simple standard-error formula (medians, ratios, ECE itself).
+([Naeini et al. 2015](/references/#naeini-2015); [Guo et al. 2017](/references/#guo-2017)).
 
-**Paired comparison.** For two models evaluated on the same units, bootstrap the differences $d_i = z^{A}_i - z^{B}_i$. Because $\mathrm{Var}(d_i) = \mathrm{Var}(z^A_i) + \mathrm{Var}(z^B_i) - 2\mathrm{Cov}(z^A_i, z^B_i)$, the positive covariance of two models on items of shared difficulty is subtracted: on the spine's stories the paired interval for the difference between Stage 04 and Stage 07 is $\pm0.005$, against intervals of about $\pm0.009$ for each model alone (Worked Example 10.3).
+ECE is an estimator defined by a binning rule, not the unique “amount of miscalibration.” More bins improve localization but raise sampling noise; fewer bins smooth real structure. Equal-width and equal-count bins answer differently. A finite sample from a perfectly calibrated predictor generally has positive empirical ECE because $|\bar a_b-\bar c_b|$ is positive from noise.
 
-**What the bootstrap does not cover.** Resampling test items captures uncertainty from the finite test set, not from the randomness of training. Two training runs with different seeds differ too; claims about a *method*, rather than a trained model, must resample seeds as well ([Bouthillier et al. 2021](/references/#bouthillier-2021)) — the design of Unit 12.
+Therefore report:
 
-## 10.3.6 Many comparisons
+- the reliability table or diagram;
+- counts and uncertainty by bin;
+- the binning rule;
+- ECE on important subgroups and shifted sets;
+- a proper score for the full probability vector.
 
-A hypothesis test at level $\alpha$ rejects a true null hypothesis with probability $\alpha$. Comparing $m$ variants against a baseline at $\alpha = 0.05$, the chance that at least one *useless* variant looks significant is up to $1 - 0.95^m$: 64% for $m = 20$. Corrections either control the probability of any false positive (Bonferroni: use $\alpha/m$) or the expected *fraction* of false positives among those declared significant — the **false discovery rate** (§10.5.4). Leaderboards that rank hundreds of models on one test set are many-comparison problems with no correction at all; differences at the top are often within noise ([Dietterich 1998](/references/#dietterich-1998); [Miller 2024](/references/#miller-2024)).
+### The Brier score
+
+For $K$ classes, predicted vector $p_i=(p_{i1},\ldots,p_{iK})$ and true class $y_i$, define
+
+$$
+\mathrm{BS}
+=\frac1n\sum_i\sum_{k=1}^K
+(p_{ik}-\mathbf1\{y_i=k\})^2.
+$$
+
+This convention has range $[0,2]$; some authors divide by $K$, so comparisons must state the convention. The multiclass Brier score is strictly proper: in expectation, reporting the true conditional probabilities minimizes it ([Gneiting & Raftery 2007](/references/#gneiting-2007)).
+
+Do not confuse it with the top-label binary score
+
+$$
+\frac1n\sum_i(c_i-a_i)^2,
+$$
+
+which evaluates only the event “the selected class is correct.” Two probability vectors with the same top confidence can have equal top-label Brier scores but different multiclass scores.
+
+### Temperature scaling
+
+Given logits $z$, temperature scaling uses
+
+$$
+p_k^{(\tau)}
+=\frac{e^{z_k/\tau}}{\sum_je^{z_j/\tau}},
+\qquad \tau>0.
+$$
+
+Fit $\tau$ on a validation set by minimizing NLL, not on the final test set. Because positive scaling preserves logit order, argmax accuracy is unchanged. $\tau>1$ softens probabilities; $\tau<1$ sharpens them. One global temperature cannot correct a model that is overconfident on one subgroup and underconfident on another.
+
+## 10.3.5 Bootstrap intervals from the sampling unit
+
+Let $z_1,\ldots,z_n$ be one score per independent unit and let $\hat\theta=t(z_1,\ldots,z_n)$ be a statistic. The nonparametric bootstrap replaces the unknown population by the empirical distribution:
+
+1. draw $n$ indices with replacement from $\{1,\ldots,n\}$;
+2. compute $\hat\theta^{*(b)}$ on the resample;
+3. repeat for $b=1,\ldots,B$;
+4. use the bootstrap distribution for uncertainty.
+
+The percentile interval takes empirical quantiles
+
+$$
+[\hat\theta^*_{\alpha/2},\hat\theta^*_{1-\alpha/2}].
+$$
+
+Stage 10 uses it for the mean of per-story NLLs and checks coverage in repeated synthetic experiments ([Efron & Tibshirani 1993](/references/#efron-1993)).
+
+The bootstrap is not assumption-free. The empirical distribution must reasonably represent the target population, the resampled units must match the dependence structure, and some statistics or small boundary samples need better methods. A percentile interval can have poor coverage for highly skewed estimators, extreme quantiles or accuracies near 0 or 1. For clustered data, resample clusters; for time series, use a block method; for binary proportions, compare with Wilson or other proportion intervals.
+
+### Paired comparison
+
+For models A and B scored on the same units, define $d_i=z_i^A-z_i^B$ and bootstrap the $d_i$. Its variance is
+
+$$
+\operatorname{Var}(d_i)
+=\operatorname{Var}(z_i^A)
++\operatorname{Var}(z_i^B)
+-2\operatorname{Cov}(z_i^A,z_i^B).
+$$
+
+Positive covariance from shared item difficulty reduces uncertainty. Pairing does not guarantee a narrower interval: if model errors are negatively correlated, the difference can be more variable. The design remains appropriate because the estimand itself is a within-item difference.
+
+The spine's Stage 04–Stage 07 mean difference is 0.106 nats per character, with paired 95% interval [0.101, 0.110]. This supports a fixed-checkpoint comparison on the story population. It does not include training-seed variation or explain the causal source of improvement.
+
+## 10.3.6 Multiple comparisons and selection
+
+For one true null hypothesis, a level-$\alpha$ test has false-positive probability at most $\alpha$ under its assumptions. If $m$ independent true nulls are tested, the probability of at least one false positive is
+
+$$
+1-(1-\alpha)^m.
+$$
+
+At $m=20$ and $\alpha=0.05$, this is about 0.642. Without independence, that exact formula need not hold. The union bound still gives
+
+$$
+P(\text{at least one false positive})\le m\alpha.
+$$
+
+**Bonferroni correction** tests each claim at $\alpha/m$, controlling family-wise error under arbitrary dependence. It can be conservative when tests are strongly correlated. **False discovery rate** procedures instead control the expected fraction of false discoveries among rejected claims (§10.5.4); that is a different error target.
+
+### Selection changes the estimand
+
+If the best of 100 noisy scores is reported, its expectation exceeds the common true score even when every model is equal. Confidence intervals computed as if the winner had been specified in advance ignore this selection.
+
+Valid options include:
+
+- preregister one primary comparison;
+- use validation data to select and a fresh test set to estimate;
+- adjust for the full family of comparisons;
+- report every attempted variant and treat the result as exploratory.
+
+Leaderboards add a time dimension: later submissions are adaptively designed after seeing earlier scores. A nominal standard error based only on test-item sampling does not include this community-level overfitting.
+
+## 10.3.7 Construction checklist
+
+Before attaching a confidence interval or p-value to a score, verify the order:
+
+1. define the deployment question and estimand;
+2. identify the sampling and clustering unit;
+3. freeze the metric, split and comparison family;
+4. audit leakage and overlap with deployment;
+5. compute item- or cluster-level contributions;
+6. use a procedure whose assumptions match those contributions;
+7. report sensitivity to binning, weights, thresholds and exclusions;
+8. state which uncertainty sources are still omitted.
+
+Statistical machinery quantifies variation inside a design. It cannot turn an undefined population, contaminated split or irrelevant metric into evidence.
