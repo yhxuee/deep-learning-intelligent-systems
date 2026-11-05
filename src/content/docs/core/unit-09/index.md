@@ -108,6 +108,6 @@ Exact arithmetic is recomputed by `labs/test_worked_examples_u09_u12.py`. `spine
 | [9.5 General theory](/core/unit-09/theory/) | variance, optimal baselines, inference, exploration and overoptimization | 80 min |
 | [9.6 Connections](/core/unit-09/connections/) | control, economics, psychology, neuroscience and importance sampling | 45 min |
 | [9.7 Limitations and counterexamples](/core/unit-09/limitations/) | reward hacking, proxy failure, sycophancy, plural preferences and credit assignment | 50 min |
-| [9.8 Modern developments](/core/unit-09/modern/) | RLHF, AI feedback, verifiable rewards, process feedback and agents | 50 min |
-| [9.9 Experiments](/core/unit-09/experiments/) | six controlled investigations | lab time |
-| [9.10 Problems and further study](/core/unit-09/problems/) | 20 graded problems, answer checks and source-guided reading | — |
+| [9.8 Modern developments](/core/unit-09/modern/) | RLHF as a pipeline, offline and online preferences, AI feedback, verifiable rewards, process feedback and agents | 75 min |
+| [9.9 Experiments](/core/unit-09/experiments/) | seven prediction-first controlled investigations | lab time |
+| [9.10 Problems and further study](/core/unit-09/problems/) | 26 scaffolded problems, answer checks and source-guided reading | — |

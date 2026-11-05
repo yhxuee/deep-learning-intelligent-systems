@@ -108,6 +108,6 @@ $$
 | [9.5 一般理论](/zh-cn/core/unit-09/theory/) | 方差、最优基线、推断观点、探索与过度优化 | 80 分钟 |
 | [9.6 跨领域联系](/zh-cn/core/unit-09/connections/) | 控制、经济学、心理学、神经科学与重要性采样 | 45 分钟 |
 | [9.7 局限与反例](/zh-cn/core/unit-09/limitations/) | 奖励破解、代理失效、谄媚、多元偏好与功劳分配 | 50 分钟 |
-| [9.8 现代发展](/zh-cn/core/unit-09/modern/) | RLHF、AI 反馈、可验证奖励、过程反馈与代理 | 50 分钟 |
-| [9.9 实验](/zh-cn/core/unit-09/experiments/) | 六个受控实验 | 实验时间 |
-| [9.10 习题与延伸阅读](/zh-cn/core/unit-09/problems/) | 20 题分级练习、答案检查与来源导读 | — |
+| [9.8 最新进展](/zh-cn/core/unit-09/modern/) | 作为流水线的 RLHF、离线与线上偏好、AI 反馈、可验证奖励、过程反馈与代理 | 75 分钟 |
+| [9.9 实验](/zh-cn/core/unit-09/experiments/) | 七个先预测再执行的受控实验 | 实验时间 |
+| [9.10 习题与延伸阅读](/zh-cn/core/unit-09/problems/) | 26 题循序引导练习、答案检查与来源导读 | — |

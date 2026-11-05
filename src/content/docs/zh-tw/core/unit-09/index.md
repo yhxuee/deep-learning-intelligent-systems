@@ -108,6 +108,6 @@ $$
 | [9.5 一般理論](/zh-tw/core/unit-09/theory/) | 變異數、最佳基準、推論觀點、探索與過度最佳化 | 80 分鐘 |
 | [9.6 跨領域連結](/zh-tw/core/unit-09/connections/) | 控制、經濟學、心理學、神經科學與重要性抽樣 | 45 分鐘 |
 | [9.7 限制與反例](/zh-tw/core/unit-09/limitations/) | 獎勵駭取、代理失效、諂媚、多元偏好與功勞分配 | 50 分鐘 |
-| [9.8 現代發展](/zh-tw/core/unit-09/modern/) | RLHF、AI 回饋、可驗證獎勵、過程回饋與代理 | 50 分鐘 |
-| [9.9 實驗](/zh-tw/core/unit-09/experiments/) | 六個受控實驗 | 實驗時間 |
-| [9.10 習題與延伸閱讀](/zh-tw/core/unit-09/problems/) | 20 題分級練習、答案檢查與來源導讀 | — |
+| [9.8 近期發展](/zh-tw/core/unit-09/modern/) | 作為管線的 RLHF、離線與線上偏好、AI 回饋、可驗證獎勵、過程回饋與代理 | 75 分鐘 |
+| [9.9 實驗](/zh-tw/core/unit-09/experiments/) | 七個先預測再執行的受控實驗 | 實驗時間 |
+| [9.10 習題與延伸閱讀](/zh-tw/core/unit-09/problems/) | 26 題循序引導練習、答案檢查與來源導讀 | — |

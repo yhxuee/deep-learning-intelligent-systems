@@ -344,7 +344,7 @@ The group also needs information:
 - if every response passes, all rewards are 1 and every centred advantage is again 0;
 - learning occurs when the group contains reward variation, unless another signal is added.
 
-If advantages are divided by group standard deviation, an all-equal group also has zero denominator; implementations must add an explicit convention such as skipping normalization or using an $arepsilon$ floor. This creates an exploration requirement. A verifier can tell good from bad only after the policy samples both. If correct solutions have essentially zero probability, a relative baseline cannot invent them.
+If advantages are divided by group standard deviation, an all-equal group also has zero denominator; implementations must add an explicit convention such as skipping normalization or using an $\varepsilon$ floor. This creates an exploration requirement. A verifier can tell good from bad only after the policy samples both. If correct solutions have essentially zero probability, a relative baseline cannot invent them.
 
 :::note[Claim check]
 - **Claim.** The leave-one-out baseline leaves the policy-gradient estimator unbiased.
