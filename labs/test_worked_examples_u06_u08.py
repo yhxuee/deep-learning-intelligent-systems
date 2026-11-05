@@ -189,3 +189,23 @@ def test_we_8_8_flow_matching_ring():
     near, modes = S8.mode_coverage(samples)
     assert near == pytest.approx(0.96, abs=0.005)
     assert modes == 8
+
+
+def test_unit08_problem_answers():
+    p = np.array([0.4, 0.3, 0.2, 0.1])
+    expected = {
+        0.5: ([0.5333, 0.3000, 0.1333, 0.0333], 1.0785),
+        2.0: ([0.3254, 0.2818, 0.2301, 0.1627], 1.3558),
+    }
+    for tau, (want_p, want_h) in expected.items():
+        q = p ** (1 / tau)
+        q /= q.sum()
+        assert q == pytest.approx(want_p, abs=5e-5)
+        assert -(q * np.log(q)).sum() == pytest.approx(want_h, abs=5e-5)
+
+    velocity = S8.gaussian_velocity(np.array([1.0, -2.0]), 0.5)
+    x0 = np.array([[2.0, -3.0]])
+    assert S8.integrate(velocity, x0, n_steps=2)[0] == pytest.approx(
+        np.array([1.0, -2.0]) + 0.2 * x0[0]
+    )
+    assert 0.4 * 0.99 > 0.6 * 0.6  # Problem 8.15: global path can beat greedy.
