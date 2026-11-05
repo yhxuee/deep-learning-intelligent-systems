@@ -278,6 +278,8 @@ karras-2022: { authors: "Karras, T., Aittala, M., Aila, T., and Laine, S.", year
 esser-2024: { authors: "Esser, P., Kulal, S., Blattmann, A., et al.", year: 2024, title: "Scaling Rectified Flow Transformers for High-Resolution Image Synthesis", venue: "ICML", url: "https://arxiv.org/abs/2403.03206" }
 song-2023: { authors: "Song, Y., Dhariwal, P., Chen, M., and Sutskever, I.", year: 2023, title: "Consistency Models", venue: "ICML", url: "https://arxiv.org/abs/2303.01469" }
 ho-2022: { authors: "Ho, J., and Salimans, T.", year: 2022, title: "Classifier-Free Diffusion Guidance", venue: "arXiv:2207.12598", url: "https://arxiv.org/abs/2207.12598" }
+geng-2025: { authors: "Geng, Z., Deng, M., Bai, X., Kolter, J. Z., and He, K.", year: 2025, title: "Mean Flows for One-step Generative Modeling", venue: "arXiv:2505.13447", url: "https://arxiv.org/abs/2505.13447" }
+nie-2025: { authors: "Nie, S., Zhu, F., You, Z., et al.", year: 2025, title: "Large Language Diffusion Models", venue: "arXiv:2502.09992", url: "https://arxiv.org/abs/2502.09992" }
 villani-2009: { authors: "Villani, C.", year: 2009, title: "Optimal Transport: Old and New", venue: "Springer", url: "https://doi.org/10.1007/978-3-540-71050-9", kind: book }
 theis-2016: { authors: "Theis, L., van den Oord, A., and Bethge, M.", year: 2016, title: "A note on the evaluation of generative models", venue: "ICLR", url: "https://arxiv.org/abs/1511.01844" }
 heusel-2017: { authors: "Heusel, M., Ramsauer, H., Unterthiner, T., Nessler, B., and Hochreiter, S.", year: 2017, title: "GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium", venue: "NeurIPS 30", url: "https://arxiv.org/abs/1706.08500" }
