@@ -1,87 +1,284 @@
 ---
 title: "11.4 Worked examples"
-description: Eight examples — attention scores of the hand-built circuit, its loss and direct logit contribution, ablations with controls, a patching experiment, a trained model that copies without the textbook pattern, a model that does not copy at all, a probe's selectivity, and what the KL of post-training does not say.
+description: Eight worked mechanism audits — sharp attention, direct logits, controlled ablation, real activation patching, a trained non-textbook copier, absent copying, probe selectivity, and why equal KL does not imply equal change.
 sidebar: { label: "11.4 Worked examples", order: 4 }
 ---
 
-Numbers are produced by `spine/stage11_induction.py` and checked in `spine/test_spine.py`; the hand-built circuit uses $K = 8$, $c = 60$, $\lambda = 10$ ($d = 36$, $d_h = 18$).
+Exact calculations are checked in `spine/test_spine.py` and `labs/test_worked_examples_u09_u12.py`. Fixed circuit outputs come from `spine/stage11_induction.py`. The hand-built model uses
 
-## Worked Example 11.1 — How sharp is the hand-built attention?
+$$
+K=8,\qquad c=60,\qquad\lambda=10,
+\qquad d=36,\qquad d_h=18.
+$$
 
-**Setting.** Head 0.0's score for the intended key is $c/\sqrt{d_h} = 60/\sqrt{18} = 14.14$; every other key scores 0.
+Each example separates three statements:
 
-**Attention weight.** At a position with $n$ visible keys, $e^{14.14}/(e^{14.14} + n - 1)$: for $n = 16$, $1 - 1.1\times10^{-5}$.
+- **result:** what was calculated or observed;
+- **supported claim:** the strongest conclusion justified by that result;
+- **remaining alternative:** what the result still cannot distinguish.
 
-**Reading.** The measured previous-token score of head 0.0 is 1.00 and the induction score of head 1.0 is 1.00; the unused heads, with zero weights, attend uniformly (0.08 = about 1/12 on average over positions). With $c = 20$ instead, the score would be only $4.7$, and the attention to the intended key falls to about 0.9 — the $1/\sqrt{d_h}$ scaling of Unit 04 at work.
+## Worked Example 11.1 — From an attention score to an attention weight
 
-## Worked Example 11.2 — The circuit's output
+**Question.** How sharply does the hand-built previous-token head select its intended key?
 
-**Setting.** 64 sequences $[\text{BOS}, s, s]$; loss on the 2nd–8th tokens of the repeat.
+The target query–key dot product is $c=60$. Scaled attention divides it by $\sqrt{d_h}$:
 
-**Numbers.** Loss 0.0004 nats per token. At one position, head 1.0 contributes exactly $\lambda = 10.0$ to the logit of the correct next token, and the embedding contributes $1.0$ to the logit of the *current* token; the correct token's probability is 0.9996.
+$$
+s_*=\frac{60}{\sqrt{18}}=14.142\ldots
+$$
 
-**Reading.** The direct-logit decomposition (§11.3.1) accounts for the whole prediction: one head writes the answer, the embedding writes a distractor, and nothing else contributes. In a trained model the same decomposition is exact for attention-only networks and approximate with layer normalization.
+All non-target scores are zero. If $n$ keys are visible, the target weight is
 
-## Worked Example 11.3 — Ablation, with controls
+$$
+A_*(n)=\frac{e^{s_*}}{e^{s_*}+n-1}.
+$$
 
-**Setting.** Zero-ablate each head of the hand-built circuit in turn.
+For $n=16$,
 
-| head ablated | role | loss on the repeat (nats) |
-|---|---|---|
-| none | — | 0.0004 |
-| 0.0 | previous-token | 2.84 |
-| 1.0 | induction | 2.37 |
-| 0.1 | unused | 0.0004 |
-| 1.1 | unused | 0.0004 |
+$$
+A_*(16)=0.999989,
+\qquad
+1-A_*(16)\approx1.1\times10^{-5}.
+$$
 
-**Reading.** Both circuit heads are necessary, and the circuit needs *both*: the induction head alone cannot match tokens without the previous-token information written by layer 0 (K-composition). The control ablations of the unused heads change nothing, which rules out "any ablation hurts". Without controls, the first two rows would be uninterpretable.
+The same head is less sharp if $c=20$:
 
-## Worked Example 11.4 — Patching restores the behaviour
+$$
+s_*=20/\sqrt{18}=4.714,
+\qquad
+A_*(16)\approx0.881.
+$$
 
-**Setting.** Clean input: $[\text{BOS}, s, s]$. Corrupted input: the first copy of $s$ replaced by a different permutation, the second copy unchanged. Then: the corrupted run with head 1.0's output patched in from the clean run.
+**Sanity check.** Increasing the number of visible distractor keys reduces the target weight even when each distractor has score zero. At $n=1\,000$ and $c=60$, the missing mass is about $7.2\times10^{-4}$—still small, but much larger than at $n=16$.
 
-| run | loss on the repeat |
-|---|---|
+**Supported claim.** The constructed head almost deterministically routes attention to the previous position on these sequence lengths.
+
+**Remaining alternative.** A sharp routing pattern alone does not tell us what value content is moved or whether it affects the output. Example 11.2 inspects the write; Example 11.3 intervenes on it.
+
+## Worked Example 11.2 — Reconstruct the output probability from logit contributions
+
+**Question.** Why is repeat loss approximately 0.0004 nats?
+
+At a scored position in the second copy:
+
+- head 1.0 writes $\lambda=10$ toward the correct next-token logit;
+- the tied embedding writes $1$ toward the **current** token, a distractor;
+- the other seven vocabulary logits receive 0 in this idealized construction.
+
+Softmax therefore assigns the correct token probability
+
+$$
+p_*
+=\frac{e^{10}}{e^{10}+e^1+7e^0}
+=0.99956\ldots
+$$
+
+and loss
+
+$$
+-\log p_*=0.00044\ldots\ \text{nats}.
+$$
+
+This agrees with the measured average loss 0.0004 over the predictable second-to-eighth tokens of the repeat.
+
+**Why this decomposition is exact here.** The model is attention-only, has no layer normalization, and uses a linear tied readout. The final residual stream is literally a sum of writes.
+
+**Supported claim.** In the hand-built model, head 1.0 supplies the decisive direct write for the correct token, while the embedding supplies a known competing logit.
+
+**Remaining alternative.** In a normalized trained Transformer, using the same additive story without specifying an attribution convention would be an approximation. Also, a component with small direct contribution may still matter indirectly by feeding later components.
+
+## Worked Example 11.3 — Ablation becomes informative only with controls
+
+**Question.** Which heads matter under zero ablation?
+
+| head set to zero | constructed role | repeat loss | change from clean |
+|---|---|---:|---:|
+| none | — | 0.0004 | — |
+| 0.0 | previous-token write | 2.84 | +2.8396 |
+| 1.0 | induction/copy write | 2.37 | +2.3696 |
+| 0.1 | unused control | 0.0004 | approximately 0 |
+| 1.1 | unused control | 0.0004 | approximately 0 |
+
+Head 1.0 cannot perform its match when head 0.0 no longer writes the previous-token field. This is the K-composition predicted by the construction.
+
+The two unused heads are critical controls. If all four ablations had raised loss, “the proposed circuit heads matter” would be confounded with “zeroing any head breaks the program.”
+
+**Supported claim.** Heads 0.0 and 1.0 are necessary for the constructed copying behaviour **under this zero-ablation intervention**, while matched unused heads are not.
+
+**Remaining alternative.** In an ordinary trained network, zero may be off-manifold and redundancy may allow a natural computation to be implemented in several ways. Repeat with mean or resample ablation before making a broad necessity claim.
+
+## Worked Example 11.4 — A real patching test, not a renamed clean run
+
+**Question.** Does head 1.0 transmit the information that distinguishes a clean input from a controlled corruption?
+
+Start with
+
+$$
+x_{\mathrm{clean}}=[\mathrm{BOS},s,s].
+$$
+
+Construct $x_{\mathrm{corrupt}}$ by replacing the first copy of $s$ with another permutation while keeping the second copy fixed. Now the induction rule points toward wrong successor tokens.
+
+| forward run | repeat loss |
+|---|---:|
 | clean | 0.0004 |
 | corrupted | 8.77 |
-| corrupted, head 1.0 patched from clean | 0.0004 |
+| corrupted input, head 1.0 output patched from clean run | 0.0004 |
 
-**Reading.** The corruption destroys the information the second half needs (its "earlier occurrences" now point to the wrong next tokens), and the model confidently copies the wrong tokens — hence a loss far above uniform. Patching one head's output restores the clean behaviour completely: head 1.0 carries all of the information that distinguishes the two runs. Patching a run with its own activations changes nothing (the spine test asserts it), so the restoration is not an artefact of the hook.
+The recovery fraction is
 
-## Worked Example 11.5 — A trained model that copies without the textbook pattern
+$$
+R=\frac{8.77-0.0004}{8.77-0.0004}\approx1.
+$$
 
-**Setting.** The same architecture (2 layers × 2 heads, $d = 48$, learned positions, no MLP, no normalization) trained for 8 000 steps on sequences $[\text{BOS}, \text{noise}, s, \text{noise}, s, \text{noise}]$ with random gaps, 24 tokens, $|s| = 8$.
+The test implementation matters: one must run the **corrupted input** while passing
 
-**Behaviour.** Loss on the predictable part of the second copy: 2.63 at step 1 000 … 0.26 at step 8 000 (uniform: $\ln24 = 3.18$).
+```python
+patch = {(1, 0): clean_cache["blocks"][1]["o"][:, 0]}
+```
 
-**Attention.** The largest induction score of any head is 0.02; previous-token scores are at most 0.18.
+Recomputing the clean input and calling it “patched” would not test the intervention. The repository test explicitly performs the corrupted forward run and compares its patched loss with clean loss. A separate self-patching test verifies that the hook is a no-op when values are unchanged.
 
-**Ablation.**
+**Supported claim.** In this constructed circuit and corruption, replacing head 1.0's output with its clean value is sufficient to restore clean behaviour.
 
-| head ablated | 0.0 | 0.1 | 1.0 | 1.1 |
-|---|---|---|---|---|
-| loss on the second copy | 3.52 | 1.89 | 2.21 | 1.44 |
+**Remaining alternative.** Patching the whole head output does not identify which coordinates carry the effect. In an unknown network, wrong-head, wrong-position and unrelated-source patches are needed to establish specificity. Here the hand construction supplies ground truth.
 
-**Reading.** The model has learned to copy — the behaviour is real, and every head is needed for it. But no head attends from a token's second occurrence to the token that followed its first, which is what the induction-head account predicts. The mechanism is something else: distributed across all four heads, possibly reading positional information in ways the attention-to-target score cannot see. An attention-pattern search alone would conclude "no induction head, so no copying" — contradicted by the behaviour; a search that assumed the textbook mechanism and found the "best" head (score 0.02) would tell a false story. What the mechanism *is* remains open here (Experiment 11.4).
+## Worked Example 11.5 — Copying without the textbook attention pattern
 
-## Worked Example 11.6 — A model that does not copy
+**Question.** If a trained model copies, must one head display the canonical induction pattern?
 
-**Setting.** The pretrained spine model (Stage 07), prompts in which a made-up pet name occurs and then recurs: "… Max also had a cat called Raman. One sunny day Max went to the park with Sam. Raman ran to …".
+Train a two-layer, two-head attention-only model with learned positions, $d=48$, no MLP and no normalization. Training sequences contain two copies of an eight-token segment separated by random-length noise:
 
-**Behaviour.** Loss on the 2nd, 3rd and 4th letters of the second mention: 10.62, 6.76 and 6.88 nats (uniform: 3.91). The model predicts the continuation of a familiar name ("R" → "uby") with confidence.
+$$
+[\mathrm{BOS},\mathrm{noise},s,\mathrm{noise},s,\mathrm{noise}].
+$$
 
-**Reading.** There is no copying behaviour, so there is no copying mechanism to find. The best "induction score" of any head (0.02) is noise. This is also the mechanism-level explanation of Unit 10's unseen-names failure: the model has memorized a name list rather than learned to copy names from context — a hypothesis that predicts it will also fail on unseen animal names, and that a model trained with more varied names (Experiment 11.5) should not.
+The vocabulary has 24 ordinary tokens, so uniform loss is
 
-## Worked Example 11.7 — Probe selectivity
+$$
+\log24=3.178\ \text{nats}.
+$$
 
-**Setting.** A linear probe trained on 200 hidden states to predict a binary property reaches 92% held-out accuracy. The same probe, trained on the same states with labels randomly reassigned per *input type* (a control task), reaches 81%.
+### Behaviour
 
-**Computation.** Selectivity $= 92 - 81 = 11$ points.
+Loss on the predictable part of the second copy falls from 2.63 at step 1 000 to 0.26 at step 8 000. The model has learned substantial copying behaviour on the frozen evaluation generator.
 
-**Reading.** Most of the probe's accuracy comes from the probe's own capacity to memorize input types, not from a simple encoding of the property. A small selectivity is weak evidence of representation, and no evidence of use ([Hewitt & Liang 2019](/references/#hewitt-2019)). (Illustrative numbers; Experiment 11.3 measures a real probe on the spine model.)
+### Observational search
 
-## Worked Example 11.8 — What changed in post-training?
+The largest induction score of any head is only 0.02, and previous-token scores are at most 0.18. No single attention map resembles the hand-built two-head story.
 
-**Setting.** Unit 09's REINFORCE and buggy-checker runs ended with KL to the reference of 1.34 and 1.43 nats at the answer position — about the same — with true accuracy 0.79 and 0.09.
+### Zero ablations
 
-**Reading.** A single summary of how much the model changed says nothing about *what* changed. A mechanistic hypothesis does: if the buggy run learned a prompt-independent bias toward "9", its change in the direct logit contributions should be the same for every prompt; if the correct run learned to use the digits, its change should depend on them. Experiment 11.6 tests exactly this — a prediction the behaviour (both changed) and the KL (both about 1.4) cannot make, and one that could turn out wrong.
+| head set to zero | 0.0 | 0.1 | 1.0 | 1.1 |
+|---|---:|---:|---:|---:|
+| second-copy loss | 3.52 | 1.89 | 2.21 | 1.44 |
+
+All four losses exceed the clean 0.26, so each zero-ablation damages the behaviour. The effects differ substantially, which already argues against treating heads as interchangeable.
+
+**Supported claim.** This trained model copies on the tested distribution, the canonical single-head attention score does not locate that behaviour, and all four zero-ablation interventions damage it.
+
+**Remaining alternative.** These results do not yet reveal the actual algorithm. It may use distributed position-dependent paths, several weak matches, or another feature basis. Nor do the ablations prove that every head is uniquely necessary under natural interventions. Experiment 11.4 must distinguish candidate mechanisms.
+
+This is a counterexample to two shortcuts:
+
+$$
+\text{no familiar attention pattern}\not\Rightarrow\text{no behaviour},
+$$
+
+$$
+\text{largest weak score}\not\Rightarrow\text{the mechanism}.
+$$
+
+## Worked Example 11.6 — When there is no copying behaviour to localize
+
+**Question.** Does the pretrained Stage 07 spine checkpoint copy a made-up pet name from context?
+
+A prompt introduces a generated pet name, inserts intervening text, and repeats the name. The probe scores predictions of letters 2–4 in the second occurrence.
+
+| target within second mention | NLL (nats) |
+|---|---:|
+| second letter | 10.62 |
+| third letter | 6.76 |
+| fourth letter | 6.88 |
+| uniform baseline | 3.91 |
+
+Lower is better. The model is not merely a little worse than a copier; it assigns the true characters less probability than uniform on average. In one illustrative case, after “R” it confidently continues a familiar name such as “Ruby” instead of the earlier made-up name.
+
+The largest measured induction-attention score is 0.02. Because no null distribution for the maximum score is supplied, call it “small under this metric,” not proven noise.
+
+**Supported claim.** This checkpoint fails the specified contextual name-copying probe. There is no successful copying behaviour here that requires a copying circuit explanation.
+
+**Remaining alternative.** The result is consistent with reliance on familiar continuations, but it does not prove that the model stores a finite name list. Tokenization, training coverage, positional structure and other mechanisms remain. Tests with unseen animal names, controlled token lengths and training interventions can separate them.
+
+## Worked Example 11.7 — Probe accuracy needs a capacity control
+
+**Question.** What does 92% probe accuracy mean if a matched control reaches 81%?
+
+A linear probe predicts a binary property from 200 hidden states:
+
+$$
+\operatorname{acc}_{\mathrm{real}}=0.92.
+$$
+
+The same probe class is trained on labels randomly reassigned per input type, preserving the opportunity to memorize input types:
+
+$$
+\operatorname{acc}_{\mathrm{control}}=0.81.
+$$
+
+Selectivity is
+
+$$
+0.92-0.81=0.11,
+$$
+
+or 11 percentage points ([Hewitt & Liang 2019](/references/#hewitt-2019)).
+
+The high control score warns that the probe and split permit substantial memorization or nuisance decoding. It is not valid to say exactly “81 of the 92 points came from probe capacity”; accuracies are not additive causal contributions.
+
+**Supported claim.** The tested representation offers an 11-point advantage over this particular capacity control for this decoder and split.
+
+**Remaining alternative.** A different control construction, regularization or group split may change selectivity. Even high selectivity would show decodability, not that the original model uses the property. That requires a feature intervention.
+
+## Worked Example 11.8 — Similar KL, different task changes
+
+**Question.** Does similar KL from a reference model imply similar learned computation?
+
+Unit 09 produced two post-training runs:
+
+| run | mean KL to reference at answer position | held-out greedy true accuracy | mean $p(\mathrm{correct})$ |
+|---|---:|---:|---:|
+| exact-reward REINFORCE | 1.347 nats | 0.82 | 0.79 |
+| buggy $\ge$ checker | 1.43 nats | 0.09 | 0.07 |
+
+The old shorthand “true accuracy 0.79” would confuse two different columns: 0.79 is mean probability assigned to the correct answer, while greedy true accuracy is 0.82.
+
+KL measures an average distributional displacement:
+
+$$
+D_{\mathrm{KL}}(\pi\|\pi_{\mathrm{ref}}).
+$$
+
+It does not identify which logits changed, whether the change depends on the prompt, or whether the changed distribution solves the intended task.
+
+A mechanistic hypothesis makes a sharper prediction:
+
+- if the buggy run learned a nearly prompt-independent bias toward digit 9, its answer-logit change should be similar across digit inputs;
+- if exact-reward training learned to use the two input digits, its changes should vary systematically with them.
+
+**Supported claim.** Similar scalar KL can accompany opposite task outcomes, so KL magnitude alone cannot identify what computation changed.
+
+**Remaining alternative.** The prompt-independent-bias story is still a hypothesis until direct-logit changes and interventions are measured. Experiment 11.6 is designed to risk that hypothesis.
+
+## Evidence ledger
+
+| example | evidence type | strongest justified conclusion |
+|---|---|---|
+| 11.1 | observation | routing is sharply concentrated |
+| 11.2 | exact decomposition | head 1.0 directly writes the correct logit in the constructed model |
+| 11.3 | controlled zero ablation | constructed heads matter under zero replacement |
+| 11.4 | activation patching | clean head output restores behaviour in the constructed corruption |
+| 11.5 | behaviour + ablation | copying exists without the searched single-head pattern |
+| 11.6 | behavioural falsification | the spine checkpoint fails this copying probe |
+| 11.7 | probe + control | limited decodability beyond a matched control |
+| 11.8 | aggregate counterexample | equal change magnitude does not identify change content |

@@ -486,9 +486,13 @@ def test_stage11_patching_the_induction_head_transfers_the_clean_prediction():
     corrupt = clean.copy()
     corrupt[:, 1:9] = np.stack([rng.permutation(8) for _ in range(16)])   # first half differs
     _, cc = M.forward(p, cfg, clean[:, :-1], keep=True)
-    patched = S11.second_half_loss(p, cfg, clean, 8, patch=None)
-    corrupt_loss = S11.second_half_loss(p, cfg, np.concatenate([corrupt[:, :9], clean[:, 9:]], 1), 8)
-    assert patched < 0.01 and corrupt_loss > 1.0
+    corrupted_input = np.concatenate([corrupt[:, :9], clean[:, 9:]], 1)
+    clean_loss = S11.second_half_loss(p, cfg, clean, 8)
+    corrupt_loss = S11.second_half_loss(p, cfg, corrupted_input, 8)
+    patch = {(1, 0): cc["blocks"][1]["o"][:, 0]}
+    patched_loss = S11.second_half_loss(p, cfg, corrupted_input, 8, patch=patch)
+    assert clean_loss < 0.01 and corrupt_loss > 1.0
+    assert patched_loss == pytest.approx(clean_loss, abs=1e-12)
 
 
 # ----------------------------------------------------------------------------- Stage 12

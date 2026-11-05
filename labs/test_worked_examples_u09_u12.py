@@ -153,6 +153,8 @@ def test_unit_11_attention_and_logits():
     assert 1 - weight(16) == pytest.approx(1.1e-5, rel=0.05)
     assert 1 - weight(1000) == pytest.approx(7.2e-4, rel=0.05)
     assert 20 / math.sqrt(18) == pytest.approx(4.7, abs=0.05)
+    s20 = 20 / math.sqrt(18)
+    assert math.exp(s20) / (math.exp(s20) + 15) == pytest.approx(0.881, abs=1e-3)
     assert math.exp(10) / (math.exp(10) + math.e + 7) == pytest.approx(0.9996, abs=1e-4)
     assert math.exp(3) / (math.exp(3) + math.e + 7) == pytest.approx(0.674, abs=1e-3)
     assert (8.77 - 4.4) / (8.77 - 0.0004) == pytest.approx(0.50, abs=5e-3)
