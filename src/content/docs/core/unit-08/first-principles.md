@@ -86,13 +86,13 @@ $$
 =\left(\frac{p_1(i)}{p_1(j)}\right)^{1/\tau}.
 $$
 
-- $	au=1$ leaves the conditional unchanged;
+- $\tau=1$ leaves the conditional unchanged;
 - $0<\tau<1$ magnifies odds and lowers entropy in typical non-tied cases;
-- $	au>1$ compresses odds and moves toward uniformity;
+- $\tau>1$ compresses odds and moves toward uniformity;
 - as $\tau\to0$, mass concentrates on the maximum-logit set—one token only when the maximum is unique;
 - as $\tau\to\infty$, a finite vocabulary approaches uniform probability.
 
-For $p=(0.5,0.3,0.15,0.05)$, $	au=0.5$ gives approximately $(0.685,0.247,0.062,0.007)$; $	au=2$ gives $(0.379,0.294,0.208,0.120)$. Worked Example 8.2 computes the entropies.
+For $p=(0.5,0.3,0.15,0.05)$, $\tau=0.5$ gives approximately $(0.685,0.247,0.062,0.007)$; $\tau=2$ gives $(0.379,0.294,0.208,0.120)$. Worked Example 8.2 computes the entropies.
 
 Lower temperature is often used to reduce low-probability surprises, but “higher model probability” is not synonymous with truth or utility. It can amplify a confident misconception or repetitive template. Temperature is a decoder control, not a correctness knob.
 
