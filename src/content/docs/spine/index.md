@@ -3,9 +3,21 @@ title: The spine project
 description: One small language model built across all twelve units — one NumPy Transformer with hand-derived gradients, one instrumented corpus, and a verification target for every stage.
 ---
 
-Abstract questions need a concrete object to be asked about. The spine project is **one small language model that you build, extend and interrogate across the whole Core**. Stanford's CS336 shows that building a language model from scratch is a viable organizing thread for a course [CS336](/references/#cs336-2026); the spine applies the same idea at laptop scale, using a corpus of simple stories in the spirit of TinyStories [Eldan & Li 2023](/references/#eldan-2023).
+Abstract questions become easier to reason about when they keep returning to the same concrete object. The spine project is **one small language model that you build, extend and interrogate across the whole Core**. You do not need to understand the final Transformer before starting. At Stage 01 the “model” is only a table of character counts. Each later stage changes one idea at a time, so you can ask what the new mechanism bought, what it cost and how you know it works.
+
+Stanford's CS336 shows that building a language model from scratch is a viable organizing thread for a course [CS336](/references/#cs336-2026); the spine applies the same idea at laptop scale, using a corpus of simple stories in the spirit of TinyStories [Eldan & Li 2023](/references/#eldan-2023).
 
 Every stage has a **verification target** — a number or invariant that tells you, independently of any AI, whether the stage is correct. All targets run in CI (`spine/test_spine.py`, `spine/test_model.py`).
+
+If this is your first machine-learning project, read a stage in this order:
+
+1. write down what should happen and one way it could fail;
+2. run the smallest test before reading the reference implementation;
+3. implement or inspect the one new mechanism;
+4. explain every failed invariant in words before changing code;
+5. record what the passing test establishes — and what it does **not** establish.
+
+A red test is therefore not a verdict on you. At the beginning of a stage it is the executable statement of the problem.
 
 ## One model, one corpus
 
@@ -31,6 +43,16 @@ Every stage has a **verification target** — a number or invariant that tells y
 
 ## Running it
 
+From the repository root, create an isolated environment and install the shared lab requirements once:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate          # Windows PowerShell: .venv\Scripts\Activate.ps1
+python -m pip install -r labs/requirements.txt
+```
+
+Then run the spine from its directory:
+
 ```bash
 cd spine
 python -m pytest                         # every verification target, a few minutes on a laptop
@@ -42,9 +64,15 @@ python stage09_post_training.py          # uses the Stage 07 checkpoint
 
 Every stage needs only NumPy. Stages 05 and 08–11 load the Stage 07 checkpoint, which is committed so that they run without retraining. To use a real corpus, pass `--data path/to/text.txt` to stages 01–04.
 
+For a first pass, start with `python stage01_bigram.py`, inspect the printed uniform baseline and held-out loss, and then run only its relevant tests with `python -m pytest -k stage01 -v`. A failure report gives the test name, the observed value and the violated expectation. Before editing, translate that report into a sentence such as “the smoothed probabilities no longer sum to one” or “training improved while held-out prediction did not.” That sentence is the beginning of the diagnosis.
+
+Generated checkpoints and measurements are evidence only under the conditions that produced them. Record the command, code revision, environment and seed. A passing unit test establishes the named property for the tested cases; it does not prove that the implementation is fast, robust to every input, or scientifically useful on a different corpus.
+
 ## Design rules
 
 - **Earned abstraction.** Every gradient in the reference is one you have derived (Units 03–04); frameworks are welcome once you can check them against it.
 - **One change per stage**, with a prediction written before the run.
 - **Laptop first.** Every stage runs on a laptop CPU in minutes; nothing needs a GPU.
 - **Ground truth before claims.** Where a stage detects something (duplicates, contamination, circuits), the ground truth is planted or hand-built first, so the detector itself is tested.
+- **Failure is localized, not hidden.** Preserve the first failing case, reduce it to the smallest example you can, and fix the mechanism rather than loosening the assertion.
+- **Software evidence is not scientific evidence.** Exact equality, a finite-difference check or a planted-data recovery validates a bounded claim. Generalization to natural corpora requires a new study.
