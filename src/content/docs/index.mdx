@@ -5,11 +5,11 @@ template: splash
 hero:
   tagline: A deep learning textbook for 2027–2037 that teaches on its own — fewer topics, each derived in full — with AI as a companion, one small language model you build across all twelve units, and a verification layer for checking what AI tells you.
   actions:
-    - text: Start with the Core
-      link: core/
-      icon: right-arrow
-    - text: How to study with AI
+    - text: New to deep learning? Start here
       link: start/how-to-study/
+      icon: right-arrow
+    - text: Explore the Core
+      link: core/
       icon: open-book
       variant: minimal
 ---
@@ -49,6 +49,8 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## Where to go next
 
+If terms such as *negative log-likelihood*, *nat* or *gradient* are new, begin with the [first 90 minutes](/start/how-to-study/#your-first-90-minutes), not with a prerequisite marathon. Unit 01 introduces probability and log-loss through counts; the appendices are available when a mathematical tool first becomes necessary. You are allowed to understand the motivating example before you understand the general notation.
+
 <CardGrid>
   <LinkCard title="Philosophy" href="start/philosophy/" description="Why coverage is the wrong goal — and why depth on exemplars is the right one." />
   <LinkCard title="The argument of the book" href="core/" description="Twelve units, one argument: each answer exposes the limitation that becomes the next question — and Unit 12 returns to Unit 01." />
@@ -60,4 +62,4 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
   <LinkCard title="简体中文版 · Simplified Chinese" href="zh-cn/" description="全书中国大陆用语版，关键术语附英文对照，并附中英术语表。" />
 </CardGrid>
 
-<small>Status: v2.2. All twelve units are full drafts in the ten-part chapter structure, with eight mathematical appendices, in English, Traditional Chinese and Simplified Chinese (generated from the Traditional Chinese edition), connected as one argument and awaiting subject and pedagogical review; see the [review ledger](/start/errata/#review-ledger). The textbook is written to be complete without AI; the Mentor augments it. Content © contributors, CC BY 4.0; code MIT.</small>
+<small>Status: v2.3. All twelve units and eight mathematical appendices have received a beginner-oriented editorial rewrite in English and Traditional Chinese; Simplified Chinese is generated from the Traditional Chinese edition. They remain full drafts awaiting named subject review, named translation review and learner pilots; see the [review ledger](/start/errata/#review-ledger). The textbook is written to be complete without AI; the Mentor augments it. Content © contributors, CC BY 4.0; code MIT.</small>

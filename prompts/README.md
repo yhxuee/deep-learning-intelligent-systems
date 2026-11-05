@@ -6,4 +6,4 @@ Use: paste `base-policy.md` + one mode file (or one unit file) into any capable 
 
 Prompts are pedagogical suggestions, not enforcement. They cannot proctor an exam. Each change must pass a human review and the regression checklist in `docs/` (Phase 3) against at least two different model families.
 
-Version: 1.1.0 (edition 2026-11)
+Version: 1.2.0 (edition 2026-11)
