@@ -6,6 +6,25 @@ sidebar: { label: "A · 线性代数", order: 1 }
 
 本书的每个模型都由矩阵乘积构成，而它的理论大多是谱理论：步长上限是特征值（单元 03），记忆的衰减是谱半径（单元 05），低秩结构是奇异值分解（单元 02 与 04）。本附录收录各单元所用的事实，证明简短且有启发性时附上证明。例题中的数字由 `labs/test_appendices.py` 检查。
 
+### 初学者图像：矩阵是一个动作
+
+不要先把矩阵看成等着操作的数字方框。把它看成移动向量的函数。以
+
+$$
+A=\begin{pmatrix}2&0\\0&\tfrac12\end{pmatrix},
+\qquad x=\begin{pmatrix}1\\2\end{pmatrix},
+\qquad Ax=\begin{pmatrix}2\\1\end{pmatrix}
+$$
+
+为例，$A$ 把第一个坐标放大两倍、第二个缩小一半。线性代数反复追问几个关于这个动作的问题：
+
+- **哪些信息留下来？**秩计算独立输出方向；零空间收集被映射消除的输入。
+- **哪些方向的行为最简单？**特征向量保持方向；奇异向量找出伸缩最大的方向。
+- **反解有多敏感？**条件数描述输入或舍入误差可能被放大多少。
+- **重复应用会怎样？**矩阵幂 $A^t$ 描述深层乘积与递推记忆。
+
+阅读符号时把这幅图像放在旁边。此处定理之所以有用，是因为它精确回答其中一题。
+
 | 小节 | 用于 |
 |---|---|
 | A.1 内积与范数 | 02（相似度、JL 引理）、03（最陡下降）、04（注意力分数） |
@@ -18,7 +37,7 @@ sidebar: { label: "A · 线性代数", order: 1 }
 
 ## A.1 向量、内积与范数
 
-向量是列向量，$x\in\mathbb{R}^n$。**内积（inner product）**为 $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$，**欧几里得范数**为 $\lVert x\rVert = \sqrt{x^{\top}x}$。其他常见范数：$\lVert x\rVert_1 = \sum_i|x_i|$ 与 $\lVert x\rVert_\infty = \max_i|x_i|$。
+向量写成行向量，$x\in\mathbb{R}^n$。向量可以代表一个点、方向、特征列表或隐藏状态；各处背景会说明采用哪种解读。**内积（inner product）**为 $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$，**欧几里得范数**为 $\lVert x\rVert = \sqrt{x^{\top}x}$。其他常见范数：$\lVert x\rVert_1 = \sum_i|x_i|$ 与 $\lVert x\rVert_\infty = \max_i|x_i|$。
 
 **定理 A.1（柯西–施瓦茨，Cauchy–Schwarz）。** $|x^{\top}y|\le\lVert x\rVert\,\lVert y\rVert$，等号成立当且仅当 $x$ 与 $y$ 平行。
 

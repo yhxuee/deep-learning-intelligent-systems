@@ -6,6 +6,18 @@ sidebar: { label: "C · Probability", order: 3 }
 
 Every model in this book outputs a probability distribution, every loss is an expectation, and every evaluation is an estimate from a sample. This appendix states the probability the units use. Measure-theoretic detail is kept out of the way: sums are for discrete variables, integrals for continuous ones, and every statement below holds for both with the obvious change. Numbers in the examples are checked by `labs/test_appendices.py`.
 
+### The beginner's picture: uncertainty before and after information
+
+Probability has two jobs in this book. It describes **variation in the world or procedure**—which token occurs, which minibatch is drawn, which training run succeeds—and it represents **uncertainty given current information**. Conditioning connects the two. Before seeing a coin toss you may assign $P(H)=0.5$; after learning that the coin came from a biased production line, the relevant probability changes even though the physical toss has not yet occurred.
+
+Keep three statements separate:
+
+- a distribution is a mathematical description of possible outcomes;
+- a sample is one realized collection drawn under a procedure;
+- an expectation is a distribution-weighted average, not necessarily an outcome that can occur.
+
+Also resist a common shortcut: uncorrelated does not generally mean independent, and repeated rows are not independent merely because there are many of them. Independence is an assumption about the data-generating process, not a visual property of a table.
+
 | Section | Used in |
 |---|---|
 | C.1–C.2 Expectation, variance | 01 (risk), 03 (stochastic gradients), 10, 12 (standard errors) |
@@ -35,7 +47,7 @@ $$
 Two consequences recur throughout the book:
 
 - **The mean of $n$ independent copies** has variance $\sigma^2/n$ and standard deviation $\sigma/\sqrt n$. This is the $1/\sqrt n$ law behind every standard error (Unit 01, §1.3.7) and behind the noise of a minibatch gradient (Unit 03, §3.3.7).
-- **Pairing.** $\mathrm{Var}(X - Y) = \mathrm{Var}(X) + \mathrm{Var}(Y) - 2\,\mathrm{Cov}(X, Y)$: a comparison on shared items or seeds is more precise exactly when the two measurements are positively correlated (Unit 10, §10.3.5; Unit 12, §12.3.1, where the correlation turned out negative).
+- **Pairing.** $\mathrm{Var}(X - Y) = \mathrm{Var}(X) + \mathrm{Var}(Y) - 2\,\mathrm{Cov}(X, Y)$: a comparison on shared items or seeds is more precise exactly when the two measurements are positively correlated (Unit 10, §10.3.5; Unit 12, §12.3.2, where the correlation turned out negative).
 
 For a random vector $Z\in\mathbb{R}^n$, the **covariance matrix** $\Sigma = \mathbb{E}[(Z - \mu)(Z - \mu)^{\top}]$ is positive semidefinite (Appendix A.5), and $\mathrm{Cov}(AZ) = A\Sigma A^{\top}$.
 

@@ -4,7 +4,11 @@ description: Eight appendices — linear algebra, calculus, probability, informa
 sidebar: { label: Overview, order: 0 }
 ---
 
-The units teach mathematics where it is needed, in the order the argument needs it. These appendices collect it by subject, for reference and review: definitions, the theorems the units rely on with proofs where a proof is short and instructive, worked examples whose numbers are checked by `labs/test_appendices.py`, exercises with selected answers, and pointers to the sections that use each result.
+The units teach mathematics where it is needed, in the order the argument needs it. These appendices collect the same ideas by subject. They are **not an entrance examination** that must be completed before Unit 01. If a symbol interrupts the main argument, come here for the needed section, work its smallest example, and return to the unit.
+
+Each appendix preserves the full mathematical statement, but a first reading has a narrower goal: identify the objects, the operation, and the question the theorem answers. Before proving the spectral theorem, for example, be able to say that a matrix is a transformation, an eigenvector is a direction it does not turn, and the eigenvalue is the stretch along that direction. The proof then explains why that picture is valid—not the other way around.
+
+The appendices contain definitions, theorems, short instructive proofs, checked numerical examples, exercises with selected answers, and pointers back to the sections that use each result. Numbers are recomputed by `labs/test_appendices.py`.
 
 They do not repeat proofs the units already give. Where a unit proves a result in context — the descent lemma and the convergence rates of gradient descent (Unit 03, §3.5), Hoeffding's inequality (Unit 01, §1.5.1), the Eckart–Young theorem (Unit 02, §2.5.5) — the appendix states it and points there.
 
@@ -21,9 +25,15 @@ They do not repeat proofs the units already give. Where a unit proves a result i
 
 ## How to use them
 
-- **Before a unit**, skim the appendices listed under its prerequisites; each unit's page 1 names what it assumes.
-- **While reading**, follow the links from a unit to the appendix section when a step is unfamiliar, and back.
-- **For review**, the exercises at the end of each appendix are graded for independent work; answers to selected ones follow them.
+- **Just in time:** when a unit cites a section, read its opening explanation and first example. Write the dimensions or random variables beside every symbol, then return to the unit.
+- **For repair:** if a derivation feels magical, reconstruct the relevant theorem on paper and check it on a two-dimensional or two-outcome case.
+- **For mastery:** read the proof, cover it, reproduce its main steps, then solve the exercises without AI. A proof you can recognize but not reconstruct is not yet available for verification work.
+
+When stuck, ask three questions before asking for another formula:
+
+1. What type of object is this—scalar, vector, matrix, random variable, function, distribution, or policy?
+2. What are its dimensions or domain and codomain?
+3. What changes, what is held fixed, and what quantity is being bounded or optimized?
 
 Notation follows the [notation page](/start/notation/): vectors are lower case and not bold, logarithms are natural and information is measured in nats.
 

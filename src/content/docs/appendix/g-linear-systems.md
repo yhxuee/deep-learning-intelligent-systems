@@ -6,6 +6,23 @@ sidebar: { label: "G · Linear systems", order: 7 }
 
 Unit 05 builds memory from the exponential moving average up to state-space models and linear attention; every one of those layers is, or contains, a linear dynamical system. This appendix gives the system-theoretic facts in general form, including the ones the unit uses informally — what the poles of a transfer function can and cannot tell you, and what it costs to run a recurrence. Numbers in the examples are checked by `labs/test_appendices.py`.
 
+### The beginner's picture: state is a compressed history
+
+A dynamical system receives an input, updates an internal state, and emits an output. In
+
+$$
+h_t=Ah_{t-1}+Bx_t,
+\qquad y_t=Ch_t,
+$$
+
+$h_t$ is not “the past” itself. It is the information about the past that the update has chosen—or been able—to retain. The matrix $A$ moves old state forward, $B$ writes the new input, and $C$ reads an output. This gives three concrete questions:
+
+1. Does old state decay, persist, oscillate, or explode?
+2. Can an input write every state direction, and can the output reveal every direction?
+3. Can the same input–output behaviour be computed more cheaply as a recurrence, convolution, or parallel scan?
+
+The vocabulary of stability, controllability, observability, and transfer functions gives exact answers to these questions in the linear case. Nonlinear and selective systems reuse the questions even when the answers are harder.
+
 | Section | Used in |
 |---|---|
 | G.1 Recurrences and impulse responses | 05 (§5.3.2), 04 (attention as a lower-triangular map) |
