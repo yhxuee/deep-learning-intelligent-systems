@@ -127,7 +127,7 @@ The harness itself is software and can be wrong. Therefore its bootstrap, pairin
 1. **First principles** (§10.2): a score as an estimator, the target population, independent units, leakage, metric mismatch, uncertainty and calibration.
 2. **Mathematical construction** (§10.3): covariate, label and concept shift; importance weighting; calibration measures; bootstrap intervals; paired comparison; multiple testing.
 3. **Worked reasoning** (§10.4): every reported spine number is reconstructed and interpreted, including what it does not say.
-4. **General theory and connections** (§§10.5–10.6): proper scoring rules, conformal coverage, false-discovery control, medicine, psychometrics, metrology and software testing.
+4. **General theory and connections** (§§10.5–10.6): proper scoring rules, conformal coverage, false-discovery control, medicine, psychometrics, metrology, software testing, survey sampling and causal reasoning.
 5. **Limits and current practice** (§§10.7–10.8): judge models, benchmark saturation, contamination tests and the boundary between behavioural evidence and mechanism.
 6. **Experiments and problems** (§§10.9–10.10): prediction-first audits that force every metric to state its population and uncertainty.
 
@@ -150,8 +150,8 @@ Exact arithmetic is recomputed by `labs/test_worked_examples_u09_u12.py`. Stage 
 | [10.3 Mathematical construction](/core/unit-10/construction/) | shift, leakage, calibration, bootstrap, pairing and multiplicity | 2–3 h |
 | [10.4 Worked examples](/core/unit-10/worked-examples/) | eight complete calculations and interpretations | 90 min |
 | [10.5 General theory](/core/unit-10/theory/) | proper scores, bootstrap theory, conformal prediction and FDR | 90 min |
-| [10.6 Connections](/core/unit-10/connections/) | medicine, psychometrics, metrology and software testing | 45 min |
-| [10.7 Limitations and counterexamples](/core/unit-10/limitations/) | saturation, judge models and limits of behavioural testing | 45 min |
-| [10.8 Modern developments](/core/unit-10/modern/) | holistic evaluation, uncertainty, contamination and adaptive tests | 50 min |
-| [10.9 Experiments](/core/unit-10/experiments/) | six controlled evaluation audits | lab time |
+| [10.6 Connections](/core/unit-10/connections/) | medicine, psychometrics, metrology, software testing, surveys and causality | 60 min |
+| [10.7 Limitations and counterexamples](/core/unit-10/limitations/) | saturation, unknown shifts, judge bias, aggregation, utility and mechanism | 75 min |
+| [10.8 Modern developments](/core/unit-10/modern/) | evaluation profiles, uncertainty, contamination defense and continuous tests | 70 min |
+| [10.9 Experiments](/core/unit-10/experiments/) | seven controlled, prediction-first evaluation audits | lab time |
 | [10.10 Problems and further study](/core/unit-10/problems/) | graded calculations, proofs, designs and reading | — |
