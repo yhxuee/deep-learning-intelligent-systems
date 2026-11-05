@@ -73,6 +73,7 @@ def test_unit_09_selected_answers():
     assert sigmoid(0.5) == pytest.approx(0.6225, abs=1e-4) and -math.log(sigmoid(0.5)) == pytest.approx(0.474, abs=1e-3)
     assert 1 / (1 - 0.9) == pytest.approx(10) and 1 / (1 - 0.99) == pytest.approx(100)
     assert softplus_neg(0.1) == pytest.approx(0.644, abs=1e-3) and softplus_neg(1.0) == pytest.approx(0.313, abs=1e-3)
+    assert 1 - (1 - 1e-6) ** 64 == pytest.approx(6.4e-5, rel=1e-4)
 
 
 # ----------------------------------------------------------------------------- Unit 10
