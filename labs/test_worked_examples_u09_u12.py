@@ -44,6 +44,8 @@ def test_we_9_3_tilted_optimum():
 
 def test_we_9_4_bellman():
     assert 0.9 * 1.0 == 0.9
+    q = 0.5
+    assert 0.9 * (1 - q) / (1 - 0.9 * q) == pytest.approx(0.8182, abs=1e-4)
 
 
 def test_we_9_5_preferences_and_dpo():
@@ -56,6 +58,7 @@ def test_we_9_5_preferences_and_dpo():
 
 def test_we_9_8_kl_reference_point():
     assert 0.8 * math.log(0.8 / 0.2) + 0.2 * math.log(0.2 / 0.8) == pytest.approx(0.832, abs=1e-3)
+    assert 1.34 / math.log(2) == pytest.approx(1.93, abs=5e-3)
 
 
 def test_unit_09_selected_answers():
