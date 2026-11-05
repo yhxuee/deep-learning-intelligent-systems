@@ -123,6 +123,7 @@ def test_unit_10_selected_answers():
     assert S10.ece(conf, correct, n_bins=10)[0] == pytest.approx(0.15)
     assert 1.96 * math.sqrt(0.81 * 0.19 / 500) == pytest.approx(0.034, abs=5e-4)
     assert math.ceil((1.96 / 0.01) ** 2 * 0.81 * 0.19) == 5913
+    assert math.ceil((1.96 / 0.01) ** 2 * 0.25) == 9604
     assert 1 - 0.95 ** 20 == pytest.approx(0.642, abs=5e-4)
     assert math.ceil(100 * 0.9) == 90
     assert 0.2 * 0.30 + 0.8 * 0.05 == pytest.approx(0.10) and 0.1 * 0.30 + 0.9 * 0.05 == pytest.approx(0.075)
@@ -134,6 +135,13 @@ def test_unit_10_selected_answers():
     assert counts.sum() == 5120
     assert rounded_table_ece == pytest.approx(0.00977, abs=5e-6)
     assert counts[-1] / counts.sum() == pytest.approx(0.8572, abs=5e-5)
+    brier = 0.5 * (0.7 * 0.2**2 + 0.3 * 0.8**2) + 0.5 * (0.6 * 0.6**2 + 0.4 * 0.4**2)
+    calibration = 0.5 * (0.8 - 0.7) ** 2 + 0.5 * (0.4 - 0.6) ** 2
+    resolution = 0.5 * (0.7 - 0.65) ** 2 + 0.5 * (0.6 - 0.65) ** 2
+    uncertainty = 0.65 * 0.35
+    assert brier == pytest.approx(0.25)
+    assert (calibration, resolution, uncertainty) == pytest.approx((0.025, 0.0025, 0.2275))
+    assert calibration - resolution + uncertainty == pytest.approx(brier)
 
 
 # ----------------------------------------------------------------------------- Unit 11
