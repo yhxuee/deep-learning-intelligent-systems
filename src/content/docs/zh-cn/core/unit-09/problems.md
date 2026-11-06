@@ -114,6 +114,6 @@ $$
 
 **以偏好为基础的后训练。** [Christiano et al. 2017](/zh-cn/references/#christiano-2017)、[Ouyang et al. 2022](/zh-cn/references/#ouyang-2022)、[Rafailov et al. 2023](/zh-cn/references/#rafailov-2023) 提供三种不同流水线设计。[Calandriello et al. 2024](/zh-cn/references/#calandriello-2024) 研究线上偏好优化；[Zhao et al. 2025](/zh-cn/references/#zhao-2025-preference-limits) 分析序位偏好数据的限制。要比较的是假设，不只是基线分数。
 
-**验证器与推理。** [Shao et al. 2024](/zh-cn/references/#shao-2024) 与 [DeepSeek-AI 2025](/zh-cn/references/#deepseek-2025) 研究大规模可验证奖励；[Lightman et al. 2024](/zh-cn/references/#lightman-2024) 与 [Khalifa et al. 2025](/zh-cn/references/#khalifa-2025-thinkprm) 研究逐步验证。务必分开“可观察推理轨迹”与“隐藏的因果运算”。
+**验证器与推理。** [Shao et al. 2024](/zh-cn/references/#shao-2024) 与 [DeepSeek-AI et al. 2025](/zh-cn/references/#deepseek-r1-2025) 研究大规模可验证奖励；[Lightman et al. 2024](/zh-cn/references/#lightman-2024) 与 [Khalifa et al. 2025](/zh-cn/references/#khalifa-2025-thinkprm) 研究逐步验证。务必分开“可观察推理轨迹”与“隐藏的因果运算”。
 
 **会出什么错。** [Amodei et al. 2016](/zh-cn/references/#amodei-2016)、[Gao et al. 2023](/zh-cn/references/#gao-2023)、[Sharma et al. 2024](/zh-cn/references/#sharma-2024)、[Skalse et al. 2022](/zh-cn/references/#skalse-2022) 涵盖规范博弈、过度优化、谄媚与形式化奖励破解。对每个失败，都要问修正应落在数据、评估器、目标、优化器或部署边界的哪一层。

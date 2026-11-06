@@ -1,6 +1,6 @@
 ---
 title: "8.3 Mathematical construction"
-description: Derive ancestral sampling, change of variables, the ELBO, denoising scores, flow matching, the exact Gaussian field, and numerical sampling from one question: which distribution does the procedure actually generate?
+description: "Derive ancestral sampling, change of variables, the ELBO, denoising scores, flow matching, the exact Gaussian field, and numerical sampling from one question: which distribution does the procedure actually generate?"
 sidebar: { label: "8.3 Construction", order: 3 }
 ---
 

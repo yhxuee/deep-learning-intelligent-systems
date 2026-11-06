@@ -44,6 +44,12 @@ Serving has two recurrent wastes: unused cache space and repeated weight reads.
 
 Why might this be faster? During memory-bound decoding, checking several positions can require a similar **target-weight** read to checking one. But total traffic is not identical: the draft model, KV caches, verification tensors and rejected proposals all cost something. Measured speed-up therefore depends on draft acceptance, block length, verification kernels, batching and cache overhead ([Leviathan et al. 2023](/references/#leviathan-2023)) **[E]**. A poor draft can make speculation slower. “Exact” describes the corrected output distribution, not arbitrary greedy acceptance of draft tokens.
 
+### Prefill and decode are different workloads
+
+The prompt **prefill** evaluates many known positions in parallel, producing large matrix--matrix operations; its user-visible target is often **time to first token (TTFT)**. Autoregressive **decode** advances one position per sequence at a time, repeatedly reading weights and a growing KV cache; its target is often **time per output token (TPOT)**. A system can improve one while worsening the other. **Goodput** therefore counts requests that satisfy both latency limits, rather than all tokens processed.
+
+DistServe reported gains by placing prefill and decode on different devices and choosing parallelism and placement for their different bottlenecks ([Zhong et al. 2024](/references/#distserve-2024)) **[E]**. This is a case study, not a universal deployment rule: separation also transfers KV state and can lose when the interconnect is slow or requests are too small. For an electronic engineer, the durable question is whether the current phase is limited by arithmetic, memory bandwidth, capacity, or communication—and which limit moves after the optimization.
+
 ## 6.8.4 More total parameters without proportional active FLOPs
 
 A mixture-of-experts (MoE) layer has many expert MLPs but routes each token to only a few. If there are $E$ experts and $k\ll E$ are active, expert capacity can grow roughly with $E$ while expert arithmetic per token grows with $k$ **[D]**. This is why DeepSeek-V3 reports 671 billion total parameters but 37 billion activated per token ([DeepSeek-AI et al. 2024](/references/#deepseek-v3-2024)) **[O]**.

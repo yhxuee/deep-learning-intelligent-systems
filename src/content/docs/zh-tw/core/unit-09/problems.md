@@ -114,6 +114,6 @@ $$
 
 **以偏好為基礎的後訓練。** [Christiano et al. 2017](/zh-tw/references/#christiano-2017)、[Ouyang et al. 2022](/zh-tw/references/#ouyang-2022)、[Rafailov et al. 2023](/zh-tw/references/#rafailov-2023) 提供三種不同管線設計。[Calandriello et al. 2024](/zh-tw/references/#calandriello-2024) 研究線上偏好最佳化；[Zhao et al. 2025](/zh-tw/references/#zhao-2025-preference-limits) 分析序位偏好資料的限制。要比較的是假設，不只是基準分數。
 
-**驗證器與推理。** [Shao et al. 2024](/zh-tw/references/#shao-2024) 與 [DeepSeek-AI 2025](/zh-tw/references/#deepseek-2025) 研究大規模可驗證獎勵；[Lightman et al. 2024](/zh-tw/references/#lightman-2024) 與 [Khalifa et al. 2025](/zh-tw/references/#khalifa-2025-thinkprm) 研究逐步驗證。務必分開「可觀察推理軌跡」與「隱藏的因果運算」。
+**驗證器與推理。** [Shao et al. 2024](/zh-tw/references/#shao-2024) 與 [DeepSeek-AI et al. 2025](/zh-tw/references/#deepseek-r1-2025) 研究大規模可驗證獎勵；[Lightman et al. 2024](/zh-tw/references/#lightman-2024) 與 [Khalifa et al. 2025](/zh-tw/references/#khalifa-2025-thinkprm) 研究逐步驗證。務必分開「可觀察推理軌跡」與「隱藏的因果運算」。
 
 **會出什麼錯。** [Amodei et al. 2016](/zh-tw/references/#amodei-2016)、[Gao et al. 2023](/zh-tw/references/#gao-2023)、[Sharma et al. 2024](/zh-tw/references/#sharma-2024)、[Skalse et al. 2022](/zh-tw/references/#skalse-2022) 涵蓋規格投機、過度最佳化、諂媚與形式化獎勵駭取。對每個失敗，都要問修正應落在資料、評估器、目標、最佳化器或部署邊界的哪一層。

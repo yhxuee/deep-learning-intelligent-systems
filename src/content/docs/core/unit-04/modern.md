@@ -1,6 +1,6 @@
 ---
 title: "4.8 Modern developments"
-description: IO-aware exact attention with the online softmax, multi-query and grouped-query attention, linear and sparse variants, mixture-of-experts MLPs, and attention beyond text — with evidence labels.
+description: IO-aware exact attention, shared KV heads, long-context constraints, sparse and linear variants, mixture-of-experts MLPs, and attention beyond text — with evidence labels.
 sidebar: { label: "4.8 Modern developments", order: 8 }
 ---
 
@@ -56,6 +56,21 @@ Nothing in §4.2–§4.3 requires tokens to be words. **Vision Transformers** sp
 
 For graphs, the “positions” are nodes and the mask can be the adjacency relation (§4.5.4). For images, audio or multimodal inputs, the attention equations stay recognizable, but tokenization, positional structure and valid symmetries change. Reusing the equation does not make the domains identical.
 
-## 4.8.6 What to take from this section
+## 4.8.6 Long context is four different problems
 
-Each development changes one quantity from this unit: **memory traffic** (IO-aware kernels, same intended function), **cache size** (shared KV heads, changed parameter sharing), **the interaction graph** (sparse/local attention), **the similarity kernel and state** (linear attention), **active parameters per token** (MoE), or **the domain and its symmetries** (vision and graphs). No single variant “solves attention.” When you meet a new one, identify the changed quantity, recompute the relevant cost, state whether the function changed, and then inspect the evidence for quality—not just the speed headline.
+A model that accepts a long input has not necessarily learned to use all of it. Separate four gates:
+
+| gate | question | representative intervention |
+|---|---|---|
+| position | are unseen or stretched position indices represented sensibly? | RoPE interpolation or retraining |
+| computation | can attention be evaluated within the time and device-memory budget? | IO-aware kernels or sequence parallelism |
+| cache | can stored keys and values fit and be moved during decoding? | GQA/MQA, quantization or paging |
+| use | can the model retrieve, combine and reason over the relevant evidence? | controlled evaluation with distractors and multiple dependencies |
+
+LongRoPE is one example of extending RoPE-based models through non-uniform positional interpolation and limited fine-tuning ([Ding et al. 2024](/references/#longrope-2024)) **[E]**. Ring Attention instead distributes sequence blocks across devices and overlaps movement of key--value blocks with blockwise attention ([Liu et al. 2023](/references/#ring-attention-2023)) **[E]**. They address different gates: the first changes how positions extrapolate; the second changes where exact attention is computed. Neither by itself proves that information near the beginning will influence a difficult answer near the end.
+
+Evaluation must therefore increase both length and task difficulty. RULER extends a simple needle-retrieval test with multiple needles, aggregation and multi-hop tracing; its reported models often deteriorated with length despite high scores on the simplest retrieval test ([Hsieh et al. 2024](/references/#ruler-2024)) **[E]**. A useful engineering checkpoint is immediate: doubling $T$ makes dense attention's pairwise score count about four times larger, while the uncompressed KV cache becomes about twice as large. A single advertised “context length” hides both costs and says nothing about effective recall.
+
+## 4.8.7 What to take from this section
+
+Each development changes one quantity from this unit: **memory traffic** (IO-aware kernels, same intended function), **cache size** (shared KV heads, changed parameter sharing), **position range and sequence placement** (long-context methods), **the interaction graph** (sparse/local attention), **the similarity kernel and state** (linear attention), **active parameters per token** (MoE), or **the domain and its symmetries** (vision and graphs). No single variant “solves attention.” When you meet a new one, identify the changed quantity, recompute the relevant cost, state whether the function changed, and then inspect the evidence for quality—not just the speed headline.

@@ -1,6 +1,6 @@
 ---
 title: "12.7 Limitations and counterexamples"
-description: What rigorous procedure cannot guarantee: construct and external validity, affordable power, honest registration, independent replication, complete observation, and sound scientific judgement.
+description: "What rigorous procedure cannot guarantee: construct and external validity, affordable power, honest registration, independent replication, complete observation, and sound scientific judgement."
 sidebar: { label: "12.7 Limitations", order: 7 }
 ---
 

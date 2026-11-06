@@ -1,6 +1,6 @@
 ---
 title: "9.9 Experiments"
-description: Seven prediction-first experiments that connect policy-gradient algebra to observable behaviour: estimator variance, KL tilting, spine post-training, regularization, offline versus online feedback, reward hacking, and checker audits.
+description: "Seven prediction-first experiments that connect policy-gradient algebra to observable behaviour: estimator variance, KL tilting, spine post-training, regularization, offline versus online feedback, reward hacking, and checker audits."
 sidebar: { label: "9.9 Experiments", order: 9 }
 ---
 

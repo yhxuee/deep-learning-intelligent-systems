@@ -1,6 +1,6 @@
 ---
 title: "12.5 General theory"
-description: Evidence as error-correcting inquiry: positive predictive value, selection, falsification, strong inference, Bayesian updating, replication, cumulative evidence, and bounded roles for AI.
+description: "Evidence as error-correcting inquiry: positive predictive value, selection, falsification, strong inference, Bayesian updating, replication, cumulative evidence, and bounded roles for AI."
 sidebar: { label: "12.5 General theory", order: 5 }
 ---
 

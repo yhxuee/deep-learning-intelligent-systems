@@ -11,6 +11,7 @@ sidebar: { order: 3 }
 3. **Beginner entry ramps were added across the supporting book.** Every mathematical appendix begins with a concrete picture; the study paths include a first 90 minutes, a two-pass method and a stuck ladder; the notation page decodes a complete loss equation and matrix shapes; the Spine, labs, Atlas and assessment pages now teach how to interpret failures and the limits of passing tests.
 4. **Three editions remain synchronized.** The rewrite was authored in English and independently localized in Traditional Chinese with Taiwan terminology; Simplified Chinese is regenerated from it. Automated checks compare mathematics and numbered results, reject stale generated text and flag Taiwan-only terminology in the mainland edition.
 5. **Status remains “full draft.”** This editorial pass is not a substitute for named subject review, named translation review or learner pilots. Those gates remain open in the [review ledger](/start/errata/#review-ledger).
+6. **A compact frontier-systems thread was added without turning the book into an LLM survey.** Unit 04 separates positional extension, attention computation, KV memory and effective long-context use; Unit 06 distinguishes prefill from decode; Unit 09 uses DeepSeek-R1 as a bounded case study in verifiable rewards, filtering and distillation; the reading paths connect them for electronic-engineering students.
 
 ## v2.2 — 3 November 2026: Simplified Chinese edition, consistency checks and reading paths
 

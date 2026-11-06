@@ -110,7 +110,7 @@ $$
 A_i=\frac{r_i-\bar r}{s_r+\epsilon}
 $$
 
-as a relative advantage, avoiding a separately trained value network. DeepSeekMath introduced a PPO-like group-relative method ([Shao et al. 2024](/references/#shao-2024)); DeepSeek-R1 reported large reasoning gains from verifiable-reward training at scale ([DeepSeek-AI 2025](/references/#deepseek-2025)) **[E]**. §9.3.7 explains why the ordinary group mean slightly rescales the score-function gradient and how a leave-one-out baseline differs **[D]**.
+as a relative advantage, avoiding a separately trained value network. DeepSeekMath introduced a PPO-like group-relative method ([Shao et al. 2024](/references/#shao-2024)); DeepSeek-R1 reported large reasoning gains from verifiable-reward training at scale ([DeepSeek-AI et al. 2025](/references/#deepseek-r1-2025)) **[E]**. §9.3.7 explains why the ordinary group mean slightly rescales the score-function gradient and how a leave-one-out baseline differs **[D]**.
 
 The simple equation exposes three failure modes:
 
@@ -121,6 +121,12 @@ The simple equation exposes three failure modes:
 Recent experiments extended outcome rewards beyond short arithmetic. For example, one grounded-question-answering study combined rewards for answer correctness, citation sufficiency and appropriate refusal, and found that staged optimization helped on its evaluated datasets ([Sim et al. 2025](/references/#sim-2025-grounded-rlvr)) **[E]**. This is evidence for that reward design and benchmark suite, not a guarantee that arbitrary generated citations are trustworthy.
 
 Stage 09 is the smallest executable version of this story. With the exact checker, reward and correctness rise together. With the buggy “greater than or equal” checker, measured reward approaches one while true correctness collapses. Scaling the optimizer cannot repair the meaning of the checker.
+
+### Case study: what DeepSeek-R1 does and does not establish
+
+The useful object is the training pipeline, not the model name. DeepSeek-R1-Zero starts from a pretrained base model and applies RL with mechanically checked rewards. DeepSeek-R1 adds cold-start examples, reasoning-oriented RL, rejection sampling plus supervised fine-tuning, and a later RL stage; teacher outputs are also used to fine-tune smaller dense models ([DeepSeek-AI et al. 2025](/references/#deepseek-r1-2025)) **[E]**. At each arrow, ask what supplied the data, what was rewarded, what was filtered, and on which distribution the result was measured.
+
+The study is evidence that this particular pipeline substantially improved measured mathematics and coding performance and that long verification and self-correction patterns appeared during training. It does **not** establish that longer text is deeper reasoning, that pure RL is the best recipe for every task, or that a distilled student uses the same internal mechanism as its teacher. R1-Zero's poor readability and language mixing also show why a checkable final answer is not the whole specification. The lesson generalizes beyond LLMs: an optimizer reveals both the information in a measurement and every important property that measurement omits.
 
 ## 9.8.5 Outcome reward versus process supervision
 

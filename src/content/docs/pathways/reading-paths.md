@@ -94,5 +94,6 @@ The units teach the mathematics they need where they need it; the [appendices](/
 | **Evaluation first** | 01 → 02 (essentials) → 03 → 04 → 07 → 10 → 12 | Readers who must judge models before building them |
 | **Architecture** | 01 → 02 → 03 → 04 → 05 → 06 → 11 | Readers who build and inspect models |
 | **Generation and control** | 01 → 03 → 05 (§5.2, §5.3.1–§5.3.4, §5.3.9) → 07 → 08 → 09 | Readers heading for generative models and post-training |
+| **Frontier systems for EE** | 04 (§4.8) → 05 (memory limits) → 06 → 09 (§9.8.4–§9.8.5) → 10 | Readers connecting long context, inference, accelerators and evidence |
 
-Every path ends where the book does: with [Unit 12](/core/unit-12/)'s question of how a claim becomes a finding, which no shortcut skips.
+The frontier-systems path is deliberately not an LLM survey. Keep one worksheet with four columns—arithmetic, memory, communication and measurement—and place every new method in the column whose constraint it changes. Every path ends where the book does: with [Unit 12](/core/unit-12/)'s question of how a claim becomes a finding, which no shortcut skips.
