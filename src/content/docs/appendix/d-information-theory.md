@@ -6,6 +6,19 @@ sidebar: { label: "D · Information theory", order: 4 }
 
 The training loss of every language model in this book is a cross-entropy, its excess over the best achievable value is a KL divergence, the anchor that keeps post-training close to a pretrained model is a KL divergence, and the contrastive objective of Unit 07 bounds a mutual information. Unit 01 (§1.3.2, §1.3.8) introduces entropy, cross-entropy and KL for the bigram; this appendix gives the general definitions and the properties the later units use. All logarithms are natural and quantities are in **nats**; divide by $\ln 2$ for bits. Numbers in the examples are checked by `labs/test_appendices.py`.
 
+### First decode the unit: what is a nat?
+
+A **nat** is not a new physical quantity. It is one unit of log-information obtained when the logarithm base is $e$. If a model assigns probability $q$ to what actually happens, its surprise or log-loss is $-\ln q$ nats:
+
+| assigned probability $q$ | loss $-\ln q$ | reading |
+|---:|---:|---|
+| $1$ | $0$ nats | no surprise |
+| $1/2$ | $0.693$ nats | one bit of surprise |
+| $1/10$ | $2.303$ nats | a ten-way uniform guess |
+| $0$ | $+\infty$ | the model declared the event impossible |
+
+The word changes with the logarithm base, not the underlying ranking: natural logs give nats; base-2 logs give bits. Divide nats by $\ln2$ to obtain bits. Averaging $-\ln q$ over outcomes gives cross-entropy; averaging it under the true distribution itself gives entropy. This unit convention is introduced in Unit 01 before the book first uses a measured NLL.
+
 | Section | Used in |
 |---|---|
 | D.1 Entropy, chain rule | 01 (loss floor), 07 (sequence models) |

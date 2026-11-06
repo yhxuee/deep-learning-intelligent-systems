@@ -4,7 +4,32 @@ description: The notation shared by all twelve units, so that a symbol means the
 sidebar: { order: 3 }
 ---
 
-Every unit uses the conventions below. Where a symbol is overloaded by long-standing usage (for example $\beta$), the meaning is stated locally and listed here.
+Notation is compressed language. You are not supposed to recognize every symbol before beginning the book, and this page is a lookup table rather than a prerequisite exam. When an equation feels dense, read it in three passes:
+
+1. **name the objects** — which are scalars, vectors, matrices, probabilities or sets?
+2. **check the shapes and range** — can the stated operations legally fit together, and should the result be a number or an array?
+3. **say the operation in words** — only then substitute numbers or manipulate the algebra.
+
+Every unit uses the conventions below. Where a symbol is overloaded by long-standing usage (for example $\beta$), the meaning is stated locally and listed here. A local definition always wins.
+
+## Decode one equation before using the tables
+
+Consider the per-example loss
+
+$$
+\ell(\theta;x,y)=-\ln p_\theta(y\mid x).
+$$
+
+- $x$ is the input and $y$ is its observed target.
+- $\theta$ denotes all trainable parameters, not a multiplication factor.
+- $p_\theta(y\mid x)$ is one number between 0 and 1: the probability the model assigns to the observed target after seeing $x$.
+- $\ln$ is the natural logarithm. The leading minus sign makes confident correct predictions have small loss and assigns large loss to a target given tiny probability.
+
+For example, probability $0.5$ gives $-\ln 0.5\approx0.693$ **nats**, while probability $0.01$ gives about $4.605$ nats. A nat is the amount produced by using the natural logarithm; it is a unit of log-loss, not a new kind of probability. Changing to logarithm base 2 would express the same information in bits.
+
+## Shapes are part of the meaning
+
+This book does not bold every vector, so dimensions carry important information. If $X\in\mathbb R^{T\times d}$ and $W\in\mathbb R^{d\times m}$, then $XW\in\mathbb R^{T\times m}$: the inner dimensions $d$ agree, and the operation transforms each of the $T$ rows from width $d$ to width $m$. An expression such as $WX$ is generally invalid for those shapes. Writing shapes beside each intermediate is one of the fastest ways to find an error.
 
 ## General
 
@@ -19,6 +44,8 @@ Every unit uses the conventions below. Where a symbol is overloaded by long-stan
 | $\langle u, v\rangle = u^{\top}v$ | inner product | 02 |
 | $\lVert\cdot\rVert$ | Euclidean norm (vectors), spectral norm (matrices) unless stated | 03 |
 | $\ln$ | natural logarithm; all information quantities are in **nats** | 01 |
+
+Indices are labels, not powers: $x_i$ means “the item indexed by $i$,” whereas $x^2$ means $x$ squared. A superscript may also label a layer or dataset when explicitly stated; context and the local definition decide.
 
 ## Data, models and losses
 
@@ -86,3 +113,14 @@ Every unit uses the conventions below. Where a symbol is overloaded by long-stan
 - **★ Advanced** marks proofs and generalizations that can be skipped on a first reading.
 - **[D] / [E] / [O] / [H]** in "Modern developments" label a claim as derived, experimental evidence, engineering observation or open hypothesis.
 - **[AI-off]** marks problems for independent practice and assessment.
+
+## When the same letter means two things
+
+Mathematics reuses a small alphabet. Do not infer meaning from the letter alone. For each equation, make a tiny local legend and check type and shape. In this book in particular:
+
+- $V$ can be the vocabulary size when it is a scalar, or the value matrix in attention when it has rows and columns;
+- $h$ can count attention heads, while $h_t$ is a vector state at time $t$;
+- $\beta$ is an inverse temperature in Unit 04 and a KL coefficient in Unit 09;
+- $L$ usually denotes a loss, but an architecture table may use $L$ for the number of layers when it says so explicitly.
+
+If the local meaning is missing or two shape-consistent readings remain possible, that is a documentation defect rather than something the reader should guess. Record the equation and report it through the [errata page](/start/errata/).

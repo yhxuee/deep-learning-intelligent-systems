@@ -21,7 +21,7 @@ import argparse
 
 import numpy as np
 
-from common import DEFAULT_DATA, load_corpus, nll
+from common import DEFAULT_DATA, load_corpus, load_corpus_three_way, nll
 from stage01_bigram import fit_bigram
 
 
@@ -168,11 +168,15 @@ def main():
     for ch in ["a", "3", "T", "."]:
         if ch in vocab:
             print(f"nearest to {ch!r}: " + ", ".join(f"{c!r} {s:.2f}" for c, s in nearest(p, vocab, ch)))
-    print("count vs neural 4-gram (held-out NLL) as the training text grows:")
+    print("count vs neural 4-gram (untouched test NLL) as the training text grows:")
+    eval_tr, tune, test, eval_vocab = load_corpus_three_way(args.data)
+    assert vocab == eval_vocab and np.array_equal(tr, eval_tr)
     for n in [5000, 20000, 80000, len(tr)]:
-        cnt = min(count_ngram_nll(tr[:n], va, V, 4, a)[0] for a in [0.003, 0.01, 0.03, 0.1, 0.3])
+        alphas = [0.003, 0.01, 0.03, 0.1, 0.3]
+        alpha = min(alphas, key=lambda a: count_ngram_nll(tr[:n], tune, V, 4, a)[0])
+        cnt = count_ngram_nll(tr[:n], test, V, 4, alpha)[0]
         q = train_ngram(tr[:n], V, k=4)
-        print(f"   n={n:7d}  count {cnt:.3f}  neural {ngram_nll(q, va, 4):.3f}")
+        print(f"   n={n:7d}  alpha={alpha:.3f}  count-test {cnt:.3f}  neural-test {ngram_nll(q, test, 4):.3f}")
 
 
 if __name__ == "__main__":

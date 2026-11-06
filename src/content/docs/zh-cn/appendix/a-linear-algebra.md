@@ -6,6 +6,25 @@ sidebar: { label: "A · 线性代数", order: 1 }
 
 本书的每个模型都由矩阵乘积构成，而它的理论大多是谱理论：步长上限是特征值（单元 03），记忆的衰减是谱半径（单元 05），低秩结构是奇异值分解（单元 02 与 04）。本附录收录各单元所用的事实，证明简短且有启发性时附上证明。例题中的数字由 `labs/test_appendices.py` 检查。
 
+### 初学者图像：矩阵是一个动作
+
+不要先把矩阵看成等着操作的数字方框。把它看成移动向量的函数。以
+
+$$
+A=\begin{pmatrix}2&0\\0&\tfrac12\end{pmatrix},
+\qquad x=\begin{pmatrix}1\\2\end{pmatrix},
+\qquad Ax=\begin{pmatrix}2\\1\end{pmatrix}
+$$
+
+为例，$A$ 把第一个坐标放大两倍、第二个缩小一半。线性代数反复追问几个关于这个动作的问题：
+
+- **哪些信息留下来？**秩计算独立输出方向；零空间收集被映射消除的输入。
+- **哪些方向的行为最简单？**特征向量保持方向；奇异向量找出伸缩最大的方向。
+- **反解有多敏感？**条件数描述输入或舍入误差可能被放大多少。
+- **重复应用会怎样？**矩阵幂 $A^t$ 描述深层乘积与递推记忆。
+
+阅读符号时把这幅图像放在旁边。此处定理之所以有用，是因为它精确回答其中一题。
+
 | 小节 | 用于 |
 |---|---|
 | A.1 内积与范数 | 02（相似度、JL 引理）、03（最陡下降）、04（注意力分数） |
@@ -18,7 +37,7 @@ sidebar: { label: "A · 线性代数", order: 1 }
 
 ## A.1 向量、内积与范数
 
-向量是列向量，$x\in\mathbb{R}^n$。**内积（inner product）**为 $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$，**欧几里得范数**为 $\lVert x\rVert = \sqrt{x^{\top}x}$。其他常见范数：$\lVert x\rVert_1 = \sum_i|x_i|$ 与 $\lVert x\rVert_\infty = \max_i|x_i|$。
+向量写成行向量，$x\in\mathbb{R}^n$。向量可以代表一个点、方向、特征列表或隐藏状态；各处背景会说明采用哪种解读。**内积（inner product）**为 $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$，**欧几里得范数**为 $\lVert x\rVert = \sqrt{x^{\top}x}$。其他常见范数：$\lVert x\rVert_1 = \sum_i|x_i|$ 与 $\lVert x\rVert_\infty = \max_i|x_i|$。
 
 **定理 A.1（柯西–施瓦茨，Cauchy–Schwarz）。** $|x^{\top}y|\le\lVert x\rVert\,\lVert y\rVert$，等号成立当且仅当 $x$ 与 $y$ 平行。
 
@@ -93,9 +112,9 @@ $$
 
 *证明概要。* $A^{\top}A$ 是对称半正定的，所以 $A^{\top}A = V\,\mathrm{diag}(\sigma_i^2)\,V^{\top}$，$\sigma_i\ge0$。对 $\sigma_i > 0$，令 $u_i = Av_i/\sigma_i$。它们标准正交：$u_i^{\top}u_j = v_i^{\top}A^{\top}Av_j/(\sigma_i\sigma_j) = \mathbb{1}[i = j]$。把它们扩充成 $\mathbb{R}^m$ 的标准正交基。于是 $AV = U\Sigma$，即 $A = U\Sigma V^{\top}$。$\blacksquare$
 
-从几何上读，每个线性映射都是一次旋转（$V^{\top}$）、一次沿座标轴的伸缩（$\Sigma$），再一次旋转（$U$）。奇异值就是伸缩倍数：$\sigma_1 = \max_{\lVert x\rVert = 1}\lVert Ax\rVert$。
+从几何上读，每个线性映射都是一次旋转（$V^{\top}$）、一次沿坐标轴的伸缩（$\Sigma$），再一次旋转（$U$）。奇异值就是伸缩倍数：$\sigma_1 = \max_{\lVert x\rVert = 1}\lVert Ax\rVert$。
 
-**低秩近似。** 截取最大的 $k$ 项，$A_k = \sum_{i\le k}\sigma_iu_iv_i^{\top}$，在谱范数与 Frobenius 范数下都是最优的秩 $k$ 近似，误差分别为 $\sigma_{k+1}$ 与 $\sqrt{\sum_{i>k}\sigma_i^2}$（Eckart–Young 定理，证明於单元 02，§2.5.5）。
+**低秩近似。** 截取最大的 $k$ 项，$A_k = \sum_{i\le k}\sigma_iu_iv_i^{\top}$，在谱范数与 Frobenius 范数下都是最优的秩 $k$ 近似，误差分别为 $\sigma_{k+1}$ 与 $\sqrt{\sum_{i>k}\sigma_i^2}$（Eckart–Young 定理，证明于单元 02，§2.5.5）。
 
 **伪逆。** $A^{+} = V\Sigma^{+}U^{\top}$，把非零奇异值取倒数。$A^{+}y$ 是 $Ax\approx y$ 的最小范数最小二乘解——在欠定线性问题上，从零出发的梯度下降法正是收敛到它，这是隐式偏差最简单的例子（单元 01，§1.5.4）。
 
@@ -105,7 +124,7 @@ $$
 
 **谱范数** $\lVert A\rVert = \sigma_1$ 是 $A$ 伸长向量的最大倍数；**Frobenius 范数** $\lVert A\rVert_F = \sqrt{\sum_{ij}A_{ij}^2} = \sqrt{\sum_i\sigma_i^2}$ 是各元素的欧几里得范数。两者都满足次乘性：$\lVert AB\rVert\le\lVert A\rVert\,\lVert B\rVert$。这个不等式是所有关于深层乘积之论证的骨干——$L$ 个层雅可比矩阵乘积的范数可能随 $L$ 呈几何增长或缩小（单元 03，§3.7.4）。
 
-可逆矩阵 $A$ 的**条件数（condition number）**为 $\kappa(A) = \sigma_1/\sigma_n$。它量测求解 $Ax = b$ 时相对误差被放大多少：若 $A(x + \delta x) = b + \delta b$，则
+可逆矩阵 $A$ 的**条件数（condition number）**为 $\kappa(A) = \sigma_1/\sigma_n$。它度量求解 $Ax = b$ 时相对误差被放大多少：若 $A(x + \delta x) = b + \delta b$，则
 $$
 \frac{\lVert\delta x\rVert}{\lVert x\rVert}\le\kappa(A)\,\frac{\lVert\delta b\rVert}{\lVert b\rVert},
 $$

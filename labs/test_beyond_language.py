@@ -20,15 +20,18 @@ def accuracy(w, X, y):
 
 def test_point_clouds_need_an_invariant_representation():
     X, y = B.point_clouds(2000, np.random.default_rng(0))
+    Xt, yt = B.point_clouds(5000, np.random.default_rng(100))
     # permuting the points of a cloud does not change its invariant features
     perm = X[:, ::-1]
     assert np.allclose(B.radial_features(X), B.radial_features(perm))
-    F = B.radial_features(X)
-    F = (F - F.mean(0)) / F.std(0)
-    C = X.reshape(len(X), -1)
-    C = (C - C.mean(0)) / C.std(0)
-    assert accuracy(B.logistic_regression(F, y), F, y) > 0.8      # invariant summary: easy
-    assert accuracy(B.logistic_regression(C, y), C, y) < 0.6      # raw coordinates: near chance
+    F, Ft = B.radial_features(X), B.radial_features(Xt)
+    f_mean, f_std = F.mean(0), F.std(0)
+    F, Ft = (F - f_mean) / f_std, (Ft - f_mean) / f_std
+    C, Ct = X.reshape(len(X), -1), Xt.reshape(len(Xt), -1)
+    c_mean, c_std = C.mean(0), C.std(0)
+    C, Ct = (C - c_mean) / c_std, (Ct - c_mean) / c_std
+    assert accuracy(B.logistic_regression(F, y), Ft, yt) > 0.8    # invariant summary generalizes
+    assert accuracy(B.logistic_regression(C, y), Ct, yt) < 0.6    # raw coordinates: near chance
 
 
 def test_sensor_ema_with_kalman_alpha_is_best():

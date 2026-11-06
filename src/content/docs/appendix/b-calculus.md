@@ -6,6 +6,18 @@ sidebar: { label: "B · Calculus", order: 2 }
 
 Unit 03 builds reverse-mode differentiation from scratch; this appendix states the calculus it rests on in one place, and adds the matrix identities that make backpropagation through linear algebra mechanical. Numbers in the examples are checked by `labs/test_appendices.py`.
 
+### The beginner's picture: a derivative is a local prediction
+
+A derivative is not primarily a rule for moving symbols. It is the best linear prediction of how an output changes after a small input change. If $f(3)=9$ and $f'(3)=6$, then
+
+$$
+f(3+h)\approx 9+6h.
+$$
+
+For many inputs, the gradient predicts a scalar change, $\Delta f\approx\nabla f^{\top}\Delta x$; a Jacobian predicts a vector change, $\Delta y\approx J\Delta x$. Backpropagation repeatedly answers one question: **given sensitivity at the output, what sensitivity must be assigned to each input?**
+
+Shapes are the first error detector. If $x\in\mathbb R^n$ and $y=f(x)\in\mathbb R^m$, then $J_f$ is $m\times n$. Write shapes beside every factor before multiplying Jacobians. This habit catches a large fraction of derivation and code mistakes before any algebra is done.
+
 | Section | Used in |
 |---|---|
 | B.1–B.2 Gradients, Jacobians, chain rule | 03 (backpropagation), 04, 05 (BPTT) |

@@ -34,9 +34,9 @@ Write a prediction — a number or a curve shape, with one sentence of reasoning
 
 **Tests:** §3.5.6. **Predict:** how the final loss plateau of constant-step SGD on a least-squares problem changes when (a) the step halves, (b) the batch size quadruples.
 
-**Procedure.** Linear regression with 10 000 examples and 20 features plus label noise. SGD with batch sizes 1, 4, 16, 64 and steps $\eta, \eta/2$; average the plateau loss over the last 1 000 steps and over three seeds. Then try $\eta_k\propto1/k$.
+**Procedure.** Linear regression with 10,000 examples and 20 features plus label noise. Compute the full-batch optimum first. Run SGD with batch sizes 1, 4, 16, 64 and steps $\eta, \eta/2$; average the **excess over the optimum training loss** during the last 1,000 steps and across at least three seeds, with uncertainty bars. Then try $\eta_k\propto1/k$ using the same update budget.
 
-**Look for:** a plateau excess roughly proportional to $\eta/B$; convergence with the decreasing schedule.
+**Look for:** under the independent-batch approximation, plateau excess roughly proportional to $\eta/B$ over the stable range. Treat deviations as data: finite-population sampling, curvature, and transient bias all break the simple scaling. The decreasing schedule should lower late excess while usually slowing early progress.
 
 ## Experiment 3.5 — Finite-difference error
 
@@ -50,9 +50,9 @@ Write a prediction — a number or a curve shape, with one sentence of reasoning
 
 **Tests:** §3.7.4, §3.8.1. **Predict:** the gradient norm at the first layer of a 50-layer, width-256 MLP for sigmoid, tanh and ReLU, each with $\sigma_w^2 \in\{1/n, 2/n\}$.
 
-**Procedure.** Adapt `u03_vanishing_gradients` in `figures/make_figures.py`; then add residual connections $h_\ell = h_{\ell-1} + \varphi(W_\ell h_{\ell-1})$ and repeat.
+**Procedure.** Adapt `u03_vanishing_gradients` in `figures/make_figures.py`. Run at least 10 seeds and plot a median plus an interval. Then compare plain layers with $h_\ell=h_{\ell-1}+\alpha\varphi(W_\ell h_{\ell-1})$ for both $\alpha=1$ and the depth-scaled choice $\alpha=1/\sqrt{50}$.
 
-**Look for:** collapse for sigmoid; nearly constant norms for the matched pairs (tanh with $1/n$, ReLU with $2/n$); geometric decay for ReLU with $1/n$, since each layer halves the signal's second moment (Worked Example 3.9); and much flatter curves with residuals.
+**Look for:** collapse for sigmoid; better scale preservation for the matched pairs; and geometric decay for ReLU with $1/n$ under the independence approximation. Do not assume every residual curve is flatter: an unscaled branch can accumulate or explode. Test whether depth scaling makes the identity contribution dominate more reliably.
 
 ## Experiment 3.7 — Build and check your engine (AI-off)
 

@@ -13,7 +13,7 @@ A textbook that asks readers to verify claims must make its own corrections visi
 | **Executed validation** — the test suite and the build pass in CI | every quoted number is reproduced by code; gradients agree with finite differences; links and citations resolve | that a theorem's hypotheses and quantifiers are right, that a proof is complete, that prose states the scope of a claim correctly |
 | **Scientific editorial review** — a named, dated reading by a subject expert | that statements, proofs and scope are correct | that the code reproduces the numbers |
 
-Neither implies the other. As of v2.2, every unit has executed validation; **no unit has completed scientific editorial review**. The external audit below is a partial review: it read the general-theory pages of all twelve units and selected other sections, and did not check every worked example or problem.
+Neither implies the other. As of v2.3, every unit has executed validation and has received an internal beginner-oriented editorial rewrite; **no unit has completed named scientific editorial review or a learner pilot**. The external audit below is a partial review: it read the general-theory pages of all twelve units and selected other sections, and did not check every worked example or problem.
 
 ## Corrections in v2.1 (audit of 3 November 2026)
 
@@ -61,6 +61,8 @@ Each row records what kind of review a part of the book has had, at which revisi
 | Traditional Chinese edition | the same checks; display mathematics and result numbers compared with English | — | no named translation reviewer yet |
 | Simplified Chinese edition | generated from Traditional Chinese by `scripts/zh_cn.py`; build fails if it is out of date or if a listed Taiwan-usage term survives | — | no named translation reviewer yet |
 | Labs and experiments | `labs/` test suites, including the beyond-language generators (from v2.2) | — | no learner pilot yet |
+
+The v2.3 rewrite changed exposition throughout the Core, appendices and onboarding pages. It was checked for generated-edition consistency, displayed mathematics, numbered-result parity, cited evidence and executable examples; it was not a named external pedagogical review. This distinction prevents an extensive authorial revision from being reported as independent validation.
 
 "None yet" is a statement of fact, not a judgment of quality: executed validation can show that the numbers are reproduced, not that the theorems are stated correctly.
 

@@ -6,6 +6,19 @@ sidebar: { label: "H · Markov decision processes", order: 8 }
 
 Unit 09 treats post-training as reinforcement learning and works mostly with one-step problems, where the answer is a single token. This appendix gives the multi-step theory in general form: the Markov structure, the Bellman equations, why value iteration converges, the policy-gradient theorem with its discount factor in the right place, and the conditions under which a baseline leaves the gradient unbiased. Numbers in the examples are checked by `labs/test_appendices.py` and, for the policy-gradient facts, by `spine/test_spine.py`.
 
+### The beginner's picture: prediction becomes intervention
+
+A Markov chain asks what state comes next under a fixed transition rule. A Markov decision process adds a choice: the action changes both immediate reward and future states. This is why maximizing the next reward can be wrong. An action with reward zero may lead to a state from which many later rewards become available.
+
+Four objects organize the subject:
+
+- **state** contains the information treated as relevant for predicting the future;
+- **policy** chooses a distribution over actions;
+- **value** is expected future return under that policy, not an immediate score;
+- **Bellman equation** expresses a long-horizon value as one step plus the value after that step.
+
+Before applying a formula, draw one transition and label its state, action, reward, next state, and discount. This prevents the most common beginner error: moving the discount factor or expectation to the wrong time index.
+
 | Section | Used in |
 |---|---|
 | H.1 Markov chains | 01 (n-gram models), 07 (sequence models), 08 (ancestral sampling) |

@@ -6,32 +6,58 @@ sidebar: { label: "2.8 Modern developments", order: 8 }
 
 Labels: **[D]** derivation, **[E]** experimental evidence, **[O]** engineering observation, **[H]** open hypothesis.
 
+The basic recipe of this unit—choose symbols, map them to vectors, and train geometry for a task—still underlies modern systems. What changed is the scale and the answer to three questions: what counts as a symbol, whether a vector may depend on context, and whether a model stores one feature per coordinate at all.
+
 ## 2.8.1 What is a symbol? Subword tokenization
 
-**Quantity:** $V$ and the length of a text in symbols.
+**Quantity:** vocabulary size $V$ and sequence length $T$.
 
-The spine model uses characters ($V = 50$). Word-level models face unbounded vocabularies; character-level models face long sequences. Most current language models use **subword** units learned by byte-pair encoding: start from characters and repeatedly merge the most frequent adjacent pair ([Sennrich et al. 2016](/references/#sennrich-2016)) **[O]**. The vocabulary (typically tens of thousands to a few hundred thousand) is a representation decision made *before* learning, and its quirks — numbers split inconsistently, rare words fragmented — propagate into model behaviour **[E]**.
+The spine model makes each character a symbol ($V=50$). A word vocabulary gives shorter sequences, but must somehow handle rare and previously unseen words. A character or byte vocabulary handles every string, but makes $T$ much larger. Because attention and memory costs depend on $T$, this is not merely a preprocessing detail.
+
+Most current language models choose a compromise: **subword tokens**. A common family of algorithms starts from small units—characters, bytes, or an initial alphabet—and repeatedly adds frequent adjacent combinations to the vocabulary; byte-pair encoding is one example ([Sennrich et al. 2016](/references/#sennrich-2016)) **[O]**. After the tokenizer is trained, the language model usually treats its resulting vocabulary as fixed. Increasing $V$ can shorten sequences but enlarges the embedding and output tables; decreasing $V$ does the reverse.
+
+The tokenizer therefore decides which patterns the model receives as single reusable units. Numbers may split differently depending on their digits or leading spaces; related words may share pieces in one language and not another; rare text may require many tokens. Subword tokenization has produced task-level gains on rare-word translation ([Sennrich et al. 2016](/references/#sennrich-2016)) **[E]**, while sequence length and vocabulary size determine the arithmetic and parameter costs derived earlier **[D]**. “What is one symbol?” remains a modeling choice, not a fact supplied by the raw text.
 
 ## 2.8.2 Contextual and joint embeddings
 
-**Quantity:** the input to the read-out.
+**Quantity:** the vector presented to a read-out for a particular item in a particular context.
 
-Static embeddings (§2.7.2) were superseded by representations computed from the whole context by deep networks — every layer of a Transformer produces one (Unit 04) **[E]**. A second shift was to embed *different modalities in one space*: CLIP trains an image encoder and a text encoder so that matching image–caption pairs have high dot product ([Radford et al. 2021](/references/#radford-2021)), making "similar" mean "describes the same thing" across modalities **[E]**. The objective that achieves this — contrastive learning — is derived in Unit 07.
+Modern language models still begin with a static token lookup, but they do not stop there. Each Transformer layer mixes information across positions, producing a new vector for every token occurrence (Unit 04). Thus the two appearances of “bank” begin with the same lookup vector but can acquire different contextual representations; BERT is a concrete trained example ([Devlin et al. 2019](/references/#devlin-2019)) **[E]**. Which layer to read is itself a choice: earlier and later layers need not expose the same information equally well.
+
+A second development aligns *different modalities*. CLIP uses separate image and text encoders and trains matching image–caption pairs to have larger similarity than mismatched pairs ([Radford et al. 2021](/references/#radford-2021)) **[E]**. The shared coordinates need not literally contain a complete, modality-independent description of the world. They only need to retain enough information for the contrastive matching objective. Unit 07 derives that objective and explains the role of negative examples.
 
 ## 2.8.3 The linear representation hypothesis
 
-**Quantity:** the geometry of the space the read-out sees.
+**Quantity:** whether a property can be read or changed along a simple direction in activation space.
 
-Many high-level properties (sentiment, truthfulness, language, tense) appear to be encoded as **directions** in the internal representations of trained language models: a linear probe can read them out, and adding the direction changes behaviour in the predicted way. [Park et al. (2024)](/references/#park-2024) formalize the hypothesis and connect it to the geometry of the unembedding **[D]/[E]**. How far it extends, and whether it is a consequence of training dynamics or of the data, is open **[H]**. Linear probes have a known pitfall — a probe can learn the property itself from a rich representation — which Unit 11 treats with control tasks.
+Suppose hidden state $h$ tends to have a larger dot product $v^\top h$ when a property is present. Then a linear read-out can detect that property using direction $v$. The **linear representation hypothesis** proposes that many useful high-level variables are organized in this way. Results for properties such as language, tense, sentiment, and truth-related behavior provide suggestive examples; [Park et al. (2024)](/references/#park-2024) formalize versions of the hypothesis and connect them to unembedding geometry **[D]/[E]**.
+
+Three claims must remain separate:
+
+1. a linear probe can predict a label from $h$;
+2. direction $v$ corresponds to the model's own representation of that property;
+3. changing $h$ along $v$ causes a specific behavioral change.
+
+The first does not prove the other two: a powerful probe may extract a label the model itself does not use, and an intervention may disturb correlated variables. Control tasks and causal interventions strengthen the evidence but do not make the hypothesis universal (Unit 11). Which properties are linear, in which layers and models, and why training produces them remain open **[H]**.
 
 ## 2.8.4 Superposition and sparse dictionaries
 
-**Quantity:** number of features versus number of dimensions.
+**Quantity:** number of candidate features versus activation dimension $d$.
 
-Following the toy-model evidence for superposition ([Elhage et al. 2022](/references/#elhage-2022)) **[E]**, interpretability research trains sparse autoencoders to decompose a model's activations into many more directions than dimensions, each active rarely; in large language models many of the resulting features are human-interpretable ([Templeton et al. 2024](/references/#templeton-2024)) **[E]**. Whether these dictionaries reveal the model's own units of computation or impose the analyst's is debated **[H]** (Unit 11).
+If an activation has $d$ coordinates, it is tempting to search for exactly $d$ features, one per coordinate. Superposition (§2.7.5) suggests a different picture: the model may use an overcomplete set of directions, with only a small subset active on each input. Toy models demonstrate conditions under which this trade-off emerges ([Elhage et al. 2022](/references/#elhage-2022)) **[E]**.
+
+A **sparse autoencoder** fits an approximate decomposition
+
+$$
+h \approx D z, \qquad z \text{ sparse},
+$$
+
+where the dictionary $D\in\mathbb{R}^{d\times m}$ may have $m\gg d$ columns. The hope is that each rarely active coefficient $z_j$ corresponds to a more coherent feature than a raw neuron. Large-model studies report many dictionary features that humans can describe ([Templeton et al. 2024](/references/#templeton-2024)) **[E]**. But reconstruction error, sparsity, feature splitting, and feature merging all depend on training choices. Whether a learned dictionary recovers the model's causal computational units or merely provides a useful analyst's coordinate system remains open **[H]** (Unit 11).
 
 ## 2.8.5 Do different models learn the same representation?
 
-**Quantity:** similarity between two representations of the same inputs.
+**Quantity:** similarity between two activation matrices computed on the same examples.
 
-Centred kernel alignment and related measures compare representations across networks ([Kornblith et al. 2019](/references/#kornblith-2019)) **[O]**. Networks trained with different seeds, architectures and even modalities produce increasingly similar representational geometries as they grow; [Huh et al. (2024)](/references/#huh-2024) conjecture convergence toward a shared statistical model of the world — the "Platonic representation hypothesis" **[H]**. If true, the distributional hypothesis of §2.2.5 has a strong form: data, not architecture, determines the representation at scale.
+Two networks can encode the same relations in different coordinate systems, so comparing neurons one by one is usually meaningless. **Centred kernel alignment (CKA)** instead compares the pairwise geometry induced by two activation matrices and is invariant to some transformations that preserve that geometry ([Kornblith et al. 2019](/references/#kornblith-2019)) **[D]/[E]**. A high CKA score means agreement under that particular measure on that particular input set; it does not show that the networks implement the same algorithm.
+
+Empirical comparisons have found representational similarities across random seeds, architectures, objectives, and even modalities. [Huh et al. (2024)](/references/#huh-2024) interpret such trends as possible convergence toward a shared statistical model of the world—the **Platonic representation hypothesis** **[E]/[H]**. The strong version, in which scale and data overwhelm architectural differences, is not established. Similarity scores depend on the examples, layers, preprocessing, and metric, and different models can agree on common variation while disagreeing on rare or task-critical structure. For now, convergence is a research program, not a law.

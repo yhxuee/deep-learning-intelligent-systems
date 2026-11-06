@@ -34,4 +34,4 @@ $\mathrm{softmax}(s)_i = e^{s_i}/\sum_j e^{s_j}$ 把实数分数映到概率向�
 - 用 `log(softmax(s))` 而不是 log-softmax：对有把握的预测会下溢成 $-\infty$。
 - 在 softmax *之后*才应用遮罩（权重总和不再为 1）。
 
-以单次扫描线上计算归一化分母的方法 [Milakov & Gimelshein 2018](/zh-cn/references/#milakov-2018)，是考量 IO 的注意力核心的基础。
+以单次扫描线上计算归一化分母的方法 [Milakov & Gimelshein 2018](/zh-cn/references/#milakov-2018)，是面向内存读写优化的注意力内核的基础。

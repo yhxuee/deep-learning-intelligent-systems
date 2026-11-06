@@ -208,7 +208,22 @@ def test_we_2_8_cover_count():
     assert cover(10, 3) == 92
 
 
+@pytest.mark.parametrize("n,eps", [(10, 0.2), (1000, 0.5), (1_000_000, 0.8)])
+def test_unit02_jl_dimension_makes_the_displayed_union_bound_below_one(n, eps):
+    exponent = eps ** 2 / 2 - eps ** 3 / 3
+    d = math.floor(4 * math.log(n) / exponent) + 1
+    pairwise_failure_bound = n * (n - 1) * math.exp(-d * exponent / 2)
+    assert pairwise_failure_bound < 1
+
+
+@pytest.mark.parametrize("p", [1, 2, 3, 8])
+def test_unit02_cover_midpoint_is_half_not_shattering(p):
+    assert cover(p, p) == 2 ** p
+    assert cover(2 * p, p) == 2 ** (2 * p - 1)
+
+
 def test_unit02_problem_answers():
     assert 256 * 32 + 8 * 32 * 512 + 512 + 512 * 256 + 256 == 271_104
-    assert math.ceil(8 * math.log(1e4) / 0.1 ** 2) == 7369
-    assert math.ceil(8 * math.log(1e4) / 0.01 ** 2) == 736_828
+    jl_dimension = lambda eps: math.floor(4 * math.log(1e4) / (eps ** 2 / 2 - eps ** 3 / 3)) + 1
+    assert jl_dimension(0.1) == 7_895
+    assert jl_dimension(0.01) == 741_773

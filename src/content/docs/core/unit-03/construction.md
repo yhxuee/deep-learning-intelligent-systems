@@ -6,7 +6,9 @@ sidebar: { label: "3.3 Construction", order: 3 }
 
 ## 3.3.1 Programs as computation graphs
 
-Any program that computes a loss from parameters performs a sequence of **primitive operations** — additions, multiplications, $\tanh$, $\exp$, matrix products — each producing a new intermediate value from earlier ones. Writing those values down in order gives an **evaluation trace**.
+Any program that computes a loss from parameters performs a sequence of **primitive operations**—additions, multiplications, $\tanh$, $\exp$, matrix products—each producing an intermediate from earlier values. Record the operations actually executed and their values, and you obtain an **evaluation trace**. A loop is unrolled into repeated operations; a branch records the path that was taken. Differentiability at branch boundaries is a separate issue (§3.7.1).
+
+There will be two readings of the same trace. The **forward pass** asks, “what value does this node compute?” The **backward pass** asks, “if this node changed a little, how would the final loss change?” Keeping those questions separate makes the notation below much easier to follow.
 
 Take one neuron with squared-error loss, the running example of this section:
 
@@ -26,13 +28,13 @@ Its trace, with every intermediate named:
 | $d$ | $a - t$ | 0.099668 |
 | $L$ | $\tfrac12 d^2$ | 0.0049669 |
 
-Draw an arrow from each value to every value computed from it. The result is a **directed acyclic graph** (DAG): the **computation graph**. Inputs and parameters are its sources; the loss is its sink. Each arrow $p\to c$ carries a **local derivative** $\partial c/\partial p$ that depends only on the primitive operation and its inputs: for $c = p\cdot q$ it is $q$; for $c = \tanh p$ it is $1-\tanh^2 p$; for $c = \tfrac12p^2$ it is $p$.
+Draw an arrow from each value to every later value that directly uses it. The result is a **directed acyclic graph** (DAG), the **computation graph** for this execution. Inputs and parameters are sources; the scalar loss is the sink. Each edge $p\to c$ carries a **local derivative** $\partial c/\partial p$ determined by one primitive: for $c=pq$ it is $q$ while holding $q$ fixed; for $c=\tanh p$ it is $1-\tanh^2p$; for $c=\tfrac12p^2$ it is $p$.
 
 By the chain rule of §3.2.6, $\partial L/\partial w_1$ is the **sum over all paths** from $w_1$ to $L$ of the **product of local derivatives** along each path. Here there is one path, $w_1\to v_1\to v_3\to z\to a\to d\to L$, with product $x_1\cdot1\cdot1\cdot(1-a^2)\cdot1\cdot d$. In a real network there are astronomically many paths. The two algorithms below organize the sum so that it is never enumerated.
 
 ## 3.3.2 Forward mode: push derivatives along with values
 
-Fix one input direction — say we want derivatives with respect to $w_1$. For every intermediate $v$, define its **tangent** $\dot v = \partial v/\partial w_1$. Seed $\dot w_1 = 1$ and $\dot u = 0$ for every other source. Then, by the chain rule, each value's tangent is computed from its parents' tangents as the value itself is computed:
+Fix one direction in source space—first take the coordinate direction that changes $w_1$ by one and all other sources by zero. For every intermediate $v$, define its **tangent** $\dot v=\partial v/\partial w_1$. Seed $\dot w_1=1$ and $\dot u=0$ for every other source. The chain rule then computes each tangent from its parents' tangents at the same time as the value:
 
 $$
 \dot v_c = \sum_{p\,\in\,\text{parents}(c)} \frac{\partial v_c}{\partial v_p}\;\dot v_p .
@@ -40,17 +42,17 @@ $$
 
 On the trace: $\dot v_1 = x_1\dot w_1 = 1$, $\dot v_2 = 0$, $\dot v_3 = 1$, $\dot z = 1$, $\dot a = (1-a^2)\dot z = 0.990066$, $\dot d = 0.990066$, $\dot L = d\,\dot d = 0.098678$. That is $\partial L/\partial w_1$.
 
-Forward mode is simple and needs no extra memory, but one pass yields derivatives with respect to **one** input direction. To get $\partial L/\partial w_2$ and $\partial L/\partial b$ we would run it again with different seeds: **$n$ passes for $n$ parameters**, no better than finite differences in count (though exact).
+More generally, arbitrary source tangents specify a direction $r$, and one pass computes the Jacobian–vector product $Jr$. Forward mode can stream values and tangents without storing a full reverse tape, but it does carry tangent information. One scalar-direction pass gives one directional derivative. To recover $\partial L/\partial w_2$ and $\partial L/\partial b$ separately, we would repeat with new coordinate seeds: **$n$ passes for all $n$ parameter partials**. That is exact chain-rule differentiation, but its pass count is still poor when a scalar loss depends on many parameters.
 
 ## 3.3.3 Reverse mode: pull derivatives back from the loss
 
-Turn the question around. For every intermediate $v$, define its **adjoint**
+Reverse mode turns the question around. Instead of asking how one source direction changes every later value, ask how the final scalar changes with each intermediate. Define the **adjoint**
 
 $$
 \bar v = \frac{\partial L}{\partial v},
 $$
 
-the sensitivity of the final loss to that intermediate value.
+the sensitivity of the final loss to that intermediate value. The bar does not mean an average; it marks a reverse-mode derivative.
 
 **Derivation of the recursion.** Every path from $v_p$ to $L$ begins with an edge from $v_p$ to one of its children $v_c$. Group the paths by that first edge. The paths starting with $p\to c$ contribute $\frac{\partial v_c}{\partial v_p}$ times the sum over all paths from $v_c$ to $L$, which is $\bar v_c$. Summing over children:
 
@@ -59,7 +61,7 @@ $$
 \qquad\text{with}\qquad \bar L = 1 .
 $$
 
-To evaluate it we need the adjoints of all children before the parent: visit the nodes in **reverse topological order** — from the loss back toward the parameters. When we reach the sources, we have $\bar\theta_j = \partial L/\partial\theta_j$ for **every** parameter at once.
+To evaluate the recursion, all children of a node must contribute before that node sends its adjoint farther back. We therefore visit nodes in **reverse topological order**—from the loss toward the parameters. When we reach the sources, $\bar\theta_j=\partial L/\partial\theta_j$ for every parameter used by this execution. “At once” means one reverse traversal, not one constant-time machine instruction.
 
 **On the trace** (local derivatives use the stored forward values):
 
@@ -94,17 +96,17 @@ Reverse-mode differentiation was developed in numerical analysis — it appears 
 
 ## 3.3.4 What reverse mode costs
 
-**Time.** In the backward pass each recorded operation is visited once, and for each input edge we compute one local derivative and one multiply–add. The local derivative of a primitive costs at most a small constant times the primitive itself (often less: $\tanh'$ reuses the stored $\tanh$). Summing over all operations:
+**Time.** The backward pass visits each recorded operation once. For each input edge it applies a local VJP rule and accumulates a contribution. Under a standard model in which each primitive's derivative rule costs at most a bounded multiple of that primitive (often less—$\tanh'$ reuses the stored output), summing over the trace gives a bound of the form
 
 $$
 \text{cost}(\nabla L) \;\le\; c\cdot\text{cost}(L),
 $$
 
-with a small constant $c$ **that does not depend on the number of parameters $n$**. This is the *cheap gradient principle*; [Griewank & Walther (2008)](/references/#griewank-2008) state and prove explicit bounds under standard operation-count models. It answers the prediction of §3.1: the exact gradient of a scalar loss costs a few forward passes, whether the model has ten parameters or a hundred billion.
+where $\operatorname{cost}(\nabla L)$ includes the forward and reverse work and $c$ does not gain an extra factor of the number of input parameters. This is the **cheap gradient principle**; [Griewank & Walther (2008)](/references/#griewank-2008) give explicit bounds for specified primitive sets and operation-count models. The statement is about a ratio: a larger model has a more expensive forward pass and therefore a more expensive gradient, but reverse mode avoids running a separate forward computation for every parameter.
 
 **Memory.** The price is storage: the forward values needed by the backward pass. For a neural network this is dominated by the activations of every layer for every example in the batch — often the largest memory cost of training. Checkpointing (§3.7.6) trades recomputation for memory.
 
-**Forward versus reverse, in general.** For $f:\mathbb{R}^n\to\mathbb{R}^m$, forward mode gives one column of the Jacobian per pass ($n$ passes for all of it); reverse mode gives one row per pass ($m$ passes). A training loss has $m = 1$, so reverse mode wins by a factor of $n$. For a function with one input and many outputs, forward mode wins. Worked Example 3.8 counts both.
+**Forward versus reverse, in general.** For $f:\mathbb{R}^n\to\mathbb{R}^m$, coordinate-seeded forward mode gives one Jacobian column per pass, while coordinate-seeded reverse mode gives one row per pass. Forming the *entire* Jacobian therefore takes $n$ forward sweeps or $m$ reverse sweeps. A scalar training loss has $m=1$, so reverse mode obtains its full gradient in one sweep; if a function has few inputs and many outputs, forward mode may be preferable. Usually we need only products $Jr$ or $J^\top v$, not the complete Jacobian. Worked Example 3.8 counts the sweeps.
 
 ## 3.3.5 Vectors and matrices: Jacobians and vector–Jacobian products
 
@@ -116,7 +118,7 @@ $$
 \bar x = J^{\top}\bar y .
 $$
 
-This is a **vector–Jacobian product (VJP)**. Reverse mode never forms $J$ (which could be enormous); each operation only needs a rule for computing $J^{\top}\bar y$ efficiently. Four rules cover most of what you will verify in this book.
+This is the column-vector form of a **vector–Jacobian product (VJP)**: the more traditional row notation writes $\bar y^\top J$, whose transpose is $J^\top\bar y$. Reverse mode never needs to form the potentially enormous $J$; each operation supplies a rule that maps the incoming adjoint $\bar y$ to $J^\top\bar y$. Four rules cover most cases verified in this book.
 
 **(a) Linear map.** $y = Wx$ with $W\in\mathbb{R}^{m\times n}$, i.e. $y_i = \sum_jW_{ij}x_j$. Then $\partial y_i/\partial x_j = W_{ij}$ and $\partial y_i/\partial W_{ij} = x_j$ (and $W_{ij}$ affects no other output). Hence
 
@@ -150,9 +152,9 @@ $$
 \boxed{\;\bar s = p - e_y\;}
 $$
 
-where $e_y$ is the one-hot vector of the target. The gradient is "predicted probabilities minus the truth" — bounded, cheap, and numerically benign. (The softmax alone has Jacobian $\mathrm{diag}(p) - pp^{\top}$; Unit 04 needs it for attention.)
+where $e_y$ is the one-hot target. Each score gradient lies in $[-1,1]$, and the components sum to zero because adding a constant to every score leaves softmax unchanged. The compact rule is cheap, but the forward loss must still use a stable log-sum-exp computation—directly evaluating $e^{s_j}$ can overflow. The softmax alone has Jacobian $\mathrm{diag}(p)-pp^\top$; Unit 04 uses its VJP for attention.
 
-**(d) Copy and sum.** If a vector is used in several places (fan-out), its adjoint is the sum of the adjoints of its uses — the accumulation rule again. Conversely, for $y = \sum_ix_i$, every $\bar x_i = \bar y$. The two are transposes of each other: broadcasting in the forward pass becomes summation in the backward pass.
+**(d) Copy, broadcast, and sum.** If a value is copied to several uses (fan-out), its adjoint is the sum of the contributions from those uses. If $y=\sum_i x_i$, then every $\bar x_i=\bar y$. These operations transpose each other: forward broadcasting or reuse becomes backward summation, while forward reduction becomes backward broadcasting. This is the accumulation rule in array form.
 
 ## 3.3.6 Backpropagation through a multilayer network
 
@@ -184,7 +186,7 @@ $$
 g_B = \frac1B\sum_{b=1}^{B}\nabla\ell_{i_b}(\theta).
 $$
 
-**It is unbiased.** Each sampled index is uniform over $\{1,\dots,N\}$, so $\mathbb E[\nabla\ell_{i_b}] = \frac1N\sum_i\nabla\ell_i = \nabla L$, and by linearity $\mathbb E[g_B] = \nabla L$.
+**It is unbiased under the stated sampling scheme.** At a fixed $\theta$, each with-replacement index is uniform on $\{1,\dots,N\}$, so $\mathbb E[\nabla\ell_{i_b}]=N^{-1}\sum_i\nabla\ell_i=\nabla L$ and, by linearity, $\mathbb E[g_B]=\nabla L$. The words “at fixed $\theta$” matter: the parameter changes after an update.
 
 **Its noise shrinks like $1/\sqrt B$.** Let $\Sigma = \mathrm{Cov}(\nabla\ell_i)$ be the covariance of a single sampled gradient. The $B$ samples are independent, and the covariance of an average of $B$ independent copies is $\Sigma/B$:
 
@@ -192,7 +194,9 @@ $$
 \mathrm{Cov}(g_B) = \frac{\Sigma}{B},\qquad \mathbb E\|g_B - \nabla L\|^2 = \frac{\mathrm{tr}\,\Sigma}{B}.
 $$
 
-Quadrupling the batch halves the typical error, at four times the cost. **Stochastic gradient descent** (SGD) replaces $\nabla L$ by $g_B$ in the update. Each step is cheap and noisy; §3.5.6 shows that the noise sets a floor on how close constant-step SGD gets to a minimum and why decreasing step sizes remove it ([Robbins & Monro 1951](/references/#robbins-1951); [Bottou et al. 2018](/references/#bottou-2018)). In practice, data are shuffled once per **epoch** and consumed in order (sampling without replacement), which behaves similarly.
+Quadrupling $B$ halves this root-mean-square sampling error while multiplying the arithmetic work by four; parallel hardware may change wall-clock scaling. **Stochastic gradient descent** (SGD) replaces $\nabla L$ by $g_B$ in the update. Each update is cheaper than a full-data gradient and is noisy. Under the assumptions made explicit in §3.5.6, the convergence bound for a constant step retains a noise term; persistent nonzero noise commonly produces a neighborhood of fluctuation, while a decreasing schedule can drive the bound toward stationarity ([Robbins & Monro 1951](/references/#robbins-1951); [Bottou et al. 2018](/references/#bottou-2018)).
+
+Practical loaders often shuffle once per **epoch** and consume examples without replacement. The complete epoch average is the full gradient at a fixed $\theta$, but successive minibatches within training are dependent and are evaluated at changing parameters. The simple $\Sigma/B$ proof above therefore applies exactly to independent with-replacement sampling, not literally to every data-loader implementation.
 
 ## 3.3.8 Momentum and adaptive step sizes
 
@@ -204,7 +208,7 @@ $$
 v_{k+1} = \beta v_k - \eta\nabla L(\theta_k),\qquad \theta_{k+1} = \theta_k + v_{k+1},\qquad 0\le\beta<1 .
 $$
 
-Unrolling the velocity gives $v_{k+1} = -\eta\sum_{j\le k}\beta^{k-j}\nabla L(\theta_j)$ — an exponentially weighted sum of past gradients, with memory of about $1/(1-\beta)$ steps (the same object as the moving average of Unit 05). Components of the gradient that keep their sign accumulate; components that alternate in sign, as in a zig-zag, cancel. Physically, it is a ball with mass rolling in the loss landscape under friction. On quadratics with condition number $\kappa$, tuned momentum improves the convergence rate from $(\kappa-1)/(\kappa+1)$ to $(\sqrt\kappa - 1)/(\sqrt\kappa+1)$ (§3.5.7) — for $\kappa = 10$, from 0.818 to 0.519 per step.
+Unrolling the velocity (with $v_0=0$) gives $v_{k+1}=-\eta\sum_{j=0}^{k}\beta^{k-j}\nabla L(\theta_j)$, an exponentially weighted sum of past gradients with an effective window of order $1/(1-\beta)$ steps (the same mathematical object as the moving average of Unit 05). Components whose signs persist accumulate; alternating components can cancel. The “heavy ball” name comes from a physical analogy with inertia and friction, but the displayed discrete update is the definition. On positive-definite quadratics with eigenvalues in a known interval, tuned momentum improves the worst-case contraction factor from $(\kappa-1)/(\kappa+1)$ to $(\sqrt\kappa-1)/(\sqrt\kappa+1)$ (§3.5.7)—for $\kappa=10$, from 0.818 to 0.519.
 
 ![Paths of gradient descent and heavy-ball momentum from (1, 1) on the quadratic with curvatures 1 and 10: gradient descent zig-zags across the steep direction; momentum reaches the minimum in fewer steps.](/figures/u03-quadratic-paths.svg)
 
@@ -224,15 +228,21 @@ $$
 
 *Why the bias correction?* With $m_0 = 0$, $m_k = (1-\beta_1)\sum_{j=1}^{k}\beta_1^{k-j}g_j$. If the gradients were constant, $g_j = g$, this sum equals $(1-\beta_1^{k})g$ — too small early on, because the average started at zero. Dividing by $1-\beta_1^k$ removes exactly this bias; the same holds for $v_k$.
 
-*What the update does.* The ratio $\hat m/\sqrt{\hat v}$ is dimensionless: multiplying every gradient by a constant $c>0$ leaves it unchanged (up to $\epsilon$). On the first step, $\hat m_1 = g_1$ and $\hat v_1 = g_1^2$, so every coordinate moves by exactly $\eta\,\mathrm{sign}(g_1)$, whatever the gradient's magnitude (Worked Example 3.7). Adam thus behaves like a per-coordinate, sign-like method whose steps shrink where gradients are noisy (where $|\hat m|\ll\sqrt{\hat v}$).
+*What the update does.* Ignoring $\epsilon$, the ratio $\hat m/\sqrt{\hat v}$ is dimensionless: multiplying every gradient by a constant $c>0$ leaves the ratio unchanged. On the first step, $\hat m_1=g_1$ and $\hat v_1=g_1^2$, so a nonzero coordinate moves by
 
-**AdamW: decoupled weight decay.** A common regularizer adds $\tfrac\lambda2\|\theta\|^2$ to the loss, i.e. $\lambda\theta$ to the gradient. Inside Adam, that term is divided by $\sqrt{\hat v}$, so parameters with large gradients are regularized *less* — not what the penalty intends. AdamW applies the decay directly to the parameters, outside the adaptive scaling ([Loshchilov & Hutter 2019](/references/#loshchilov-2019)):
+$$
+-\eta\frac{g_1}{|g_1|+\epsilon},
+$$
+
+which is approximately $-\eta\operatorname{sign}(g_1)$ only when $|g_1|\gg\epsilon$ (Worked Example 3.7). Across later steps, a consistent gradient can make $|\hat m|$ comparable to $\sqrt{\hat v}$, while sign changes or variability reduce that ratio. This is a useful per-coordinate normalization heuristic, not an exact estimate of inverse curvature and not a universal convergence guarantee.
+
+**AdamW: decoupled weight decay.** Adding $\tfrac\lambda2\|\theta\|^2$ to the loss adds $\lambda\theta$ to the gradient. Adam then mixes that term into both moment estimates and adaptively scales it, so the resulting update is not the simple multiplicative shrinkage produced by weight decay in ordinary SGD. AdamW instead applies shrinkage outside the adaptive gradient transform ([Loshchilov & Hutter 2019](/references/#loshchilov-2019)):
 
 $$
 \theta_k = \theta_{k-1} - \eta\Bigl(\frac{\hat m_k}{\sqrt{\hat v_k}+\epsilon} + \lambda\,\theta_{k-1}\Bigr).
 $$
 
-It is the default optimizer for Transformers and the spine project. The [AdamW Atlas node](/atlas/nodes/opt-adamw/) lists its invariants and common implementation bugs.
+Equivalently, the displayed formula multiplies the previous parameter by $1-\eta\lambda$ and then applies the adaptive update. AdamW is a common Transformer optimizer and is the choice used by the relevant spine stages; that popularity is an engineering convention, not a theorem that it is best for every model. The [AdamW Atlas node](/atlas/nodes/opt-adamw/) lists its invariants and common implementation bugs.
 
 ## 3.3.9 Building the engine
 
@@ -240,7 +250,7 @@ The lab asks you to implement reverse mode for scalars. The design follows direc
 
 - **A node type** (`Value`) stores its number (`data`), its adjoint (`grad`, initialized to 0), references to its parents, and a small function that, given its own adjoint, adds its contributions to its parents' adjoints using rule $\bar p \mathrel{+}= \bar c\,\partial c/\partial p$.
 - **Each operation** (`+`, `*`, `tanh`, …) creates a new node and attaches the right local-derivative function, capturing the values it needs (e.g. $\tanh$ captures its output $t$ and uses $1-t^2$).
-- **`backward()`** builds a topological order of the graph (iteratively — recursive depth-first search overflows the call stack on graphs 10 000 nodes deep), sets the output's adjoint to 1, and calls each node's local function in reverse order.
-- **Zeroing is the caller's job.** Adjoints accumulate across backward passes through different graphs that share leaves; an optimizer loop sets them to zero before each step.
+- **`backward()`** builds a topological order of the reachable graph, sets the output's adjoint to 1, and calls each node's local function in reverse order. The lab requires an iterative traversal because recursive depth-first search can overflow the language call stack on a graph 10,000 nodes deep.
+- **Zeroing is the caller's job in this engine.** Adjoint contributions intentionally accumulate, both within one fan-out graph and across backward calls through graphs that share leaf nodes. An optimizer loop therefore resets parameter adjoints before computing the next update unless accumulation across batches is intended.
 
-The [lab](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/labs/unit-03-autodiff) tests exactly these properties: the worked example's numbers, accumulation under fan-out (`a*a`, `a+a`), agreement with central differences on random expression graphs, linearity, deep graphs, and accumulation across graphs. Once your engine passes them, you have **earned the abstraction**: frameworks such as PyTorch and JAX implement the same algorithm on tensors, with one VJP rule per operation, and from Unit 04 on the spine project uses them.
+The [lab](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/labs/unit-03-autodiff) tests exactly these properties: the worked-example numbers, accumulation under fan-out (`a*a`, `a+a`), agreement with central differences on random expression graphs, linearity, deep graphs, and accumulation across graphs. Passing them validates this bounded scalar implementation. Tensor frameworks such as PyTorch and JAX use the same reverse-mode idea with one VJP rule per primitive, while adding broadcasting, devices, mutation rules, control flow, and many performance optimizations. From Unit 04 onward, the spine project uses those frameworks.

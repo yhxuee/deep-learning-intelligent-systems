@@ -1,6 +1,6 @@
 ---
 title: "Unit 02 · What is representation?"
-description: Why the same data and the same learner can make a problem impossible or trivial depending on how inputs are represented — from XOR and one-hot codes to learned embeddings, sharing, invariance and the geometry of a learned table.
+description: Why the same data and learner can face a hard or easy problem depending on how inputs are represented — from XOR and one-hot codes to learned embeddings, sharing, invariance and the geometry of a learned table.
 sidebar: { label: "2.1 The problem", order: 1 }
 unit:
   number: 2
@@ -19,16 +19,55 @@ unit:
 
 ## 2.1 The problem
 
-[Unit 01](/core/unit-01/) ended with a limitation. A count table treats every symbol as an unrelated index, so it cannot share what it learns about one context with a similar one. Here is what that costs in numbers. Predict the next character of a children's story from the previous **four** characters, after reading only 5 000 characters of training text:
+Before using the technical word *representation*, make it concrete:
 
-- A **count table** over 4-character contexts, smoothed as well as possible, reaches a held-out loss of **1.11 nats per character**. Most of the 6.25 million possible contexts were never seen; for those it can only spread probability uniformly.
-- A **neural 4-gram** — the same four characters, but each first replaced by a learned 16-number vector — reaches **0.98 nats**, with 15 570 parameters.
+> A representation is the collection of numbers used to describe an object to a learner—or to the next layer of a model.
 
-Same data, same context, same loss function. The only difference is *how the four characters are represented* before prediction. With 385 000 training characters the advantage disappears (0.52 vs 0.54): the representation matters most when data are scarce relative to the number of situations the model must cover — which, for any interesting task, is always.
+The object itself does not change. The numbers used to describe it do. A character can be presented as an arbitrary integer ID, a 50-entry one-hot vector, or a learned vector of 16 real numbers. A photograph can be presented as raw pixels or as features that already respond to edges and shapes. Once we choose those numbers, we also choose which relationships are easy for the learner to notice.
 
-An older and starker example has the same shape. Four points in the plane, $(0,0)$ and $(1,1)$ labelled 0, $(0,1)$ and $(1,0)$ labelled 1 — the **XOR** problem. No straight line separates the labels; a linear classifier on the coordinates $(x_1, x_2)$ cannot solve it, however much data it sees. Add a third coordinate $x_1x_2$, and a plane separates them perfectly. Nothing about the learner changed. The problem went from impossible to trivial because the **representation** changed.
+That choice can change a problem in three ways:
 
-This unit asks **why a change of representation changes the difficulty of learning** — and what a *good* representation is. The answer is the hinge of the whole book: deep networks are, above all, machines for *learning* representations, and every architecture in Units 04–05 is a design for what to share and what to ignore.
+1. It can make the desired rule **simple or complicated**. A curved boundary in one coordinate system may become a plane in another.
+2. It can let examples **share evidence**. If two symbols receive nearby vectors, learning from one can affect predictions about the other.
+3. It can preserve useful information or **throw it away**. Discarding a nuisance is helpful; discarding what determines the answer makes the task impossible.
+
+The rest of the unit turns these three sentences into mathematics.
+
+### The spine result, read slowly
+
+[Unit 01](/core/unit-01/) ended with a count table. It treats every context as a separate address: evidence collected at one address does not automatically help a similar address. Consider predicting the next character of a children's story from the preceding **four** characters after reading only 5 000 training characters. Lower test loss is better. Because this loss uses the natural logarithm, its unit is the **nat**: one nat equals $\log_2 e\approx1.44$ bits, and exponentiating an average loss in nats gives perplexity. You need only remember here that a smaller number means more probability assigned to the observed next characters.
+
+- A **count 4-gram**, with its smoothing parameter chosen on validation stories, obtains **1.07 nats per character** on separate test stories. There are $50^4=6.25$ million possible four-character contexts, and most were never observed. Under add-$\alpha$ smoothing, a completely unseen context receives the same probability for all 50 next characters.
+- A **neural 4-gram** uses the same four-character context, but first maps each character to a learned 16-number vector. A shared neural network then uses those vectors to predict the next character. With 15 570 parameters it obtains **0.94 nats per character** on the same test stories.
+
+This is not a magic property of the number 16. The learned coordinates and the shared prediction function allow evidence from many contexts to update common parameters. The data, context length and loss function are held fixed; the representation and the model's pattern of parameter sharing change together. The result therefore demonstrates the value of representation-induced sharing, not an isolated contest between two encodings.
+
+With about 385 000 training characters, the count model has enough direct evidence to catch up and slightly pass the neural model in this run (0.51 versus 0.53 nats). In this comparison, learned sharing helps most when the number of possible situations is large relative to the data available. That sparse-data regime is common, but the crossover depends on the corpus, model, and training procedure.
+
+### A four-point version: XOR
+
+The same idea appears without language modelling. In **XOR** (“exclusive or”), the label is 1 when exactly one of two binary inputs is 1:
+
+| $x_1$ | $x_2$ | label $y$ | added feature $x_1x_2$ |
+|---:|---:|---:|---:|
+| 0 | 0 | 0 | 0 |
+| 0 | 1 | 1 | 0 |
+| 1 | 0 | 1 | 0 |
+| 1 | 1 | 0 | 1 |
+
+In the original $(x_1,x_2)$ plane, no straight line separates the two 1s from the two 0s. Collecting more copies of the same four points cannot repair that mismatch: a linear classifier simply has the wrong shape. Now represent each point by $(x_1,x_2,x_1x_2)$. The score
+
+$$
+x_1+x_2-2x_1x_2
+$$
+
+is 1 for the positive points and 0 for the negative points, so thresholding it at $1/2$ solves XOR with a linear read-out. We did not change the labels or the four cases. We supplied a coordinate in which the desired rule became linear.
+
+Deep learning tries to avoid hand-designing every helpful coordinate. Hidden layers *learn* intermediate representations that make the final prediction easier. This unit therefore asks the question at the hinge of the book:
+
+> **Why does changing a representation change the difficulty of learning, and what makes a representation good for a particular task?**
+
+The phrase “for a particular task” matters. There is no universally best representation. A colour-blind representation may be ideal for recognizing shapes under changing illumination and useless for distinguishing red from green traffic lights.
 
 :::note[Predict before reading on]
 A character-level model learns a 16-dimensional vector for each of the 50 characters, trained only to predict the next character. Which characters do you expect to end up closest to the digit `3`? To the capital `T`? To the vowel `a`? Write your guesses; Worked Example 2.5 shows what the spine model learned.
@@ -41,6 +80,15 @@ A character-level model learns a 16-dimensional vector for each of the 50 charac
 3. **The general theory** (§2.5). Universal approximation and what it does not promise; Cover's counting theorem; random projections and the Johnson–Lindenstrauss lemma; group averaging and equivariant maps; embeddings as implicit matrix factorization.
 4. **What it leaves open** (§2.7). A learned representation has no closed-form fit. Its parameters must be found by gradient-based search — the subject of [Unit 03](/core/unit-03/).
 
+By the end, you should be able to separate four claims that are often blurred together:
+
+- **encoding:** how an object is turned into numbers;
+- **capacity:** which functions the model can express from those numbers;
+- **inductive bias:** which of those functions the model tends to find from limited data;
+- **information preservation:** whether two inputs that need different answers remain distinguishable.
+
+This vocabulary prevents a common mistake: saying “the representation learned the task” when the evidence only shows that the complete model predicted well.
+
 ## Prerequisites
 
 - **From Unit 01:** log-loss, maximum likelihood, the bigram model, held-out evaluation.
@@ -49,7 +97,13 @@ A character-level model learns a 16-dimensional vector for each of the 50 charac
 
 ## How to read this unit
 
-The main text is complete without an AI tutor. Worked-example numbers are recomputed by `labs/test_worked_examples_u01_u02.py` and by the spine tests (CI). Results that come from training a model (Worked Examples 2.4–2.6) are quoted to two decimals, because the last digit depends on the floating-point library. Sections marked **★ Advanced** can be skipped on a first reading.
+Do not try to absorb every theorem on the first pass. Use three passes:
+
+1. **Build the picture:** read §2.2 and Worked Examples 2.1–2.3. Be able to explain XOR, one-hot vectors and embeddings without formulas.
+2. **Connect picture to algebra:** read §2.3 through the lookup gradient and factorized bigram, then reproduce one derivation by hand.
+3. **Add scope and limits:** read §2.5–2.8 and ask of every method: what becomes easy, what is shared, and what information could be lost?
+
+If matrix rank or the singular value decomposition is new, continue anyway when it first appears: the required statement is supplied locally, and the rank-$d$ argument is marked as a second-pass topic. The main text is complete without an AI tutor. Worked-example numbers are recomputed by `labs/test_worked_examples_u01_u02.py` and by the spine tests (CI). Results that come from training a model (Worked Examples 2.4–2.6) are quoted to two decimals because the last digit depends on the floating-point library. Sections marked **★ Advanced** can be skipped on a first reading.
 
 | Section | Content | Approx. reading time |
 |---|---|---|
@@ -60,5 +114,5 @@ The main text is complete without an AI tutor. Worked-example numbers are recomp
 | [2.6 Connections](/core/unit-02/connections/) | linguistics, retrieval, kernels, signal processing | 30 min |
 | [2.7 Limitations and counterexamples](/core/unit-02/limitations/) | lost information, bias, polysemy, fragile geometry | 40 min |
 | [2.8 Modern developments](/core/unit-02/modern/) | contextual and joint embeddings, linear representations, superposition | 35 min |
-| [2.9 Experiments](/core/unit-02/experiments/) | six experiments | lab time |
+| [2.9 Experiments](/core/unit-02/experiments/) | seven experiments | lab time |
 | [2.10 Problems and further study](/core/unit-02/problems/) | graded problems and reading | — |

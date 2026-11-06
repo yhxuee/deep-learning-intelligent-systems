@@ -10,6 +10,7 @@ SPINE = pathlib.Path(__file__).resolve().parent.parent / "spine"
 sys.path.insert(0, str(SPINE))
 import model as M  # noqa: E402
 import stage06_scaling as S6  # noqa: E402
+import stage08_sampling as S8  # noqa: E402
 
 A100_FLOPS, A100_BW, A100_W = 312e12, 2.039e12, 400.0
 
@@ -101,3 +102,110 @@ def test_unit07_problem_answers():
         assert 1 - (1 - J ** 5) ** 20 == pytest.approx(P, abs=5e-4)
     assert (1 / 20) ** (1 / 5) == pytest.approx(0.549, abs=5e-4)
     assert math.log(4096) - 2.0 == pytest.approx(6.32, abs=5e-3)
+
+
+# ----------------------------------------------------------------------------- Unit 08
+def test_we_8_1_inverse_cdf_boundaries():
+    P = np.array([[0.5, 0.3, 0.15, 0.05]])
+
+    class FixedRNG:
+        def __init__(self, u):
+            self.u = u
+
+        def random(self, shape):
+            return np.full(shape, self.u)
+
+    expected = [(0.10, 0), (0.50, 0), (0.55, 1), (0.81, 2), (0.97, 3)]
+    for u, symbol in expected:
+        assert S8.draw(P, FixedRNG(u)).item() == symbol
+
+
+def test_we_8_2_and_8_3_temperature_entropy_and_nucleus():
+    p = np.array([0.5, 0.3, 0.15, 0.05])
+    expected = {
+        0.5: ([0.685, 0.247, 0.062, 0.007], 0.810),
+        1.0: ([0.500, 0.300, 0.150, 0.050], 1.142),
+        2.0: ([0.379, 0.294, 0.208, 0.120], 1.308),
+    }
+    for tau, (want_p, want_h) in expected.items():
+        p_tau = p ** (1 / tau)
+        p_tau /= p_tau.sum()
+        assert p_tau == pytest.approx(want_p, abs=5e-4)
+        assert -(p_tau * np.log(p_tau)).sum() == pytest.approx(want_h, abs=5e-4)
+
+    mask_09 = S8.nucleus_mask(p[None], 0.9)[0]
+    q_09 = np.where(mask_09, p, 0)
+    q_09 /= q_09.sum()
+    assert mask_09.tolist() == [True, True, True, False]
+    assert q_09 == pytest.approx([0.526, 0.316, 0.158, 0], abs=5e-4)
+
+    mask_06 = S8.nucleus_mask(p[None], 0.6)[0]
+    q_06 = np.where(mask_06, p, 0)
+    q_06 /= q_06.sum()
+    assert mask_06.tolist() == [True, True, False, False]
+    assert q_06 == pytest.approx([0.625, 0.375, 0, 0], abs=5e-4)
+
+
+def test_we_8_5_change_of_variables():
+    phi = lambda z: math.exp(-z * z / 2) / math.sqrt(2 * math.pi)  # noqa: E731
+    assert 0.5 * phi(0) == pytest.approx(0.1995, abs=5e-5)
+    assert 0.5 * phi(1) == pytest.approx(0.1210, abs=5e-5)
+
+
+def test_we_8_6_exact_gaussian_velocity_at_one_point():
+    velocity = S8.gaussian_velocity(np.array([1.0, -2.0]), 0.5)
+    got = velocity(np.zeros((1, 2)), np.array([0.5]))[0]
+    assert got == pytest.approx([1.6, -3.2])
+
+
+def test_we_8_7_euler_step_count_and_spread():
+    rng = np.random.default_rng(0)
+    x0 = rng.standard_normal((20_000, 2))
+    velocity = S8.gaussian_velocity(np.array([1.0, -2.0]), 0.5)
+    expected_std = {1: 0.00, 2: 0.20, 5: 0.37, 20: 0.47, 200: 0.50}
+    for steps, want in expected_std.items():
+        x = S8.integrate(velocity, x0, steps)
+        assert x.mean(0) == pytest.approx([1.0, -2.0], abs=0.003)
+        assert x.std(0).mean() == pytest.approx(want, abs=0.005)
+
+    midpoint_expected = {1: 0.40, 2: 0.495, 5: 0.500}
+    for steps, want in midpoint_expected.items():
+        x = S8.integrate_midpoint(velocity, x0, steps)
+        assert x.mean(0) == pytest.approx([1.0, -2.0], abs=0.003)
+        assert x.std(0).mean() == pytest.approx(want, abs=0.005)
+
+
+def test_we_8_8_flow_matching_ring():
+    field, history = S8.fm_train(steps=3000, seed=0)
+    assert history[:100].mean() == pytest.approx(5.272, abs=5e-4)
+    assert history[-100:].mean() == pytest.approx(3.807, abs=5e-4)
+
+    # The command-line demo has already drawn 810 random values for its three
+    # stochastic text samplers before drawing these 2-D initial conditions.
+    rng = np.random.default_rng(0)
+    rng.random(810)
+    x0 = rng.standard_normal((2000, 2))
+    samples = S8.integrate(lambda x, t: S8.mlp(field, x, t)[0], x0)
+    near, modes = S8.mode_coverage(samples)
+    assert near == pytest.approx(0.96, abs=0.005)
+    assert modes == 8
+
+
+def test_unit08_problem_answers():
+    p = np.array([0.4, 0.3, 0.2, 0.1])
+    expected = {
+        0.5: ([0.5333, 0.3000, 0.1333, 0.0333], 1.0785),
+        2.0: ([0.3254, 0.2818, 0.2301, 0.1627], 1.3558),
+    }
+    for tau, (want_p, want_h) in expected.items():
+        q = p ** (1 / tau)
+        q /= q.sum()
+        assert q == pytest.approx(want_p, abs=5e-5)
+        assert -(q * np.log(q)).sum() == pytest.approx(want_h, abs=5e-5)
+
+    velocity = S8.gaussian_velocity(np.array([1.0, -2.0]), 0.5)
+    x0 = np.array([[2.0, -3.0]])
+    assert S8.integrate(velocity, x0, n_steps=2)[0] == pytest.approx(
+        np.array([1.0, -2.0]) + 0.2 * x0[0]
+    )
+    assert 0.4 * 0.99 > 0.6 * 0.6  # Problem 8.15: global path can beat greedy.

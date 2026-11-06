@@ -5,11 +5,11 @@ template: splash
 hero:
   tagline: 一本能獨立教會你的深度學習教科書——主題較少，但每個都完整推導；AI 只是學習夥伴；一個小型語言模型貫穿全部十二個單元；外加一層驗證工具，讓你能檢查 AI 說的話。
   actions:
-    - text: 從核心教材開始
-      link: core/
-      icon: right-arrow
-    - text: 如何搭配 AI 學習
+    - text: 第一次學深度學習？從這裡開始
       link: start/how-to-study/
+      icon: right-arrow
+    - text: 探索核心教材
+      link: core/
       icon: open-book
       variant: minimal
 ---
@@ -44,6 +44,8 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## 下一步
 
+如果負對數概似（negative log-likelihood）、nat 或梯度（gradient）還很陌生，請先從[最初 90 分鐘](/zh-tw/start/how-to-study/#最初-90-分鐘)開始，而不是先跑一場漫長的先備知識馬拉松。單元 01 從計數引入機率與對數損失；數學工具真正需要時，再查附錄即可。你可以先理解為什麼需要一個方法，再逐步理解它的一般符號。
+
 <CardGrid>
   <LinkCard title="教育理念" href="start/philosophy/" description="為什麼「涵蓋一切」是錯誤目標，而「在範例上做深」才是對的。" />
   <LinkCard title="本書的論證" href="core/" description="十二個單元，一個論證：每個答案都暴露出成為下一個問題的限制——而單元 12 回到單元 01。" />
@@ -55,4 +57,4 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
   <LinkCard title="中英術語對照表" href="start/glossary/" description="本書關鍵術語的臺灣學術用語、英文原文，以及常見的中國大陸用法。" />
 </CardGrid>
 
-<small>狀態：v2.2。十二個單元皆已依十部分章節結構完成英文、繁體中文與簡體中文（由繁體中文版產生）的完整初稿，另有八篇數學附錄，並串成一個論證，等待學科與教學審查；見[審查紀錄](/zh-tw/start/errata/#審查紀錄)。本書的設計是不靠 AI 也能完整學習，AI 導師只負責輔助。內容 © 貢獻者，採 CC BY 4.0 授權；程式碼採 MIT 授權。</small>
+<small>狀態：v2.3。十二個單元與八篇數學附錄已在英文與繁體中文版完成面向初學者的編輯改寫；簡體中文版由繁體中文版產生。它們仍是完整初稿，等待具名的學科審查、翻譯審查與學習者試行；見[審查紀錄](/zh-tw/start/errata/#審查紀錄)。本書的設計是不靠 AI 也能完整學習，AI 導師只負責輔助。內容 © 貢獻者，採 CC BY 4.0 授權；程式碼採 MIT 授權。</small>

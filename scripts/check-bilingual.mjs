@@ -47,7 +47,10 @@ const LABELS = [
 ];
 function labels(src) {
   const set = new Set();
-  const text = body(src).replace(/\]\([^)]*\)/g, ']');
+  // Label words occur in visible prose, not in route slugs. Avoid a broad
+  // Markdown-link regex here: URLs may contain parentheses, and `[^)]*` can
+  // otherwise consume later prose across line breaks and hide real labels.
+  const text = body(src);
   for (const [re, k] of LABELS) for (const m of text.matchAll(re)) set.add(`${k}${m[m.length - 1]}`);
   // headings of numbered items, e.g. "**11.3 ★" in problem lists
   for (const m of text.matchAll(/^\*\*(\d+\.\d+|[A-H]\.\d+) /gm)) set.add(`Q${m[1]}`);

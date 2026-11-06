@@ -43,6 +43,7 @@ quality: { en: "quality", zh: "品質", area: general, cn: "質量" }
 file: { en: "file", zh: "檔案", area: general, cn: "文件" }
 parallel: { en: "parallel (computation)", zh: "平行", area: general, cn: "並行" }
 bit: { en: "bit", zh: "位元", area: general, cn: "比特" }
+nat: { en: "nat (natural unit of information)", zh: "nat（自然資訊單位）", area: statistics, cn: "nat（自然信息单位）", note: "以自然對數計算的資訊量或對數損失單位；1 nat 約等於 1.443 位元。" }
 project: { en: "project", zh: "專案", area: general, cn: "項目" }
 benchmark: { en: "benchmark", zh: "基準測試", area: general }
 memory-hw: { en: "memory (hardware)", zh: "記憶體", area: systems, cn: "內存 / 顯存", note: "模型的 memory（記憶）與硬體的記憶體要區分。" }

@@ -1,55 +1,122 @@
 ---
 title: "6.9 Experiments"
-description: Six experiments — the FLOP counter, a roofline on your own machine, decoding with and without a cache, a pre-registered scaling-law fit, the compute-optimal trade-off at toy scale, and recomputation.
+description: Six reproducible investigations of FLOP accounting, the roofline, KV caching, scaling-law prediction, compute-optimal allocation, and activation recomputation—with controls and failure interpretations.
 sidebar: { label: "6.9 Experiments", order: 9 }
 ---
 
-Write the prediction before running. Code: [`spine/model.py`](https://github.com/yhxuee/deep-learning-intelligent-systems/tree/main/spine) (FLOP counter `mm`), `spine/stage05_kv_cache.py`, `spine/stage06_scaling.py`.
+These are investigations, not demonstrations with guaranteed endings. Before each run, copy the small table below into your notes. A result that contradicts your prediction is useful if the measurement is valid.
 
-## Experiment 6.1 — Counting every FLOP
+| Field | Write before running |
+|---|---|
+| hypothesis | one sentence that could be wrong |
+| independent variable | the quantity you deliberately change |
+| controls | what must remain identical |
+| metric | units, aggregation and uncertainty |
+| failure criterion | what result would reject the hypothesis |
 
-**Tests:** Proposition 6.1, Worked Example 6.1. **Predict:** the counted FLOPs of one `loss_and_grads` call for $V = 13$, $d = 16$, $L = 3$, $T = 10$, $B = 4$.
+Run commands from the repository root. The relevant code is `spine/model.py`, `spine/stage05_kv_cache.py` and `spine/stage06_scaling.py`. Save the command, machine information, random seed and raw rows; a plot without provenance is not a result.
 
-**Procedure.** Reset `model.FLOPS["count"]`, run one call, compare with $BT(6N_{\text{mm}} + 12LTd)$. Then remove the first layer's input-gradient product (it is not needed if the embedding is frozen) and predict the new count before measuring.
+## Experiment 6.1 — Make the FLOP formula executable
 
-**Look for:** exact equality (the spine test asserts it); the change when the embedding is frozen equals $2BTd\cdot d$ per removed product — derive which products disappear.
+**Question.** Does the implementation perform exactly the matrix products counted in Proposition 6.1?
 
-## Experiment 6.2 — A roofline on your machine
+Use $V=13$, $d=16$, $L=3$, $T=10$ and $B=4$. First calculate on paper:
 
-**Tests:** §6.2.5, §6.3.3. **Predict:** the size $n$ at which square matrix products on your CPU stop getting faster per FLOP.
+$$
+N_{\text{mm}}=12Ld^2+Vd=9{,}424,
+$$
 
-**Procedure.** Time `A @ B` for $n\times n$ float32 matrices, $n$ from 16 to 4 096, and plot achieved GFLOP/s against arithmetic intensity $n/6$ (float32: 4 bytes). Measure memory bandwidth by timing a large array copy. Then time one spine training step and compute its utilization from Proposition 6.1.
+$$
+F_{\text{step}}=BT(6N_{\text{mm}}+12LTd)=2{,}492{,}160.
+$$
 
-**Look for:** a rising region (memory-bound) and a plateau (compute-bound) with the knee near peak FLOP/s divided by bandwidth; the spine step far below the plateau, because its products are small and its many elementwise operations are memory-bound.
+Then reset `model.FLOPS["count"]`, call `loss_and_grads` once, and compare the integer counter with your prediction. Change only $T$ to 5, 10, 20 and record the count divided by $BT$.
 
-## Experiment 6.3 — Decoding: recompute versus cache
+**Control.** Keep $V,d,L,B$ and all architecture switches fixed. The counter includes only calls through `mm`; it is not a hardware performance counter.
 
-**Tests:** §6.3.4, Unit 04 §4.3.10. **Predict:** the ratio of per-token time with and without the KV cache after 8, 32 and 120 tokens.
+**Interpretation.** Exact equality verifies an implementation invariant: the declared matrix products match the derivation. It does not say that softmax, normalization, indexing or Python cost zero machine instructions. Plotting FLOPs/token against $T$ should give a line with intercept $6N_{\text{mm}}$ and slope $12Ld$. A mismatch means either the code path or the algebra changed; inspect the individual `mm` shapes before changing the formula.
 
-**Procedure.** `python stage05_kv_cache.py` reports times for a short generation; extend it to measure per-token time as a function of position, and the cache size against `kv_cache_bytes`.
+## Experiment 6.2 — Draw a roofline from your own machine
 
-**Look for:** recomputation cost growing with position, cached cost nearly flat; cache bytes equal to the formula exactly.
+**Question.** At what arithmetic intensity does matrix multiplication change from bandwidth-sensitive to compute-sensitive on this machine?
 
-## Experiment 6.4 — A pre-registered scaling fit
+1. Create float32 matrices and time `A @ B` for $n=16,32,\ldots,4096$. Warm up each size, run at least five timed repeats, and keep the median.
+2. Compute achieved rate as $2n^3/t$ FLOP/s. Under the idealized “read $A$ and $B$ once, write $C$ once” traffic, intensity is
+   $$I_{\min}=\frac{2n^3}{3(4n^2)}=\frac{n}{6}\ \text{FLOPs/byte}.$$
+3. Estimate large-array copy bandwidth using arrays bigger than the last-level cache. Count both the bytes read and written, and report that convention.
+4. Plot achieved GFLOP/s against $I_{\min}$. Mark the measured bandwidth line $P=\beta I$ and the observed large-matrix plateau.
+5. Time a spine training step. Divide Proposition 6.1's count by wall time, then by the **measured plateau**, not a marketing peak, to obtain a local utilization ratio.
 
-**Tests:** §6.5.2, Worked Example 6.6. **Predict:** before running, write the held-out NLL you expect for width 48 *after* seeing the five smaller widths' results but *before* training it — or let the script do it: it saves the fit and the prediction to `checkpoints/stage06_prediction.json` before training the sixth model.
+**Controls and traps.** Record dtype, array layout, BLAS library and thread count. Close other heavy work. Small matrices are dominated by launch and interpreter overhead; copies may be served by cache; thermal throttling makes later trials slower. $I_{\min}$ is an optimistic traffic model, not measured bytes.
 
-**Procedure.** `python stage06_scaling.py` (about ten minutes on a laptop). Repeat with three seeds; then with half the token budget.
+**Interpretation.** You may see a rising region and a plateau, but a laptop CPU is not obliged to draw a clean textbook roofline. The experiment succeeds if your axes and units let you explain deviations rather than erase them.
 
-**Look for:** whether the prediction falls inside the seed-to-seed spread; how the fitted exponent and floor change with the budget — and what that says about which resource limited the small models.
+## Experiment 6.3 — What the KV cache saves—and what it does not
 
-## Experiment 6.5 — The compute-optimal trade-off at toy scale
+**Question.** How do recomputing the whole prefix and caching keys/values scale with context position?
 
-**Tests:** Proposition 6.2. **Predict:** for a fixed budget of $2\times10^{12}$ training FLOPs, which of widths 16, 24, 32, 48 reaches the lowest held-out NLL when each is trained for as many tokens as the budget allows.
+First run `python spine/stage05_kv_cache.py`. Before trusting timing, verify the correctness control already encoded in `spine/test_model.py`: at every position, cached logits agree with a full recomputation within tolerance.
 
-**Procedure.** For each width, compute tokens $= C/(6N_{\text{mm}} + 12LTd)$ from Proposition 6.1, convert to steps, train, evaluate. Plot loss against width at fixed compute.
+Next construct the same random model and fixed batch for context lengths that fit its `max_len`, for example 8, 16, 32, 64 and 120. For each length, warm up both paths and report the median of at least ten runs. Record:
 
-**Look for:** a U-shape — too small a model saturates, too large a model sees too few tokens; locate its minimum and compare with Proposition 6.2 using constants fitted in Experiment 6.4.
+- milliseconds for the next token with full-prefix recomputation;
+- milliseconds for one cached decoding step;
+- cache bytes from `cache.nbytes()` and from $2BLtd\,b$, where $b=8$ for the spine model's default float64 arrays;
+- the speed-up ratio, with confidence intervals or at least min–max spread.
 
-## Experiment 6.6 — Trading FLOPs for memory
+**Prediction.** Full recomputation repeats all earlier weight products and attention work. Cached decoding reuses earlier $K,V$, but its new query still attends to all $t$ cached positions; therefore cached time may grow with $t$. It should grow more slowly—not remain flat by mathematical necessity.
 
-**Tests:** §6.3.2. **Predict:** peak activation memory and step time for a 6-layer spine model with and without recomputing each block's activations in the backward pass.
+**Failure interpretation.** At this tiny NumPy scale, concatenation, allocation and interpreter overhead can make caching slower. That does not refute the arithmetic saving; it shows that saved FLOPs were not the measured bottleneck. Report both the exact-logit control and the timing result.
 
-**Procedure.** Implement block-level recomputation in a copy of `model.py` (keep only each block's input in the forward pass; recompute the block before its backward). Measure memory with `tracemalloc` and time with `time.perf_counter`; verify gradients are unchanged to $10^{-12}$.
+## Experiment 6.4 — Make a scaling law predict before it explains
 
-**Look for:** activation memory falling by about the number of cached tensors per block; time rising by roughly one extra forward pass.
+**Question.** Can a fit to five smaller widths predict an unseen sixth width?
+
+Run:
+
+```bash
+python spine/stage06_scaling.py --seed 0
+```
+
+The script trains widths 8, 12, 16, 24 and 32 at the same token budget, fits $L(N)=E+AN^{-\alpha}$, and writes the width-48 prediction to `checkpoints/stage06_prediction.json` **before** training width 48. Preserve that file before another run overwrites it.
+
+Repeat with `--seed 1` and `--seed 2`; then repeat the three seeds with `--steps 1000`. Do not refit after seeing width 48 and call the result a prediction. For each condition, record the predicted NLL, observed NLL, signed error, seed spread and fitted $(E,A,\alpha)$.
+
+**Controls.** Keep corpus split, tokenizer, optimizer schedule, context length and evaluation windows fixed. “Same steps” here means the same number of training tokens, not the same FLOPs: wider models consume more compute.
+
+**Interpretation.** Ask whether errors are comparable to seed variation and whether halving the token budget changes the fitted exponent or floor. With only five noisy points, parameter estimates may be unstable even when interpolation looks smooth. A miss is evidence about this fit and range, not evidence that no scaling relation exists.
+
+## Experiment 6.5 — Allocate a fixed compute budget
+
+**Question.** At fixed arithmetic, is it better to train a smaller model on more tokens or a larger model on fewer?
+
+Choose widths such as 8, 12, 16, 24, 32 and 48, with fixed $L,T,B$. For each width, compute its per-token matrix-product count
+
+$$
+c(d)=6N_{\text{mm}}(d)+12LTd,
+$$
+
+then assign $D(d)=\lfloor C/c(d)\rfloor$ training tokens and convert to whole steps $\lfloor D/(BT)\rfloor$. Pick $C$ so every model receives enough steps to learn and the full sweep is affordable; write $C$ before inspecting losses. Report the unused remainder caused by rounding.
+
+Train at least three seeds, plot held-out NLL against width with error bars, and compare the empirical minimum with Proposition 6.2 using constants fitted independently in Experiment 6.4.
+
+**Do not promise a U-shape.** The toy sweep may be monotone or noisy because the candidate widths miss the optimum, the fitted separable law is poor, or small models are optimization-limited. The conclusion is conditional: “among these widths, under this corpus, schedule and budget…”. If one width receives only a handful of steps, enlarge $C$ rather than interpreting an untrained model as a scaling law.
+
+## Experiment 6.6 — Buy memory with recomputation
+
+**Question.** How many activation bytes can be saved by discarding block internals, and how much extra time buys that saving?
+
+Make a separate experimental copy of the training path. In the baseline, retain every array required by `backward`. In the recomputation version, retain each block's input and any irreducible boundary state, discard its internal attention/MLP arrays, and rerun that block's forward computation immediately before its backward computation.
+
+Use the same 6-layer parameters and batch for both paths. Check the loss and every parameter gradient against the baseline before timing; report maximum absolute and relative error. Then:
+
+1. sum `nbytes` of the retained activation arrays using one documented no-double-counting rule;
+2. optionally measure process peak resident memory, noting that a Python allocator may retain freed buffers;
+3. warm up and report median step time over repeated alternating trials;
+4. count the extra `mm` FLOPs rather than assuming the time ratio.
+
+**Prediction.** Retained activation bytes should fall, while FLOPs and usually wall time rise. The exact ratios depend on which boundaries are kept and whether allocation or memory traffic dominates. If gradients change materially, you have changed the computation—not implemented checkpointing. If explicit saved bytes fall but process RSS does not, distinguish live tensors from allocator-reserved memory.
+
+## What to hand in
+
+For each experiment, submit the preregistered prediction, exact command and seed, raw table, one plot where useful, a correctness control, and a five-sentence interpretation that includes at least one alternative explanation. The goal is not six pretty curves; it is six auditable arguments from measurements.

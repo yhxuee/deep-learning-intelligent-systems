@@ -1,181 +1,427 @@
 ---
 title: "3.5 General theory: why gradient descent converges, and how fast"
-description: Taylor expansion and the Hessian; smoothness and the descent lemma; convergence to stationary points; exact analysis on quadratics and the condition number; strong convexity; stochastic gradients and the noise floor; momentum and preconditioning.
+description: Taylor expansion and the Hessian; smoothness and the descent lemma; approximate stationarity; exact analysis on quadratics and the condition number; strong convexity; stochastic gradients and noise; momentum, preconditioning and reverse-mode cost.
 sidebar: { label: "3.5 General theory", order: 5 }
 ---
 
-Section 3.2 analysed one parabola. This section proves what can be said about gradient descent in general — and, just as important, what cannot. All proofs use only Taylor's theorem, the Cauchy–Schwarz inequality and linear algebra. Standard references for this material are [Nocedal & Wright 2006](/references/#nocedal-2006), [Boyd & Vandenberghe 2004](/references/#boyd-2004), [Nesterov 2018](/references/#nesterov-2018) and, for the stochastic case, [Bottou, Curtis & Nocedal 2018](/references/#bottou-2018).
+Section 3.2 followed gradient descent on one parabola. We now ask a harder question: which parts of that behavior survive for a general multivariable loss?
+
+The argument has three layers. First, smoothness turns one local gradient step into an inequality. Second, summing that inequality over time gives a convergence bound. Third, additional structure—such as a positive-definite quadratic or strong convexity—upgrades a weak guarantee into a geometric rate. Keep the quantifiers in view: a result about the best iterate, an average over random runs, and every iterate are three different claims.
+
+The proofs use Taylor's theorem, the Cauchy–Schwarz inequality, expectation, and linear algebra. Standard references are [Nocedal & Wright (2006)](/references/#nocedal-2006), [Boyd & Vandenberghe (2004)](/references/#boyd-2004), [Nesterov (2018)](/references/#nesterov-2018), and, for stochastic optimization, [Bottou, Curtis & Nocedal (2018)](/references/#bottou-2018).
 
 ## 3.5.1 The second-order picture: the Hessian
 
-For a twice-differentiable $L$, Taylor's theorem extends the local linear model of §3.2.4 with a quadratic term:
+The gradient records the local slope. Differentiating the gradient once more gives the **Hessian**:
 
 $$
-L(\theta + \delta) = L(\theta) + \nabla L(\theta)^{\top}\delta + \tfrac12\,\delta^{\top}H(\theta)\,\delta + o(\|\delta\|^2),
-\qquad H_{ij} = \frac{\partial^2L}{\partial\theta_i\,\partial\theta_j}.
+H_{ij}(\theta)=\frac{\partial^2L}{\partial\theta_i\,\partial\theta_j}.
 $$
 
-The **Hessian** $H$ is symmetric, so by the spectral theorem it has real eigenvalues $\lambda_1,\dots,\lambda_n$ and an orthonormal basis of eigenvectors $q_1,\dots,q_n$: $H = Q\Lambda Q^{\top}$. In the direction $q_i$ the loss curves like the parabola $\tfrac12\lambda_i t^2$. Positive eigenvalues are bowl-shaped directions, negative ones are hill-shaped (a saddle if both occur), and the *spread* of the eigenvalues — not their size alone — will turn out to control the speed of gradient descent.
+For a twice-differentiable loss, Taylor's theorem extends the local linear model of §3.2.4:
+
+$$
+L(\theta+\delta)
+=L(\theta)+\nabla L(\theta)^\top\delta
++\tfrac12\delta^\top H(\theta)\delta
++o(\|\delta\|^2).
+$$
+
+Read the terms in order: current value, first-order change, quadratic curvature, and a remainder that becomes negligible relative to $\|\delta\|^2$ as $\delta\to0$. This is a **local** description; it does not say that one Hessian represents the loss far away from $\theta$.
+
+When the mixed partials are continuous, $H$ is symmetric. The spectral theorem then gives real eigenvalues $\lambda_i$ and an orthonormal eigenbasis $q_i$:
+
+$$
+H=Q\Lambda Q^\top,\qquad
+\delta=\sum_i a_iq_i,\qquad
+\delta^\top H\delta=\sum_i\lambda_i a_i^2.
+$$
+
+The last equality is the useful one. In eigen-coordinates, the quadratic term has no cross-terms: direction $q_i$ curves like $\tfrac12\lambda_i t^2$. Positive $\lambda_i$ means upward curvature and negative $\lambda_i$ means downward curvature. If the gradient is also zero, having both signs identifies a saddle; an indefinite Hessian at a nonstationary point describes curvature but does not by itself classify the point.
+
+Two summaries of the spectrum will play different roles. The largest absolute curvature limits a safe step size. For a positive-definite quadratic, the ratio between the largest and smallest curvatures controls the best worst-case rate after the step size is tuned.
 
 ## 3.5.2 Smoothness and the descent lemma
 
-**Definition.** $L$ is **$\beta$-smooth** if its gradient is $\beta$-Lipschitz: $\|\nabla L(x) - \nabla L(y)\| \le \beta\|x - y\|$ for all $x, y$. For twice-differentiable $L$ this is equivalent to all Hessian eigenvalues lying in $[-\beta, \beta]$ everywhere. Smoothness bounds how fast the slope can change, i.e. how wrong the linear model can be.
-
-**Lemma 3.1 (descent lemma).** If $L$ is $\beta$-smooth, then for all $x, y$
+**Definition.** $L$ is **$\beta$-smooth** on a convex region if its gradient is $\beta$-Lipschitz there:
 
 $$
-L(y) \le L(x) + \nabla L(x)^{\top}(y - x) + \frac\beta2\|y - x\|^2 .
+\|\nabla L(x)-\nabla L(y)\|\le\beta\|x-y\|.
 $$
 
-*Proof.* By the fundamental theorem of calculus along the segment $x + s(y-x)$, $s\in[0,1]$:
+Smoothness does not mean that the loss is convex. It says that the slope cannot change arbitrarily fast. If $L$ is twice continuously differentiable, the condition is equivalent to $\|H(x)\|_2\le\beta$ throughout the region, or equivalently that every Hessian eigenvalue lies in $[-\beta,\beta]$.
+
+**Lemma 3.1 (descent lemma).** If $L$ is $\beta$-smooth on a convex region containing the segment from $x$ to $y$, then
 
 $$
-L(y) - L(x) - \nabla L(x)^{\top}(y-x) = \int_0^1\bigl(\nabla L(x + s(y-x)) - \nabla L(x)\bigr)^{\top}(y-x)\,ds .
+L(y)\le L(x)+\nabla L(x)^\top(y-x)+\frac{\beta}{2}\|y-x\|^2.
 $$
 
-By Cauchy–Schwarz and smoothness, the integrand is at most $\beta s\|y-x\|\cdot\|y-x\|$. Integrating $\beta s$ from 0 to 1 gives $\beta/2$. $\blacksquare$
+The right side is the linear prediction plus a quadratic allowance for how much the gradient may change.
 
-**Corollary (one step of gradient descent).** Put $y = x - \eta\nabla L(x)$:
+*Proof.* Let $d=y-x$ and move along the line $\gamma(s)=x+sd$, $0\le s\le1$. The fundamental theorem of calculus gives
 
 $$
-L\bigl(x - \eta\nabla L(x)\bigr) \le L(x) - \eta\Bigl(1 - \frac{\beta\eta}{2}\Bigr)\|\nabla L(x)\|^2 .
+L(y)-L(x)=\int_0^1\nabla L(x+sd)^\top d\,ds.
 $$
 
-Every step with $0 < \eta < 2/\beta$ decreases the loss (unless the gradient is zero). The guaranteed decrease is largest at $\eta = 1/\beta$, where it equals $\|\nabla L\|^2/(2\beta)$. This is the multivariate, worst-case version of the parabola result $\eta < 2/a$.
+Subtract the constant linear prediction $\nabla L(x)^\top d$:
+
+$$
+L(y)-L(x)-\nabla L(x)^\top d
+=\int_0^1\bigl(\nabla L(x+sd)-\nabla L(x)\bigr)^\top d\,ds.
+$$
+
+Cauchy–Schwarz bounds the integrand by the product of two norms. Smoothness then bounds the first norm by $\beta s\|d\|$, so
+
+$$
+\bigl(\nabla L(x+sd)-\nabla L(x)\bigr)^\top d
+\le\beta s\|d\|^2.
+$$
+
+Integrating $s$ from 0 to 1 produces the factor $1/2$. $\blacksquare$
+
+**Corollary (one exact gradient step).** Substitute $y=x-\eta\nabla L(x)$:
+
+$$
+L\bigl(x-\eta\nabla L(x)\bigr)
+\le L(x)-\eta\left(1-\frac{\beta\eta}{2}\right)\|\nabla L(x)\|^2.
+$$
+
+If $\nabla L(x)\ne0$, every step with $0<\eta<2/\beta$ is therefore guaranteed to decrease the loss. The decrease guaranteed by this bound is largest at $\eta=1/\beta$, where it is $\|\nabla L(x)\|^2/(2\beta)$. This is the multivariable worst-case counterpart of the parabola condition $\eta<2/a$.
 
 :::note[Claim check]
-- **Claim.** Every gradient-descent step with $0 < \eta < 2/\beta$ decreases the loss.
-- **Assumptions.** $L$ is $\beta$-smooth along the whole path, the gradient is exact (full batch), and $\beta$ is known.
-- **Test.** On a quadratic with known largest eigenvalue, run step sizes just below and just above $2/\lambda_{\max}$ (Experiment 3.1).
-- **Limitation.** ReLU networks are not smooth everywhere (§3.7.1), minibatch gradients add noise (§3.5.6), and curvature changes during training, so the bound guides the choice of rate rather than setting it (§3.7.8).
+- **Claim.** An exact gradient step with $0<\eta<2/\beta$ decreases the loss.
+- **Assumptions.** The line segment traversed by the step lies in a region where $L$ is $\beta$-smooth; the gradient is exact; and the stated $\beta$ is a valid upper bound.
+- **Test.** For a quadratic with known $\lambda_{\max}$, compare steps just below and just above $2/\lambda_{\max}$ (Experiment 3.1).
+- **Limitation.** ReLU networks are not differentiable everywhere (§3.7.1), minibatches replace the exact gradient by a random estimate (§3.5.6), and curvature changes during training. The bound is a guide, not an automatic learning-rate setting (§3.7.8).
 :::
-
 
 ## 3.5.3 What is guaranteed without convexity
 
-Neural-network losses are not convex. What can still be proved?
+Neural-network losses are generally nonconvex. Smoothness alone cannot promise a global minimum, but it can promise that gradient descent finds an iterate with a small gradient.
 
-**Theorem 3.1 (convergence to stationary points).** Let $L$ be $\beta$-smooth and bounded below by $L^*$. Gradient descent with $\eta = 1/\beta$ satisfies
+**Theorem 3.1 (an approximate-stationarity bound).** Let $L$ be $\beta$-smooth and bounded below by a number $L^*$. With $\eta=1/\beta$,
 
 $$
-\min_{0\le k<K}\|\nabla L(\theta_k)\|^2 \;\le\; \frac{2\beta\,\bigl(L(\theta_0) - L^*\bigr)}{K}.
+\min_{0\le k<K}\|\nabla L(\theta_k)\|^2
+\le\frac{2\beta\bigl(L(\theta_0)-L^*\bigr)}{K}.
 $$
 
-*Proof.* By the corollary, $\|\nabla L(\theta_k)\|^2 \le 2\beta\bigl(L(\theta_k) - L(\theta_{k+1})\bigr)$. Summing over $k = 0,\dots,K-1$, the right-hand side telescopes to $2\beta\bigl(L(\theta_0) - L(\theta_K)\bigr) \le 2\beta\bigl(L(\theta_0) - L^*\bigr)$. The minimum of $K$ numbers is at most their average. $\blacksquare$
+*Proof.* The corollary with $\eta=1/\beta$ gives
 
-**What it says.** After $K$ steps some iterate has gradient norm at most $O(1/\sqrt K)$, with a constant that does not depend on the number of parameters. **What it does not say.** A small gradient means an approximately *stationary* point — which could be a minimum, a saddle, or a flat plateau. Nothing here says the minimum is global, or that it generalizes. For non-convex losses these are genuinely open matters, studied empirically and with special-case theory (§3.7.2).
+$$
+\|\nabla L(\theta_k)\|^2
+\le2\beta\bigl(L(\theta_k)-L(\theta_{k+1})\bigr).
+$$
+
+Sum this inequality for $k=0,\ldots,K-1$. Every intermediate loss appears once with a plus sign and once with a minus sign:
+
+$$
+\sum_{k=0}^{K-1}\|\nabla L(\theta_k)\|^2
+\le2\beta\bigl(L(\theta_0)-L(\theta_K)\bigr)
+\le2\beta\bigl(L(\theta_0)-L^*\bigr).
+$$
+
+Divide by $K$. The smallest of $K$ nonnegative numbers cannot exceed their average. $\blacksquare$
+
+The squared gradient of the **best iterate among the first $K$** is $O(1/K)$, so its gradient norm is $O(1/\sqrt K)$. The displayed formula has no explicit parameter count, but its constants $\beta$ and $L(\theta_0)-L^*$ may themselves change with model size.
+
+This theorem is deliberately weaker than “the iterates converge.” It identifies at least one approximately stationary iterate; it does not say that the last iterate is the one, that the sequence has a limit, or that a small-gradient point is a minimum. A stationary point may be a local minimum, a saddle, or a flat plateau, and none of these statements establishes generalization.
 
 ## 3.5.4 Quadratics exactly: the condition number
 
-Near a minimum $\theta^*$ with positive-definite Hessian, the loss is approximately quadratic. So the behaviour of gradient descent on
+To obtain an exact rate, specialize to a positive-definite quadratic:
 
 $$
-L(\theta) = \tfrac12(\theta - \theta^*)^{\top}H(\theta - \theta^*),\qquad 0<\lambda_{\min}\le\lambda_i\le\lambda_{\max},
+L(\theta)
+=\tfrac12(\theta-\theta^*)^\top H(\theta-\theta^*),
+\qquad
+0<\lambda_{\min}\le\lambda_i\le\lambda_{\max}.
 $$
 
-describes its *local* behaviour on any smooth loss. Here everything can be computed exactly.
+This model is exact for a quadratic and is the first local approximation near a smooth minimum with positive-definite Hessian. It need not describe a long trajectory when the Hessian changes substantially.
 
-The gradient is $H(\theta - \theta^*)$, so the error $e_k = \theta_k - \theta^*$ obeys $e_{k+1} = (I - \eta H)e_k$. Expand the error in the eigenbasis, $e_k = \sum_ic_{k,i}q_i$. Because $Hq_i = \lambda_iq_i$,
-
-$$
-c_{k+1,i} = (1-\eta\lambda_i)\,c_{k,i}\qquad\Longrightarrow\qquad c_{k,i} = (1-\eta\lambda_i)^k\,c_{0,i}.
-$$
-
-Each eigendirection is an independent copy of the parabola of §3.2.3. Therefore:
-
-1. **Stability:** convergence from every start iff $|1 - \eta\lambda_i| < 1$ for all $i$, i.e. $\boxed{\eta < 2/\lambda_{\max}}$.
-2. **Rate:** the error shrinks like $r(\eta)^k$ with $r(\eta) = \max\bigl(|1-\eta\lambda_{\min}|,\ |1-\eta\lambda_{\max}|\bigr)$.
-3. **Best fixed step:** $r(\eta)$ is minimized where the two terms are equal, $1 - \eta\lambda_{\min} = \eta\lambda_{\max} - 1$, i.e.
+Let $e_k=\theta_k-\theta^*$. Since $\nabla L(\theta_k)=He_k$,
 
 $$
-\eta^* = \frac{2}{\lambda_{\min}+\lambda_{\max}},\qquad r^* = \frac{\lambda_{\max}-\lambda_{\min}}{\lambda_{\max}+\lambda_{\min}} = \frac{\kappa-1}{\kappa+1},\qquad \kappa = \frac{\lambda_{\max}}{\lambda_{\min}} .
+e_{k+1}=(I-\eta H)e_k.
 $$
 
-The **condition number** $\kappa$ alone determines the best achievable rate. To shrink the error by a factor $\varepsilon$ takes $k = \ln(1/\varepsilon)/(-\ln r^*)$ steps; since $-\ln\frac{\kappa-1}{\kappa+1}\approx\frac2\kappa$ for large $\kappa$,
+Expand $e_k=\sum_i c_{k,i}q_i$ in the Hessian eigenbasis. Each direction evolves independently:
 
 $$
-k \approx \frac\kappa2\,\ln\frac1\varepsilon .
+c_{k+1,i}=(1-\eta\lambda_i)c_{k,i},
+\qquad
+c_{k,i}=(1-\eta\lambda_i)^kc_{0,i}.
 $$
 
-**Iterations grow linearly with the condition number.** A loss whose curvatures range over a factor of $10^4$ needs thousands of times more steps than a well-conditioned one, whatever the step size. Making $\kappa$ small — by initialization, normalization, preconditioning or architecture — is therefore one of the main goals of practical optimization (§3.8).
+The matrix problem has become one copy of the one-dimensional parabola for every eigenvalue. Three facts follow.
+
+1. **Stability from every start.** All components converge to zero if and only if
+
+   $$
+   0<\eta<\frac{2}{\lambda_{\max}}.
+   $$
+
+2. **Worst-case parameter contraction.** In the Euclidean norm,
+
+   $$
+   \|e_k\|\le r(\eta)^k\|e_0\|,
+   \qquad
+   r(\eta)=\max_i|1-\eta\lambda_i|.
+   $$
+
+   If only the interval $[\lambda_{\min},\lambda_{\max}]$ is known, the worst case occurs at an endpoint.
+
+3. **Best constant step in that minimax sense.** Balance the two endpoint magnitudes:
+
+   $$
+   1-\eta\lambda_{\min}
+   =\eta\lambda_{\max}-1.
+   $$
+
+   This gives
+
+   $$
+   \eta^*=\frac{2}{\lambda_{\min}+\lambda_{\max}},
+   \qquad
+   r^*=\frac{\lambda_{\max}-\lambda_{\min}}
+   {\lambda_{\max}+\lambda_{\min}}
+   =\frac{\kappa-1}{\kappa+1},
+   \qquad
+   \kappa=\frac{\lambda_{\max}}{\lambda_{\min}}.
+   $$
+
+The **condition number** $\kappa$ controls this best worst-case fixed-step rate. Multiplying $H$ by a constant changes the appropriate learning rate but leaves $\kappa$ and the tuned contraction factor unchanged. To reduce the worst-case parameter error by a factor $\varepsilon$ requires
+
+$$
+k=\frac{\ln(1/\varepsilon)}{-\ln r^*}.
+$$
+
+For large $\kappa$,
+
+$$
+-\ln\frac{\kappa-1}{\kappa+1}\approx\frac{2}{\kappa},
+\qquad
+k\approx\frac{\kappa}{2}\ln\frac1\varepsilon.
+$$
+
+Thus the worst-case iteration count grows linearly with $\kappa$. This does **not** mean every initialization takes that long: if $e_0$ has no component in the slow eigendirections, the observed rate can be faster. It says that no constant step can improve the guarantee over all starting errors for a spectrum spanning that interval. Initialization, normalization, preconditioning, and architecture all try, in different ways, to make the effective problem better conditioned.
 
 ## 3.5.5 Strong convexity and linear convergence
 
-**Definition.** $L$ is **$\mu$-strongly convex** ($\mu > 0$) if $L(y)\ge L(x) + \nabla L(x)^{\top}(y-x) + \frac\mu2\|y-x\|^2$ for all $x, y$ — a quadratic lower bound, the mirror image of Lemma 3.1. For twice-differentiable $L$ it means all Hessian eigenvalues are at least $\mu$.
+Quadratics are special, but their geometric rate extends to a broader class.
 
-**The Polyak–Łojasiewicz inequality.** Minimize both sides of the definition over $y$. The left side's minimum is $L^*$; the right side is a quadratic in $y$ minimized at $y = x - \nabla L(x)/\mu$ with value $L(x) - \frac{1}{2\mu}\|\nabla L(x)\|^2$. Hence
-
-$$
-\tfrac12\|\nabla L(x)\|^2 \;\ge\; \mu\bigl(L(x) - L^*\bigr):
-$$
-
-*far from the optimum in value means a large gradient.*
-
-**Theorem 3.2 (linear convergence).** If $L$ is $\beta$-smooth and $\mu$-strongly convex, gradient descent with $\eta = 1/\beta$ satisfies
+**Definition.** $L$ is **$\mu$-strongly convex** for $\mu>0$ if
 
 $$
-L(\theta_{k+1}) - L^* \;\le\; \Bigl(1 - \frac{\mu}{\beta}\Bigr)\bigl(L(\theta_k) - L^*\bigr).
+L(y)\ge L(x)+\nabla L(x)^\top(y-x)+\frac{\mu}{2}\|y-x\|^2
 $$
 
-*Proof.* The corollary of Lemma 3.1 gives $L(\theta_{k+1}) \le L(\theta_k) - \frac1{2\beta}\|\nabla L(\theta_k)\|^2$, and the PL inequality bounds $\|\nabla L\|^2 \ge 2\mu(L(\theta_k) - L^*)$. Subtract $L^*$ from both sides. $\blacksquare$
+for every $x,y$ in its domain. This is a quadratic lower model, the mirror image of the descent lemma's upper model. For twice-differentiable $L$, it means $H(x)\succeq\mu I$ everywhere.
 
-The ratio $\beta/\mu$ is the condition number again; the theorem is the general-function counterpart of §3.5.4. The proof only used the PL inequality, so the same linear rate holds for any smooth function satisfying it — including some non-convex ones.
+Assume a minimizer exists and write its value as $L^*$. Strong convexity implies the **Polyak–Łojasiewicz (PL) inequality**. Minimize the quadratic lower model over $y$; its minimizer is $y=x-\nabla L(x)/\mu$, and its minimum value is $L(x)-\|\nabla L(x)\|^2/(2\mu)$. Since the true minimum cannot lie below this global lower model,
+
+$$
+\frac12\|\nabla L(x)\|^2
+\ge\mu\bigl(L(x)-L^*\bigr).
+$$
+
+In plain language: under this structure, being far above the optimum in value forces a large gradient. This implication is exactly what was missing in the nonconvex theorem.
+
+**Theorem 3.2 (linear convergence in objective value).** If $L$ is $\beta$-smooth and $\mu$-strongly convex, gradient descent with $\eta=1/\beta$ satisfies
+
+$$
+L(\theta_{k+1})-L^*
+\le\left(1-\frac{\mu}{\beta}\right)
+\bigl(L(\theta_k)-L^*\bigr).
+$$
+
+*Proof.* The descent lemma gives
+
+$$
+L(\theta_{k+1})
+\le L(\theta_k)-\frac{1}{2\beta}\|\nabla L(\theta_k)\|^2.
+$$
+
+Use the PL inequality to replace the squared gradient by at least $2\mu(L(\theta_k)-L^*)$, then subtract $L^*$. $\blacksquare$
+
+Iterating the bound yields
+
+$$
+L(\theta_k)-L^*
+\le\left(1-\frac{\mu}{\beta}\right)^k
+\bigl(L(\theta_0)-L^*\bigr).
+$$
+
+Here “linear convergence” means geometric decay, not a straight line. The ratio $\beta/\mu$ is again a condition number. Notice that the proof used smoothness plus the PL inequality, not convexity directly; consequently, the same objective-value rate holds for smooth nonconvex functions that satisfy PL, even though strong convexity is one sufficient way to obtain it.
 
 ## 3.5.6 Stochastic gradients: progress plus noise
 
-Replace $\nabla L$ by an unbiased estimate $g$ with $\mathbb E[g] = \nabla L(\theta)$ and $\mathbb E\|g - \nabla L(\theta)\|^2 \le \sigma^2$ (for minibatches, $\sigma^2 = \mathrm{tr}\,\Sigma/B$, §3.3.7).
-
-**Lemma 3.2 (expected one-step progress).** For $\beta$-smooth $L$ and the step $\theta' = \theta - \eta g$,
+Now replace the exact gradient by a random estimate $g_k$. Conditioned on the current iterate $\theta_k$, assume
 
 $$
-\mathbb E\bigl[L(\theta')\bigr] \;\le\; L(\theta) - \eta\Bigl(1 - \frac{\beta\eta}{2}\Bigr)\|\nabla L(\theta)\|^2 + \frac{\beta\eta^2}{2}\,\sigma^2 .
+\mathbb E_k[g_k]=\nabla L(\theta_k),
+\qquad
+\mathbb E_k\|g_k-\nabla L(\theta_k)\|^2\le\sigma^2.
 $$
 
-*Proof.* Lemma 3.1 with $y - x = -\eta g$ gives $L(\theta') \le L(\theta) - \eta\nabla L^{\top}g + \frac{\beta\eta^2}{2}\|g\|^2$. Take expectations: $\mathbb E[\nabla L^{\top}g] = \|\nabla L\|^2$ by unbiasedness, and $\mathbb E\|g\|^2 = \|\nabla L\|^2 + \mathbb E\|g - \nabla L\|^2 \le \|\nabla L\|^2 + \sigma^2$ (the cross term has zero mean). Collect terms. $\blacksquare$
+The subscript reminds us that the expectation is over the fresh sampling randomness while $\theta_k$ is held fixed. For an independent, with-replacement batch of size $B$ whose per-example gradient covariance is $\Sigma(\theta_k)$, the variance term is $\operatorname{tr}\Sigma(\theta_k)/B$. Sampling without replacement adds a finite-population correction, and correlated examples need not obey the simple $1/B$ law.
 
-The first term is the deterministic progress of §3.5.2; the second is a **cost of noise**, proportional to $\eta^2\sigma^2$. Summing over $K$ steps with $\eta\le1/\beta$ (so that $1 - \beta\eta/2 \ge \tfrac12$) and telescoping as in Theorem 3.1:
+**Lemma 3.2 (expected one-step progress).** For a $\beta$-smooth loss and $\theta_{k+1}=\theta_k-\eta g_k$,
 
 $$
-\frac1K\sum_{k<K}\mathbb E\|\nabla L(\theta_k)\|^2 \;\le\; \frac{2\bigl(L(\theta_0) - L^*\bigr)}{\eta K} + \beta\eta\,\sigma^2 .
+\mathbb E_k[L(\theta_{k+1})]
+\le L(\theta_k)
+-\eta\left(1-\frac{\beta\eta}{2}\right)
+\|\nabla L(\theta_k)\|^2
++\frac{\beta\eta^2}{2}\sigma^2.
 $$
 
-Read the two terms:
+*Proof.* Apply the descent lemma with $y-x=-\eta g_k$:
 
-- **With a constant step, SGD has a noise floor** $\beta\eta\sigma^2$: it does not converge to a stationary point but hovers in a region whose size grows with the step and the gradient noise.
-- **Shrinking the step lowers the floor but slows progress.** Schedules with $\eta_k\to0$, $\sum_k\eta_k = \infty$ and $\sum_k\eta_k^2<\infty$ (e.g. $\eta_k\propto1/k$) drive both terms to zero — the classical conditions of [Robbins & Monro (1951)](/references/#robbins-1951).
-- **Batch size and step size trade off.** Since $\sigma^2\propto1/B$, the floor scales like $\eta/B$. Keeping $\eta/B$ fixed keeps the floor fixed, the theoretical motivation for scaling the learning rate with the batch size (§3.8.4).
+$$
+L(\theta_{k+1})
+\le L(\theta_k)-\eta\nabla L(\theta_k)^\top g_k
++\frac{\beta\eta^2}{2}\|g_k\|^2.
+$$
+
+Unbiasedness gives $\mathbb E_k[\nabla L^\top g_k]=\|\nabla L\|^2$. Expanding $g_k=\nabla L+(g_k-\nabla L)$ gives
+
+$$
+\mathbb E_k\|g_k\|^2
+=\|\nabla L\|^2
++\mathbb E_k\|g_k-\nabla L\|^2
+\le\|\nabla L\|^2+\sigma^2,
+$$
+
+because the cross-term has conditional mean zero. Substitute and collect terms. $\blacksquare$
+
+For a constant $\eta\le1/\beta$, take total expectations, sum for $K$ steps, telescope the losses, and use the lower bound $L^*$:
+
+$$
+\frac1K\sum_{k=0}^{K-1}
+\mathbb E\|\nabla L(\theta_k)\|^2
+\le
+\frac{2\bigl(L(\theta_0)-L^*\bigr)}{\eta K}
++\beta\eta\sigma^2.
+$$
+
+The first term shrinks with more steps. The second does not. This bound therefore leaves an asymptotic **noise term** of order $\eta\sigma^2$ in the average squared gradient. With persistent nonzero noise, constant-step SGD commonly fluctuates around a solution rather than settling exactly on it.
+
+Do not reverse that statement into a universal impossibility theorem. The inequality is an upper bound, not proof that every run attains the floor; if gradient noise vanishes near the optimum, a constant-step method may still converge exactly.
+
+For decreasing steps $\eta_k\le1/\beta$, the same proof gives the weighted bound
+
+$$
+\frac{\sum_{k<K}\eta_k\,
+\mathbb E\|\nabla L(\theta_k)\|^2}
+{\sum_{k<K}\eta_k}
+\le
+\frac{
+2\bigl(L(\theta_0)-L^*\bigr)
++\beta\sigma^2\sum_{k<K}\eta_k^2}
+{\sum_{k<K}\eta_k}.
+$$
+
+The classical Robbins–Monro conditions
+
+$$
+\eta_k\to0,\qquad
+\sum_k\eta_k=\infty,\qquad
+\sum_k\eta_k^2<\infty
+$$
+
+make the right side tend to zero under the stated uniform variance bound; $\eta_k\propto1/k$ is the standard example. Stronger claims about the iterates themselves require additional assumptions.
+
+Finally, if the independent-batch approximation $\sigma^2\propto1/B$ is valid, the constant-step noise term scales like $\eta/B$. This motivates increasing $\eta$ with $B$, but it does not guarantee that linear scaling will remain stable: curvature still limits $\eta$, and the variance model eventually ceases to be the whole story (§3.8.4).
 
 ## 3.5.7 ★ Momentum on quadratics
 
-Apply the heavy-ball update of §3.3.8 to the quadratic of §3.5.4. In each eigendirection the coefficient obeys a two-term recurrence,
+Apply the heavy-ball update of §3.3.8 to the positive-definite quadratic of §3.5.4. In an eigendirection with curvature $\lambda$, the error coefficient follows
 
 $$
-c_{k+1} = (1 + \beta - \eta\lambda)\,c_k - \beta\,c_{k-1},
+c_{k+1}=(1+\beta-\eta\lambda)c_k-\beta c_{k-1}.
 $$
 
-whose solutions are combinations of $r^k$ for the roots of $r^2 - (1+\beta-\eta\lambda)r + \beta = 0$. If the roots are complex, their product is $\beta$ and they have equal modulus, so $|r| = \sqrt\beta$ — **independent of $\lambda$**. The roots are complex or repeated when $(1+\beta-\eta\lambda)^2\le4\beta$, i.e.
+Trying a solution $c_k=r^k$ gives the characteristic equation
 
 $$
-(1-\sqrt\beta)^2 \;\le\; \eta\lambda \;\le\; (1+\sqrt\beta)^2 .
+r^2-(1+\beta-\eta\lambda)r+\beta=0.
 $$
 
-Choose $\eta$ and $\beta$ so that the whole interval $[\lambda_{\min}, \lambda_{\max}]$ fits exactly: $\eta\lambda_{\min} = (1-\sqrt\beta)^2$, $\eta\lambda_{\max} = (1+\sqrt\beta)^2$. Dividing, $\kappa = \bigl(\tfrac{1+\sqrt\beta}{1-\sqrt\beta}\bigr)^2$, so
+When the roots are a complex-conjugate pair, their product is $\beta$, so each has modulus $\sqrt\beta$. The same spectral radius occurs at the repeated-root boundary, although a repeated root can introduce a polynomial prefactor such as $k r^k$. The complex-or-repeated condition is
 
 $$
-\sqrt\beta = \frac{\sqrt\kappa-1}{\sqrt\kappa+1},\qquad \eta = \frac{4}{(\sqrt{\lambda_{\max}}+\sqrt{\lambda_{\min}})^2},\qquad \text{rate } \frac{\sqrt\kappa-1}{\sqrt\kappa+1}.
+(1+\beta-\eta\lambda)^2\le4\beta,
 $$
 
-Iterations now scale like $\sqrt\kappa$ instead of $\kappa$ — for $\kappa = 10^4$, a hundred times fewer. Worked Example 3.5 checks the numbers for $\kappa = 10$. Nesterov's accelerated gradient achieves the same $\sqrt\kappa$ dependence for general smooth strongly convex functions, and this dependence is optimal for first-order methods in that class ([Nesterov 2018](/references/#nesterov-2018)).
+or, equivalently,
+
+$$
+(1-\sqrt\beta)^2
+\le\eta\lambda
+\le(1+\sqrt\beta)^2.
+$$
+
+Choose $\eta$ and $\beta$ so that the full curvature interval fits exactly between these endpoints:
+
+$$
+\eta\lambda_{\min}=(1-\sqrt\beta)^2,
+\qquad
+\eta\lambda_{\max}=(1+\sqrt\beta)^2.
+$$
+
+Dividing the equations and solving gives
+
+$$
+\sqrt\beta
+=\frac{\sqrt\kappa-1}{\sqrt\kappa+1},
+\qquad
+\eta
+=\frac{4}
+{(\sqrt{\lambda_{\max}}+\sqrt{\lambda_{\min}})^2}.
+$$
+
+The worst-case asymptotic root factor is therefore
+
+$$
+\rho_{\mathrm{HB}}
+=\frac{\sqrt\kappa-1}{\sqrt\kappa+1}.
+$$
+
+Its iteration dependence is $O(\sqrt\kappa\log(1/\varepsilon))$ rather than gradient descent's $O(\kappa\log(1/\varepsilon))$. At $\kappa=10^4$, that is an order-of-growth improvement of about a factor of 100, not a promise that every finite run ends exactly 100 times sooner. Initial transients, repeated-root prefactors, and parameter mistuning all affect the observed count; Worked Example 3.5 shows this at $\kappa=10$.
+
+This heavy-ball calculation is a quadratic result; the same fixed parameters do not automatically inherit a global accelerated guarantee on a general smooth strongly convex objective. Nesterov's accelerated gradient is a different update that does achieve the same $\sqrt\kappa$ dependence for that broader class. Under the standard first-order oracle model, that dependence is optimal for the class ([Nesterov 2018](/references/#nesterov-2018)).
 
 ## 3.5.8 ★ Preconditioning
 
-A **preconditioned** step $\theta \leftarrow \theta - \eta P^{-1}\nabla L$ is steepest descent in the geometry defined by $P$ (§3.2.5). On the quadratic the error iteration becomes $e_{k+1} = (I - \eta P^{-1}H)e_k$, so what matters is the condition number of $P^{-1}H$:
+Let $P$ be symmetric positive definite. A **preconditioned** step is
 
-- $P = H$ (Newton's method) gives $P^{-1}H = I$ and convergence in one step — at the cost of forming and inverting an $n\times n$ matrix, impossible for large $n$.
-- A diagonal $P$ equal to the diagonal of $H$ removes ill-conditioning that is aligned with the coordinate axes, but not rotated ill-conditioning.
+$$
+\theta\leftarrow\theta-\eta P^{-1}\nabla L(\theta).
+$$
 
-Adam's denominator $\sqrt{\hat v}$ is a diagonal $P$ built from gradient magnitudes rather than curvature. The two are related in some settings and unrelated in others, so "Adam is a diagonal second-order method" is a heuristic interpretation, not a theorem. Optimizers that build structured, non-diagonal preconditioners at affordable cost are discussed in §3.8.6.
+This is steepest descent when distance is measured by the $P$-norm, $\|d\|_P^2=d^\top Pd$ (§3.2.5). On a quadratic,
+
+$$
+e_{k+1}=(I-\eta P^{-1}H)e_k.
+$$
+
+Although $P^{-1}H$ need not look symmetric, it is similar to the symmetric matrix $P^{-1/2}HP^{-1/2}$ and has the same positive eigenvalues. The relevant conditioning is therefore the spread of these **preconditioned** eigenvalues.
+
+- If $P=H$ and $\eta=1$, then $P^{-1}H=I$ and an exact quadratic is solved in one step. Forming, storing, and solving with a dense $n\times n$ Hessian is generally infeasible for large models.
+- If $H$ is diagonal and $P=\operatorname{diag}(H)$, the preconditioned Hessian is exactly $I$. If the difficult directions are rotated away from the coordinate axes, a diagonal $P$ cannot in general remove them.
+
+Adam's denominator $\sqrt{\hat v}+\epsilon$ acts like a time-varying diagonal rescaling built from past squared gradients, not from the Hessian itself. Gradient scale and curvature can correlate in some problems and diverge in others. “Adam is a diagonal second-order method” is therefore a heuristic analogy, not a theorem. Structured non-diagonal preconditioners are discussed in §3.8.6.
 
 ## 3.5.9 ★ The cost of reverse mode, formally
 
-Let a program evaluate $L$ with a sequence of elementary operations, each of whose local partial derivatives can be evaluated at a cost bounded by a constant multiple of the operation itself. Then the gradient can be computed with a number of operations bounded by a small constant times the cost of evaluating $L$ (independent of $n$), plus memory proportional to the number of stored intermediates. [Griewank & Walther (2008)](/references/#griewank-2008) give the precise statement and the constants under several cost models. The memory term can be reduced at the price of recomputation: storing only selected checkpoints and recomputing segments during the backward pass, down to memory logarithmic in the number of operations with a logarithmic increase in computation (their "revolve" schedules), or $O(\sqrt{\ell})$ memory for an $\ell$-layer network with about one extra forward pass ([Chen et al. 2016](/references/#chen-2016)).
+The informal claim that “one backward pass gives every parameter gradient” is a statement about a **cost ratio**, not about an absolute cost independent of model size.
+
+Suppose a program evaluates a scalar $L$ using a sequence of elementary operations, and suppose each operation's local partial derivatives can be evaluated with at most a constant-factor cost relative to that operation. Reverse-mode automatic differentiation can then compute the full gradient with an operation count bounded by a small constant times the forward evaluation cost. The factor does not grow with the number of inputs merely because there are more gradient coordinates; the forward program itself may, of course, become more expensive as the model grows. [Griewank & Walther (2008)](/references/#griewank-2008) make the statement precise under several cost models.
+
+The basic reverse pass stores forward intermediates needed by local derivative rules, so its memory can scale with the length of the executed computation. **Checkpointing** trades memory for recomputation: store selected states, rerun omitted forward segments when the backward pass needs them, and then discard them again. Different schedules occupy different points on that tradeoff. Binomial schedules such as *revolve* can use logarithmic memory with a logarithmic recomputation factor under their model; for an $\ell$-layer chain, a simpler segmentation can use $O(\sqrt\ell)$ stored activations with about one additional forward pass ([Chen et al. 2016](/references/#chen-2016)).
+
+Thus reverse mode removes the extra factor of “number of parameters” that naive coordinate-wise differentiation would pay. It does not make either computation or memory free.

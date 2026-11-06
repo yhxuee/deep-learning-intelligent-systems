@@ -6,6 +6,25 @@ sidebar: { label: "A · 線性代數", order: 1 }
 
 本書的每個模型都由矩陣乘積構成，而它的理論大多是譜理論：步長上限是特徵值（單元 03），記憶的衰減是譜半徑（單元 05），低秩結構是奇異值分解（單元 02 與 04）。本附錄收錄各單元所用的事實，證明簡短且有啟發性時附上證明。例題中的數字由 `labs/test_appendices.py` 檢查。
 
+### 初學者圖像：矩陣是一個動作
+
+不要先把矩陣看成等著操作的數字方框。把它看成移動向量的函數。以
+
+$$
+A=\begin{pmatrix}2&0\\0&\tfrac12\end{pmatrix},
+\qquad x=\begin{pmatrix}1\\2\end{pmatrix},
+\qquad Ax=\begin{pmatrix}2\\1\end{pmatrix}
+$$
+
+為例，$A$ 把第一個座標放大兩倍、第二個縮小一半。線性代數反覆追問幾個關於這個動作的問題：
+
+- **哪些資訊留下來？**秩計算獨立輸出方向；零空間收集被映射消除的輸入。
+- **哪些方向的行為最簡單？**特徵向量保持方向；奇異向量找出伸縮最大的方向。
+- **反解有多敏感？**條件數描述輸入或捨入誤差可能被放大多少。
+- **重複套用會怎樣？**矩陣冪 $A^t$ 描述深層乘積與遞迴記憶。
+
+閱讀符號時把這幅圖像放在旁邊。此處定理之所以有用，是因為它精確回答其中一題。
+
 | 小節 | 用於 |
 |---|---|
 | A.1 內積與範數 | 02（相似度、JL 引理）、03（最陡下降）、04（注意力分數） |
@@ -18,7 +37,7 @@ sidebar: { label: "A · 線性代數", order: 1 }
 
 ## A.1 向量、內積與範數
 
-向量是行向量，$x\in\mathbb{R}^n$。**內積（inner product）**為 $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$，**歐幾里得範數**為 $\lVert x\rVert = \sqrt{x^{\top}x}$。其他常見範數：$\lVert x\rVert_1 = \sum_i|x_i|$ 與 $\lVert x\rVert_\infty = \max_i|x_i|$。
+向量寫成行向量，$x\in\mathbb{R}^n$。向量可以代表一個點、方向、特徵列表或隱藏狀態；各處脈絡會說明採用哪種解讀。**內積（inner product）**為 $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$，**歐幾里得範數**為 $\lVert x\rVert = \sqrt{x^{\top}x}$。其他常見範數：$\lVert x\rVert_1 = \sum_i|x_i|$ 與 $\lVert x\rVert_\infty = \max_i|x_i|$。
 
 **定理 A.1（柯西–施瓦茨，Cauchy–Schwarz）。** $|x^{\top}y|\le\lVert x\rVert\,\lVert y\rVert$，等號成立若且唯若 $x$ 與 $y$ 平行。
 

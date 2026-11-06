@@ -6,6 +6,16 @@ sidebar: { label: "F · Optimization", order: 6 }
 
 Unit 03 derives gradient descent from first principles and proves its main guarantees: the descent lemma, convergence to a stationary point without convexity, the condition-number rate on quadratics, linear convergence under strong convexity, the noise floor of stochastic gradients and the momentum rate (§3.5.2–§3.5.7). This appendix supplies the convex-analysis background those proofs assume, collects the rates in one table, proves the one rate Unit 03 does not, and adds constrained optimization — Lagrange multipliers, KKT conditions and duality — which the book uses to derive maximum-likelihood estimates, softmax outputs and the optimum of KL-regularized post-training. Numbers in the examples are checked by `labs/test_appendices.py`.
 
+### The beginner's picture: landscape, rule, guarantee
+
+An optimization problem has three ingredients that should never be conflated:
+
+- the **objective** defines the landscape, such as $f(x)=x^2$;
+- the **algorithm** defines a movement rule, such as $x_{k+1}=x_k-\eta f'(x_k)$;
+- the **assumptions** determine what can be guaranteed, such as convexity or smoothness.
+
+The same objective can be easy for one algorithm and slow for another; the same algorithm can converge for one step size and diverge for another. Convexity says local minima are global. Smoothness limits how abruptly the slope changes. Strong convexity prevents flat directions. None of these words means “a deep network is convex”; they provide exact model cases and local tools for understanding harder landscapes.
+
 | Section | Used in |
 |---|---|
 | F.1–F.2 Convexity, smoothness | 01 (log-loss), 03 (descent lemma), 06 (compute-optimal allocation) |

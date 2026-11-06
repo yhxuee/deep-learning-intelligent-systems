@@ -1,98 +1,236 @@
 ---
 title: "7.3 Mathematical construction"
-description: The autoregressive objective and teacher forcing, masked language modelling as pseudo-likelihood, contrastive learning and the InfoNCE bound, Jaccard similarity, MinHash and locality-sensitive hashing, and n-gram contamination checks.
+description: Autoregressive maximum likelihood and teacher forcing, masked conditional reconstruction, contrastive classification and the InfoNCE bound, then Jaccard, MinHash, locality-sensitive hashing and directional n-gram contamination checks.
 sidebar: { label: "7.3 Construction", order: 3 }
 ---
 
-## 7.3.1 The autoregressive objective
+This section builds two pieces that are often taught separately. Sections 7.3.1–7.3.3 construct **learning objectives**. Sections 7.3.4–7.3.6 construct **data-audit estimators**. They belong together: a loss is an expectation over data, so an unexamined dataset silently changes the mathematical objective.
 
-For a sequence $x_{1:T}$ and a model $q_\theta(x_t\mid x_{<t})$, the per-token loss averaged over a corpus is
+## 7.3.1 Autoregressive maximum likelihood
 
-$$
-\hat L(\theta) = -\frac{1}{\sum_s T_s}\sum_{s}\sum_{t=1}^{T_s}\ln q_\theta\big(x^{(s)}_t\mid x^{(s)}_{<t}\big).
-$$
-
-By the chain rule (§7.2.2), $\sum_t\ln q_\theta(x_t\mid x_{<t}) = \ln q_\theta(x_{1:T})$, so minimizing $\hat L$ is maximum likelihood for the sequence model, and by Unit 01 (§1.3.3) it minimizes the KL divergence from the empirical distribution of sequences to the model.
-
-**Teacher forcing.** During training every conditional is computed with the *true* prefix $x_{<t}$, never the model's own predictions. This is what lets a Transformer compute all $T$ losses in one parallel pass under the causal mask. It also creates a mismatch: at generation time the model conditions on its own samples, which may lie outside the training distribution of prefixes (a cause of degenerate repetition, Unit 08).
-
-**Windows.** In practice $T$ is the context length and long documents are cut into windows; the spine model samples random 128-character windows from the concatenated stories. A window that starts mid-story still trains every position, but the first positions see little context; a held-out estimate should be computed per story (Unit 10).
-
-## 7.3.2 Masked language modelling
-
-Choose a random subset $M$ of positions (BERT uses 15%), replace their tokens by a mask symbol (or, in 10% of cases each, by a random or unchanged token), and minimize
+Let story $s$ contain tokens $x^{(s)}_{1:T_s}$. Add a begin symbol so the first token also has a context, and optionally an end symbol so sequence termination is modelled. An autoregressive model supplies one normalized distribution
 
 $$
-\hat L_{\text{MLM}}(\theta) = -\mathbb{E}_{M}\sum_{t\in M}\ln q_\theta\big(x_t\mid x_{\setminus M}\big),
+q_\theta(x^{(s)}_t\mid x^{(s)}_{<t})
 $$
 
-where $x_{\setminus M}$ is the sequence with the masked positions hidden ([Devlin et al. 2019](/references/#devlin-2019)). Each prediction uses context on both sides, so the representation at position $t$ can encode its whole sentence. But the conditionals $q(x_t\mid x_{\setminus M})$ for different $M$ need not be consistent with any single joint distribution: the objective is a **pseudo-likelihood**, and a masked model does not define a normalized probability of a sequence or an obvious way to sample one. Only 15% of positions are trained per pass, against 100% for the autoregressive objective — part of why autoregressive pretraining extracts more signal per token.
-
-## 7.3.3 Contrastive learning and the InfoNCE bound
-
-Let $(x, y)$ be a **positive pair** drawn from a joint distribution $p(x, y)$ — two augmentations of one image, an image and its caption, two halves of one story — and let $y_2,\dots,y_K$ be **negatives** drawn from the marginal $p(y)$. A critic $f(x, y)$ (typically a dot product of embeddings divided by a temperature) is trained to pick the positive:
+at every position. The token-weighted empirical loss is
 
 $$
-\mathcal L_{\text{NCE}} = -\mathbb{E}\Big[\ln\frac{e^{f(x, y_1)}}{\sum_{k=1}^{K}e^{f(x, y_k)}}\Big].
+\hat L(\theta)
+=-\frac{1}{\sum_s T_s}
+\sum_s\sum_{t=1}^{T_s}
+\ln q_\theta\!\left(x^{(s)}_t\mid x^{(s)}_{<t}\right).
 $$
 
-This is a $K$-way softmax classification with the positive as the correct class ([van den Oord et al. 2018](/references/#oord-2018); compare noise-contrastive estimation, [Gutmann & Hyvärinen 2010](/references/#gutmann-2010)).
-
-**Mutual information.** $I(X; Y) = \mathbb{E}_{p(x,y)}\big[\ln\frac{p(x,y)}{p(x)p(y)}\big]$ measures, in nats, how much knowing $x$ reduces uncertainty about $y$.
-
-**Proposition 7.1 (InfoNCE bound).** For any critic, $I(X; Y)\ \ge\ \ln K - \mathcal L_{\text{NCE}}$.
-
-*Proof ([Poole et al. 2019](/references/#poole-2019)).* Draw $Y_1\sim p(y\mid x)$ and $Y_2,\dots,Y_K\sim p(y)$ independently. The extra variables are independent of everything else, so $I(X; Y_{1:K}) = I(X; Y_1) = I(X;Y)$. For *any* conditional density $q(y_{1:K}\mid x)$, Gibbs' inequality (Unit 01, Theorem 1.1) gives the variational bound $I(X; Y_{1:K})\ge\mathbb{E}\big[\ln q(Y_{1:K}\mid X) - \ln p(Y_{1:K})\big]$. Choose
-$$
-q(y_{1:K}\mid x) = p(y_{1:K})\,\frac{e^{f(x,y_1)}}{\frac1K\sum_{k}e^{f(x,y_k)}} .
-$$
-It is a valid density: $p(y_{1:K}) = \prod_k p(y_k)$ is symmetric in the $y_k$, so its integral equals the integral of $p(y_{1:K})$ times the average over $i$ of $e^{f(x,y_i)}/\frac1K\sum_k e^{f(x,y_k)}$, which is 1. Substituting, $I(X;Y)\ge\mathbb{E}\big[\ln\frac{e^{f(X,Y_1)}}{\frac1K\sum_k e^{f(X,Y_k)}}\big] = \ln K - \mathcal L_{\text{NCE}}$. $\blacksquare$
-
-Two consequences matter. Minimizing the contrastive loss maximizes a lower bound on the information the two views share, so the embeddings keep what is common to both views and may discard the rest. And the bound **cannot exceed $\ln K$**: with 1 024 negatives, no more than $\ln 1024 = 6.93$ nats can be certified, however much information the views share (Worked Example 7.7) — one reason contrastive methods use very large batches.
-
-**Why negatives.** Without them, the loss "make $f(x, y_1)$ large" is minimized by mapping every input to the same point — **collapse**. Negatives force embeddings of different items apart. In the limit of many negatives the loss rewards *alignment* (positives close) and *uniformity* (embeddings spread over the sphere) ([Wang & Isola 2020](/references/#wang-isola-2020)). Non-contrastive methods avoid collapse by other means — asymmetric networks and stopped gradients ([Grill et al. 2020](/references/#grill-2020)) — whose analysis is subtler (§7.5.3).
-
-## 7.3.4 Duplicates and Jaccard similarity
-
-Represent a document by its set $S$ of **shingles**: here, the word 5-grams it contains. Two documents' resemblance is their **Jaccard similarity**
+By the chain rule,
 
 $$
-J(S_1, S_2) = \frac{|S_1\cap S_2|}{|S_1\cup S_2|}\in[0,1].
+\sum_{t=1}^{T_s}\ln q_\theta(x^{(s)}_t\mid x^{(s)}_{<t})
+=\ln q_\theta(x^{(s)}_{1:T_s}),
 $$
 
-Identical documents have $J = 1$; a one-word edit of a 60-word story changes about five shingles and leaves $J$ near 0.8; unrelated stories from the same template share few 5-grams. Comparing every pair is $O(n^2)$ — impossible for billions of documents. MinHash makes it nearly linear.
+so the numerator is the corpus negative log-likelihood. Minimizing it is maximum likelihood for the declared sequence factorization. Equivalently, it minimizes a forward KL divergence from the **token-weighted empirical distribution** to the model, up to the empirical entropy constant (Unit 01, §1.3.3). If every story rather than every token should receive equal weight, the averaging rule must be changed; long stories currently contribute more targets.
 
-## 7.3.5 MinHash and locality-sensitive hashing
+### Teacher forcing is a computation rule
 
-Pick a random hash function $h$ that orders all possible shingles uniformly at random, and summarize a set by its minimum: $m(S) = \min_{s\in S}h(s)$.
+During training, the conditional at $t$ receives the true prefix $x_{<t}$. This is **teacher forcing**. A causal Transformer can process all positions in one call: the input contains the full shifted sequence, while the mask prevents position $t$ from reading its target or future tokens.
 
-**Proposition 7.2 ([Broder 1997](/references/#broder-1997)).** $\Pr\big[m(S_1) = m(S_2)\big] = J(S_1, S_2)$.
+During generation, the prefix contains the model's earlier samples. A mistake can therefore create a prefix uncommon in training and alter later predictions. This train–generation context difference is often called **exposure bias**. It is a possible contributor to generation failures, not a complete explanation for repetition or hallucination; decoding, data, capacity and post-training also matter.
 
-*Proof.* Consider the element of $S_1\cup S_2$ with the smallest hash. Each of the $|S_1\cup S_2|$ elements is equally likely to be it. The two minima are equal exactly when that element lies in $S_1\cap S_2$, which happens with probability $|S_1\cap S_2|/|S_1\cup S_2|$. $\blacksquare$
+### Windows change the context distribution
 
-With $n$ independent hash functions, the fraction of agreeing minima estimates $J$ with standard error $\sqrt{J(1-J)/n}$. A **signature** of $n = 64$ minima summarizes each document in 64 numbers.
+Long streams are trained in length-$T$ windows. In the spine code, cleaned stories are joined with newline tokens and random 128-character windows are sampled. A window can start mid-story or cross a story boundary, so early positions have truncated context and the newline becomes the learned separator. The objective is therefore over sampled windows of this constructed stream, not an abstract collection of isolated stories.
 
-**Banding** finds candidate pairs without comparing all of them. Split the signature into $b$ bands of $r$ rows ($br = n$); hash each band; two documents become a candidate if *any* band matches exactly. A band matches with probability $J^r$, so
+For checkpoint monitoring, `model.evaluate` scores fixed non-overlapping windows of the concatenated held-out stream. For final uncertainty, Stage 10 scores each held-out story separately and bootstraps stories—the independent sampling unit. Both numbers can be useful, but they estimate differently weighted quantities.
+
+## 7.3.2 Masked and denoising objectives
+
+Let $M$ be a sampled set of hidden positions and let $\tilde x=C_M(x)$ be a corrupted sequence. A masked reconstruction loss is
 
 $$
-\Pr[\text{candidate}] = 1 - (1 - J^r)^b .
+\hat L_{\text{mask}}(\theta)
+=-\mathbb E_M\sum_{t\in M}
+\ln q_\theta(x_t\mid \tilde x,M).
 $$
 
-This S-shaped curve rises steeply around $J\approx(1/b)^{1/r}$. Stage 07 uses $b = 16$, $r = 4$: pairs with $J = 0.7$ become candidates with probability 0.988, pairs with $J = 0.3$ with probability 0.122 (Worked Example 7.3). Candidates are then confirmed by computing their exact Jaccard similarity, so the false positives of banding cost time, not correctness.
+BERT selects 15% of positions; among selected positions, 80% are replaced by `[MASK]`, 10% by a random token and 10% left unchanged ([Devlin et al. 2019](/references/#devlin-2019)). The target is always the original token. Random and unchanged cases reduce the train–use mismatch caused by a special mask symbol that never appears downstream.
 
-## 7.3.6 Contamination checks
+If one position at a time were hidden and every full conditional $q(x_t\mid x_{-t})$ were trained, the product of those conditional terms would be a classical **pseudo-likelihood**. BERT's multi-position random corruption is better described as pseudo-likelihood-style conditional reconstruction: masked positions may hide information from one another, and its learned conditionals are not automatically guaranteed to be the full conditionals of one normalized joint distribution.
 
-A held-out item is **contaminated** if (a near copy of) it occurs in the training data. The standard check measures, for each evaluation item, the fraction of its word $n$-grams that also occur anywhere in the training data, and flags items above a threshold; GPT-3's evaluation used 13-grams ([Brown et al. 2020](/references/#brown-2020)). Two design choices dominate:
+Only selected positions receive direct token losses in one corrupted view, whereas a shifted autoregressive window supplies a loss at almost every position. That is an accounting difference, not a universal data-efficiency ranking. Bidirectional context may make each masked prediction more informative, and different architectures, corruption rates and compute budgets change the comparison.
 
-- **$n$ and the threshold** trade false positives against false negatives. Templated or formulaic text shares many short $n$-grams by construction: in the spine corpus, a typical clean held-out story shares 40% of its word 8-grams with the training text, and any threshold between 0.68 and 1.0 catches every planted copy with no false alarms (Worked Example 7.5).
-- **What counts as a copy.** Paraphrases, translations and reformatted answers evade exact $n$-gram matching. Detection from the model's side — for example, testing whether a model assigns systematically higher likelihood to a benchmark's canonical ordering than to shuffled orderings ([Oren et al. 2024](/references/#oren-2024)) — catches some of these.
+Two limiting cases expose the design:
 
-Stage 07 removes the training copies of contaminated stories and leaves the held-out set untouched, so that held-out numbers stay comparable across stages.
+- If almost nothing is masked, the task becomes easy and may teach little global structure.
+- If almost everything is masked, context carries too little information and the model falls back toward marginal token frequencies.
+
+The useful corruption rate lies between these extremes and depends on the object and target use.
+
+## 7.3.3 Contrastive classification and the InfoNCE bound
+
+Let $(X,Y)$ be a positive pair drawn from a joint distribution $p(x,y)$: two augmentations of one image, an image and its caption, or two related spans. Given $X=x$, draw
+
+$$
+Y_1\sim p(y\mid x),\qquad Y_2,\ldots,Y_K\overset{\text{iid}}{\sim}p(y).
+$$
+
+There are $K$ candidates: one positive and $K-1$ negatives. A critic $f(x,y)$ scores each pair. The InfoNCE loss is the cross-entropy for identifying candidate 1:
+
+$$
+\mathcal L_{\text{NCE}}
+=-\mathbb E\left[
+\ln\frac{e^{f(X,Y_1)}}{\sum_{k=1}^{K}e^{f(X,Y_k)}}
+\right].
+$$
+
+Often $f(x,y)=g(x)^\top h(y)/\tau$, where $g,h$ are encoders and $\tau>0$ is a temperature. Smaller $\tau$ sharpens score differences and gradients; it does not add information by itself.
+
+### What mutual information means here
+
+Mutual information is
+
+$$
+I(X;Y)
+=\mathbb E_{p(x,y)}
+\left[\ln\frac{p(x,y)}{p(x)p(y)}\right]
+=\mathbb E\left[\ln\frac{p(Y\mid X)}{p(Y)}\right].
+$$
+
+It is zero when $X$ and $Y$ are independent and positive when observing one changes the distribution of the other. The log density ratio is exactly what distinguishes a true pair from a candidate drawn independently from $p(y)$.
+
+**Proposition 7.1 (InfoNCE bound).** Under the sampling scheme above, for any measurable critic for which the expectations exist,
+
+$$
+I(X;Y)\ge \ln K-\mathcal L_{\text{NCE}}.
+$$
+
+*Proof, with the auxiliary distribution made explicit.* The negative variables are independent of $(X,Y_1)$, so
+
+$$
+I(X;Y_{1:K})=I(X;Y_1)=I(X;Y).
+$$
+
+The marginal distribution of $Y_{1:K}$ is $p(y_{1:K})=\prod_{k=1}^{K}p(y_k)$. For any normalized conditional density $r(y_{1:K}\mid x)$, non-negativity of KL gives the variational inequality
+
+$$
+I(X;Y_{1:K})
+\ge \mathbb E\left[
+\ln\frac{r(Y_{1:K}\mid X)}{p(Y_{1:K})}
+\right].
+$$
+
+Choose
+
+$$
+r(y_{1:K}\mid x)
+=p(y_{1:K})
+\frac{e^{f(x,y_1)}}{\frac1K\sum_{k=1}^{K}e^{f(x,y_k)}}.
+$$
+
+Why is this normalized? Under the symmetric product measure $p(y_{1:K})$, each index has the same expected ratio. The average over all indices is identically
+
+$$
+\frac1K\sum_{i=1}^{K}
+\frac{e^{f(x,y_i)}}{\frac1K\sum_k e^{f(x,y_k)}}=1,
+$$
+
+so each ratio integrates to 1. Substitution into the variational inequality gives
+
+$$
+I(X;Y)
+\ge\mathbb E\left[
+\ln\frac{e^{f(X,Y_1)}}{\frac1K\sum_k e^{f(X,Y_k)}}
+\right]
+=\ln K-\mathcal L_{\text{NCE}}.
+\qquad\blacksquare
+$$
+
+The bound cannot certify more than $\ln K$ nats because $\mathcal L_{\text{NCE}}\ge0$. Thus $K=1{,}024$ candidates—one positive and 1,023 negatives—has a ceiling of $\ln1024=6.93$ nats or 10 bits. More candidates raise the ceiling but also cost memory and computation.
+
+The assumptions matter. In-batch “negatives” may include another valid match, creating a **false negative**. Correlated batches need not be iid draws from $p(y)$. A high mutual-information lower bound also says only that the views share distinguishable information, not that the retained information is useful or causal downstream.
+
+### Collapse and other ways to avoid it
+
+A loss that only pulls positive embeddings together admits the constant representation $g(x)=c$ as a trivial solution. Contrastive negatives make that solution bad because all candidates then receive equal scores. They encourage positive **alignment** and separation or **uniformity** among other examples ([Wang & Isola 2020](/references/#wang-isola-2020)). Non-contrastive methods can avoid collapse using predictor asymmetry, stopped gradients, variance constraints or covariance penalties; “no negatives” does not mean “no anti-collapse mechanism” (§7.5.3).
+
+## 7.3.4 From documents to sets: Jaccard similarity
+
+Exact hashes find byte-identical or normalized-identical documents. Near duplicates need a representation that tolerates small edits. Tokenize a document, form every consecutive word 5-gram, and keep the set of resulting **shingles** $S$.
+
+For nonempty sets,
+
+$$
+J(S_1,S_2)=\frac{|S_1\cap S_2|}{|S_1\cup S_2|}\in[0,1].
+$$
+
+$J=1$ means the shingle sets are identical; $J=0$ means they share none. Because these are sets, repeating the same phrase inside one document does not increase its weight. Using multisets or containment similarity would answer different questions.
+
+Shingle length controls tolerance. Short shingles produce chance matches in formulaic text; long shingles miss heavier edits. A one-word edit affects several overlapping 5-grams, so its effect is larger than one divided by the word count but much smaller than replacing the document.
+
+Comparing every pair of $n$ documents costs $n(n-1)/2=O(n^2)$ exact similarities. MinHash supplies a compact estimator; locality-sensitive hashing uses those estimates to avoid enumerating every pair.
+
+## 7.3.5 MinHash, then banding
+
+Imagine a uniformly random permutation of the universe of possible shingles. Define
+
+$$
+m_h(S)=\arg\min_{s\in S}h(s),
+$$
+
+the member of $S$ appearing first under that ordering. In practice, a seeded hash approximates a random ordering; independence and collision behaviour of the hash family are engineering assumptions.
+
+**Proposition 7.2 ([Broder 1997](/references/#broder-1997)).** For nonempty finite sets,
+
+$$
+\Pr[m_h(S_1)=m_h(S_2)]=J(S_1,S_2).
+$$
+
+*Proof.* Look at the first element of $S_1\cup S_2$ in the random ordering. Every union element is equally likely to be first. The two MinHashes agree exactly when this first element belongs to the intersection. Therefore the probability is $|S_1\cap S_2|/|S_1\cup S_2|$. $\blacksquare$
+
+With $n_h$ independent permutations, agreement indicators are Bernoulli variables with mean $J$. Their average $\hat J$ is unbiased and has
+
+$$
+\operatorname{SE}(\hat J)=\sqrt{\frac{J(1-J)}{n_h}}.
+$$
+
+The standard error describes the similarity estimate; Stage 07 uses the signature differently, to propose candidate pairs.
+
+Split $n_h=br$ signature values into $b$ bands of $r$ rows. Hash every band. If all $r$ rows of one band agree, that band collides; if any band collides, propose the pair. Under independent rows and bands,
+
+$$
+P_{\text{cand}}(J)=1-(1-J^r)^b.
+$$
+
+For Stage 07, $b=16,r=4$. The curve is intentionally permissive: a candidate is **not yet a duplicate**. The code computes exact Jaccard for candidates and removes a document only when $J\ge0.7$. Banding false positives therefore cost comparisons; final false removals depend on the exact threshold and shingle representation. Banding false negatives remain possible because a truly similar pair may collide in no band.
+
+## 7.3.6 Directional contamination checks
+
+Deduplication asks whether two training documents represent the same content. Contamination asks a directional question: **how much of this evaluation item is already covered by training?** For held-out document $h$, define word-$n$-gram sets $G_n(h)$ and a training index $U_{\text{train}}=\bigcup_{d\in\text{train}}G_n(d)$. Stage 07 measures
+
+$$
+C_n(h)=\frac{|G_n(h)\cap U_{\text{train}}|}{|G_n(h)|}.
+$$
+
+The denominator is the held-out item, so $C_n(h)=1$ means every distinct held-out $n$-gram appears somewhere in training—even if no one training document contains the whole item. This differs from Jaccard, whose denominator is a union. It is also vulnerable to a “mosaic” false alarm in highly formulaic corpora.
+
+The design variables are not cosmetic:
+
+- **$n$:** small values detect loose reuse but collide by chance; large values demand near-verbatim overlap;
+- **threshold:** lower catches more copies and more innocent formulaic text;
+- **normalization:** case, punctuation, Unicode, numbers and whitespace change the $n$-grams;
+- **aggregation:** matching against the union of all training grams is more sensitive but less attributable than requiring one matching document;
+- **short items:** if a document has fewer than $n$ words, the statistic is undefined unless a fallback is declared.
+
+GPT-3 reported a 13-gram contamination analysis ([Brown et al. 2020](/references/#brown-2020)); Stage 07 uses word 8-grams because its stories are short. In the synthetic corpus, the planted six copies have overlap 1.0, while the most-overlapping clean held-out story is below 0.68, so the frozen threshold 0.8 separates them. That separation is a property of this dataset, not a universal threshold.
+
+The safe intervention is to remove or quarantine matching **training** items while preserving the frozen evaluation set. Removing difficult or suspicious evaluation cases after looking at model scores changes the estimand. Keep the pre-clean and post-clean counts, document identifiers, thresholds and reasons.
 
 :::note[Claim check]
-- **Claim.** An evaluation item that shares few $n$-grams with the training data was not trained on.
-- **Assumptions.** Copies are near-verbatim, and $n$ and the threshold were set on items known to be clean and items known to be copied (Worked Example 7.5).
-- **Test.** Plant known copies in the training data and measure how many the check flags, and how many clean items it flags (Worked Example 7.5; Experiment 7.1).
-- **Limitation.** Paraphrases, translations and reformatted answers evade it (§7.7.3): a low overlap is evidence against verbatim copies only.
+- **Claim:** low $C_n(h)$ proves that $h$ was never used in training.
+- **What the statistic actually supports:** little near-verbatim word-$n$-gram coverage under the declared normalization and threshold.
+- **Known misses:** paraphrases, translations, screenshots, reordered answers and semantically equivalent code.
+- **Validation:** plant known copies and known clean items, then report recall and false positives. Passing that test scopes the detector; it does not prove complete coverage of unknown transformations.
 :::
 
+**Next:** [§7.4 Worked examples](/core/unit-07/worked-examples/) computes each objective and audit probability before §7.5 asks what their optima preserve.

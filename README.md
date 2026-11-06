@@ -16,9 +16,9 @@ This book covers fewer topics than a survey and treats each one completely — d
 | **Mentor** | model-agnostic prompt packs + `llms.txt`, `atlas.json` and a zero-dependency **MCP server** | `prompts/`, `mcp/` |
 | **Labs** | laptop-scale AI-off construction tasks with invariant tests | `labs/` |
 
-## Status (v2.2 — Simplified Chinese edition, consistency checks, reading paths)
+## Status (v2.3 — beginner-oriented deep rewrite)
 
-- **All twelve units are full drafts** in a ten-part structure (problem → first principles → construction → worked examples → theory → connections → limitations → modern developments → experiments → problems): about 100 000 words in English, 99 worked examples, 78 experiments and 240 graded problems. They await subject and pedagogical review.
+- **All twelve units are full drafts** in a ten-part structure (problem → first principles → construction → worked examples → theory → connections → limitations → modern developments → experiments → problems). Every unit has received a beginner-oriented rewrite that keeps the derivations, theory, counterexamples, experiments and exercises while adding concrete entry problems, decoded notation and intermediate reasoning. They still await named subject review and learner pilots.
 - **One argument.** Each unit records its answer, the limitation it leaves open and what it builds on; the build checks the chain, and [the argument of the book](https://yhxuee.github.io/deep-learning-intelligent-systems/core/) shows it — Unit 12's limitation returns to Unit 01's question.
 - **Spine project, stages 01–12** (`spine/`): a NumPy decoder-only Transformer with hand-derived gradients, an exact FLOP counter and a KV cache, trained on an instrumented synthetic corpus, through scaling fits, deduplication, sampling and flow matching, REINFORCE/DPO with a deliberately buggy reward, an evaluation harness, induction-circuit interventions and a pre-registered capstone. Results are reported as measured, including the ones that failed.
 - **Reproducible numbers.** Every worked-example number is recomputed by `labs/test_worked_examples*.py` or asserted by `spine/test_*.py`; the full suite runs in CI in about a minute.
@@ -27,6 +27,7 @@ This book covers fewer topics than a survey and treats each one completely — d
 - **Simplified Chinese (mainland) edition** (v2.2), generated from the Traditional Chinese one by `scripts/zh_cn.py` with a reviewed table of mainland academic terms applied before character conversion; CI fails if it is out of date or if a listed Taiwan usage survives. Mentor prompts in `prompts/zh-cn/`. Not hand-translated; no named reviewer yet.
 - **Curriculum aids** (v2.2): [reading paths](https://yhxuee.github.io/deep-learning-intelligent-systems/pathways/reading-paths/) (first pass, deep pass, unit dependencies, appendices per unit); a claim–assumptions–test–limitation template applied in seven units; four experiments on non-language data (`labs/beyond_language.py`).
 - **Mathematical appendices** (v2.1): eight appendices — linear algebra, calculus, probability, information theory, statistics, optimization, linear systems, Markov decision processes — about 17 000 words, with proofs, exercises and every example number checked by `labs/test_appendices.py`.
+- **Beginner entry ramps** (v2.3): a first-90-minutes guide and two-pass reading method; concrete openings for every appendix; expanded notation, Spine, laboratory and assessment guidance; full structural rewrites of Units 11 and 12.
 - **Audit corrections** (v2.1): all sixteen findings of an independent scientific audit corrected in both languages, with regression tests; see the [errata and review ledger](https://yhxuee.github.io/deep-learning-intelligent-systems/start/errata/). No unit has yet had named scientific editorial review.
 - Target scale: 600–750 pages for the units. **Feature freeze** on agent tooling until the Core has been reviewed.
 

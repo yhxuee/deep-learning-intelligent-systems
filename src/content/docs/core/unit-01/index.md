@@ -17,9 +17,9 @@ unit:
 
 ## 1.1 The problem
 
-In 2017 a group of researchers took a standard image-classification network and a standard dataset of 50 000 labelled photographs, and did something strange: they **shuffled the labels at random**, so that a photograph of a ship might be labelled "frog" and a photograph of a frog "truck" ([Zhang et al. 2017](/references/#zhang-2017)). Then they trained the network exactly as usual.
+In 2017, researchers took a standard image-classification network and a dataset of 50 000 labelled photographs, then did something strange: they **shuffled the labels at random**. A photograph of a ship might now be labelled "frog", and a photograph of a frog "truck" ([Zhang et al. 2017](/references/#zhang-2017)). They then trained the network exactly as usual.
 
-It reached **100% accuracy on the training set**. It had memorized 50 000 arbitrary pairings. On new photographs, its accuracy was 10% — what you would get by guessing one of the ten classes at random. The same network, trained on the *correct* labels, reaches high accuracy on new photographs.
+It reached **100% accuracy on the training set**: it had memorized 50 000 arbitrary pairings. On new photographs, however, its accuracy was 10% — what you would get by guessing one of the ten classes at random. The same network, trained on the *correct* labels, reached high accuracy on new photographs.
 
 The two runs used the same architecture, the same number of parameters, the same optimizer, and achieved the same training accuracy. Only one of them learned anything that transfers to cases it has not seen. So:
 
@@ -27,18 +27,18 @@ The two runs used the same architecture, the same number of parameters, the same
 - **Model size does not tell you either.** The network is identical in both runs.
 - Whatever makes the difference is a property of the *relationship between the training data and the new data* — in the random-label run there is no relationship to exploit.
 
-This unit asks the question underneath: **why can experience improve performance on cases never seen?** And the practical companion: **how would you know whether it has?**
+This unit asks the deeper question: **why can experience improve performance on cases never seen?** It also asks the practical one: **how can you tell whether it really has?**
 
-We will answer with the simplest learner that can be studied completely: a table that counts which character follows which in a body of text — the **bigram language model**. It is too simple to be useful by itself, but every idea in this unit — the loss, the assumption that makes learning possible, the gap between training and held-out performance, the baseline, the uncertainty of a measured number — is exactly visible in it, and every later unit reuses those ideas unchanged. The same table becomes the first stage of the [spine project](/spine/), the small language model you will build across the whole book.
+We will answer with the simplest learner we can study completely: a table that counts which character follows which in a body of text — the **bigram language model**. The model is too simple to be useful on its own, but it makes every idea in this unit visible: the loss, the assumption that makes learning possible, the gap between training and held-out performance, the baseline, and the uncertainty in a measured number. Later units reuse these ideas without changing their meaning. This table also becomes Stage 01 of the [spine project](/spine/), the small language model you will build across the book.
 
 :::note[Predict before reading on]
-A bigram model is fitted to 2 000 characters of children's stories by counting, and evaluated on 43 000 characters of different stories from the same source. Its average loss on the training text is 2.06 nats per character. Will its loss on the new text be lower, about the same, or higher — and by roughly how much? What would change with 385 000 training characters? (Worked Example 1.4 and Experiment 1.2 give the answers.)
+A bigram model is fitted to 2 000 characters of children's stories by counting, and evaluated on 43 000 characters of different stories from the same source. Its average loss on the training text is 2.06 nats per character. A **nat** is one unit of log-loss measured with the natural logarithm; lower loss is better. Will the loss on the new text be lower, about the same, or higher — and by roughly how much? What would change with 385 000 training characters? (Worked Example 1.4 and Experiment 1.2 give the answers.)
 :::
 
 ## What this unit builds
 
 1. **From a coin to a language model** (§1.2). Learning as estimating a probability distribution; the log-loss and why it is the right score; the uniform baseline $\ln V$; maximum likelihood as counting; zero counts and smoothing; the discipline of training, validation and test data.
-2. **The mathematics of generalization** (§1.3). Population and empirical risk; the decomposition *cross-entropy = entropy + KL divergence*; maximum likelihood derived; smoothing as Bayesian inference; concentration inequalities and why selecting among many models needs fresh data; the uncertainty of a held-out number.
+2. **The mathematics of generalization** (§1.3). Population and empirical risk; the decomposition *cross-entropy = entropy + KL divergence*; maximum likelihood derived; smoothing as Bayesian inference; concentration inequalities and why selecting among many models needs fresh data; the uncertainty in an estimate from held-out data.
 3. **The general theory** (§1.5). Uniform convergence and capacity, the bias–variance decomposition, the no-free-lunch theorem, and why classical capacity arguments fail for modern networks.
 4. **What it leaves open** (§1.7). The bigram cannot transfer what it learns about one character to a similar one. That limitation is the question of [Unit 02](/core/unit-02/).
 

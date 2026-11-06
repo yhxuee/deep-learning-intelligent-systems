@@ -58,7 +58,7 @@ Difficulty: ★ routine · ★★ combines ideas · ★★★ proof or open-ende
 
 - **3.1** $L'(w) = 2(w-3)$, curvature 2, stable iff $\eta<1$. With $\eta = 0.3$ the error is multiplied by $0.4$: $w = 0, 1.8, 2.52, 2.808, 2.923, 2.969$. With $\eta = 0.9$ the factor is $-0.8$: $w = 0, 5.4, 1.08, 4.536, 1.771, 3.983$ — converging while oscillating. It diverges for $\eta>1$.
 - **3.4** $p = (0.25, 0.25, 0.25, 0.25)$, loss $\ln4 = 1.386$ (the uniform baseline $\ln V$), $\bar s = (0.25, 0.25, -0.75, 0.25)$.
-- **3.5** Stability $\eta<0.25$; $\eta^* = 2/8.5 = 0.235$; $\kappa = 16$, rate $15/17 = 0.882$; steps $\ln10^4/(-\ln0.882) \approx 73.6$. Momentum: rate $(4-1)/(4+1) = 0.6$, about 18 steps asymptotically.
+- **3.5** Stability $0<\eta<0.25$; $\eta^*=2/8.5\approx0.2353$; $\kappa=16$; worst-case factor $15/17\approx0.88235$. The factor-only estimate is $\ln10^4/[-\ln(15/17)]\approx73.6$, so 74 whole steps. Heavy ball has asymptotic root factor $0.6$; $\ln10^4/[-\ln0.6]\approx18.0$, so the factor-only integer estimate is 19 steps. Repeated-root transients can make an actual run longer.
 - **3.6** $\hat m_k = 2$ and $\hat v_k = 4$ for every $k$ (bias correction is exact for constant gradients), so each update is $-\eta\cdot2/(2+\epsilon)\approx-\eta$.
 
 ## Further study

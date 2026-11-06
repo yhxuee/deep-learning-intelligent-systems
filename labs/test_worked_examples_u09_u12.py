@@ -44,6 +44,8 @@ def test_we_9_3_tilted_optimum():
 
 def test_we_9_4_bellman():
     assert 0.9 * 1.0 == 0.9
+    q = 0.5
+    assert 0.9 * (1 - q) / (1 - 0.9 * q) == pytest.approx(0.8182, abs=1e-4)
 
 
 def test_we_9_5_preferences_and_dpo():
@@ -56,6 +58,7 @@ def test_we_9_5_preferences_and_dpo():
 
 def test_we_9_8_kl_reference_point():
     assert 0.8 * math.log(0.8 / 0.2) + 0.2 * math.log(0.2 / 0.8) == pytest.approx(0.832, abs=1e-3)
+    assert 1.34 / math.log(2) == pytest.approx(1.93, abs=5e-3)
 
 
 def test_unit_09_selected_answers():
@@ -70,6 +73,17 @@ def test_unit_09_selected_answers():
     assert sigmoid(0.5) == pytest.approx(0.6225, abs=1e-4) and -math.log(sigmoid(0.5)) == pytest.approx(0.474, abs=1e-3)
     assert 1 / (1 - 0.9) == pytest.approx(10) and 1 / (1 - 0.99) == pytest.approx(100)
     assert softplus_neg(0.1) == pytest.approx(0.644, abs=1e-3) and softplus_neg(1.0) == pytest.approx(0.313, abs=1e-3)
+    assert 1 - (1 - 1e-6) ** 64 == pytest.approx(6.4e-5, rel=1e-4)
+    # Problems 9.2 and 9.6-9.8.
+    assert math.exp(4) / (math.exp(4) + 1) == pytest.approx(0.982, abs=1e-3)
+    group = np.array([1.0, 0.0, 0.0, 0.0])
+    mean_adv = group - group.mean()
+    loo_adv = group - (group.sum() - group) / 3
+    assert mean_adv == pytest.approx(0.75 * loo_adv)
+    q = 1 - (1 - 1e-4) ** 64
+    assert q == pytest.approx(0.00638, abs=1e-5)
+    assert math.ceil(math.log(0.5) / (64 * math.log(1 - 1e-4))) == 109
+    assert 2 / 3 == pytest.approx((4 / 27) / (2 / 9))
 
 
 # ----------------------------------------------------------------------------- Unit 10
@@ -82,13 +96,24 @@ def test_we_10_1_ece_by_hand():
 
 def test_we_10_3_paired_vs_unpaired_widths():
     assert 0.327 - 0.240 == pytest.approx(0.087)
-    assert math.hypot(0.018, 0.018) == pytest.approx(0.025, abs=5e-4)
+    marginal_half_04 = (0.345 - 0.327) / 2
+    marginal_half_07 = (0.240 - 0.222) / 2
+    rough_unpaired_half = math.hypot(marginal_half_04, marginal_half_07)
+    rough_unpaired_full = 2 * rough_unpaired_half
+    paired_full = 0.110 - 0.101
+    assert rough_unpaired_half == pytest.approx(0.0127, abs=5e-5)
+    assert rough_unpaired_full == pytest.approx(0.0255, abs=5e-5)
+    assert paired_full / rough_unpaired_full == pytest.approx(0.354, abs=5e-4)
 
 
 def test_we_10_8_prompts_needed():
     v = 0.82 * 0.18 + 0.78 * 0.22
     assert v == pytest.approx(0.3192)
     assert v * (1.96 / 0.04) ** 2 == pytest.approx(766.4, abs=0.1)
+    assert (1.96 + 0.84) ** 2 * v / 0.04**2 == pytest.approx(1564.08)
+    se_400 = math.sqrt(v / 400)
+    assert se_400 == pytest.approx(0.02825, abs=5e-6)
+    assert (0.04 - 1.96 * se_400, 0.04 + 1.96 * se_400) == pytest.approx((-0.015, 0.095), abs=5e-4)
 
 
 def test_unit_10_selected_answers():
@@ -98,10 +123,25 @@ def test_unit_10_selected_answers():
     assert S10.ece(conf, correct, n_bins=10)[0] == pytest.approx(0.15)
     assert 1.96 * math.sqrt(0.81 * 0.19 / 500) == pytest.approx(0.034, abs=5e-4)
     assert math.ceil((1.96 / 0.01) ** 2 * 0.81 * 0.19) == 5913
+    assert math.ceil((1.96 / 0.01) ** 2 * 0.25) == 9604
     assert 1 - 0.95 ** 20 == pytest.approx(0.642, abs=5e-4)
     assert math.ceil(100 * 0.9) == 90
     assert 0.2 * 0.30 + 0.8 * 0.05 == pytest.approx(0.10) and 0.1 * 0.30 + 0.9 * 0.05 == pytest.approx(0.075)
     assert 0.8 / 0.9 == pytest.approx(0.889, abs=5e-4)
+    counts = np.array([118, 140, 149, 70, 90, 57, 54, 53, 4389])
+    mean_conf = np.array([0.165, 0.256, 0.344, 0.444, 0.547, 0.651, 0.753, 0.854, 0.998])
+    bin_acc = np.array([0.110, 0.207, 0.282, 0.357, 0.511, 0.561, 0.574, 0.792, 0.998])
+    rounded_table_ece = np.sum(counts * np.abs(mean_conf - bin_acc)) / counts.sum()
+    assert counts.sum() == 5120
+    assert rounded_table_ece == pytest.approx(0.00977, abs=5e-6)
+    assert counts[-1] / counts.sum() == pytest.approx(0.8572, abs=5e-5)
+    brier = 0.5 * (0.7 * 0.2**2 + 0.3 * 0.8**2) + 0.5 * (0.6 * 0.6**2 + 0.4 * 0.4**2)
+    calibration = 0.5 * (0.8 - 0.7) ** 2 + 0.5 * (0.4 - 0.6) ** 2
+    resolution = 0.5 * (0.7 - 0.65) ** 2 + 0.5 * (0.6 - 0.65) ** 2
+    uncertainty = 0.65 * 0.35
+    assert brier == pytest.approx(0.25)
+    assert (calibration, resolution, uncertainty) == pytest.approx((0.025, 0.0025, 0.2275))
+    assert calibration - resolution + uncertainty == pytest.approx(brier)
 
 
 # ----------------------------------------------------------------------------- Unit 11
@@ -113,6 +153,8 @@ def test_unit_11_attention_and_logits():
     assert 1 - weight(16) == pytest.approx(1.1e-5, rel=0.05)
     assert 1 - weight(1000) == pytest.approx(7.2e-4, rel=0.05)
     assert 20 / math.sqrt(18) == pytest.approx(4.7, abs=0.05)
+    s20 = 20 / math.sqrt(18)
+    assert math.exp(s20) / (math.exp(s20) + 15) == pytest.approx(0.881, abs=1e-3)
     assert math.exp(10) / (math.exp(10) + math.e + 7) == pytest.approx(0.9996, abs=1e-4)
     assert math.exp(3) / (math.exp(3) + math.e + 7) == pytest.approx(0.674, abs=1e-3)
     assert (8.77 - 4.4) / (8.77 - 0.0004) == pytest.approx(0.50, abs=5e-3)

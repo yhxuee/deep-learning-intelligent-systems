@@ -6,11 +6,12 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from common import load_corpus, nll  # noqa: E402
+from common import load_corpus, load_corpus_three_way, nll  # noqa: E402
 from stage01_bigram import fit_bigram  # noqa: E402
 from stage03_neural_bigram import loss_and_grad, train  # noqa: E402
 
 TRAIN, VAL, VOCAB = load_corpus()
+NGRAM_TRAIN, NGRAM_VALID, NGRAM_TEST, NGRAM_VOCAB = load_corpus_three_way()
 V = len(VOCAB)
 SMALL = TRAIN[:12_000]  # the full-batch neural bigram test runs on a prefix to stay fast
 
@@ -119,12 +120,20 @@ def test_stage02_neural_ngram_gradient_matches_finite_differences():
             assert (lp - lm) / 2e-6 == pytest.approx(g[k][i], rel=1e-5, abs=1e-10)
 
 
-def test_stage02_neural_ngram_beats_counts_when_data_is_scarce():
-    """Unit 02, Worked Example 2.6: with 5 000 training characters, sharing through embeddings wins."""
-    n = 5000
-    count = min(S2.count_ngram_nll(TRAIN[:n], VAL, V, 4, a)[0] for a in [0.003, 0.01, 0.03, 0.1, 0.3])
-    q = S2.train_ngram(TRAIN[:n], V, k=4, steps=2500)
-    assert S2.ngram_nll(q, VAL, 4) < count - 0.08
+def test_stage02_count_vs_neural_ngram_uses_untouched_test_stories():
+    """Unit 02, Worked Example 2.6: tune count smoothing on validation, report once on test."""
+    assert np.array_equal(TRAIN, NGRAM_TRAIN) and VOCAB == NGRAM_VOCAB
+    alphas = [0.003, 0.01, 0.03, 0.1, 0.3]
+    expected = [(5000, 0.003, 1.07, 0.94), (20000, 0.003, 0.67, 0.62),
+                (80000, 0.01, 0.56, 0.55), (len(TRAIN), 0.01, 0.51, 0.53)]
+    for n, expected_alpha, expected_count, expected_neural in expected:
+        alpha = min(alphas, key=lambda a: S2.count_ngram_nll(TRAIN[:n], NGRAM_VALID, V, 4, a)[0])
+        count = S2.count_ngram_nll(TRAIN[:n], NGRAM_TEST, V, 4, alpha)[0]
+        q = S2.train_ngram(TRAIN[:n], V, k=4, steps=2500)
+        neural = S2.ngram_nll(q, NGRAM_TEST, 4)
+        assert alpha == expected_alpha
+        assert count == pytest.approx(expected_count, abs=0.01)
+        assert neural == pytest.approx(expected_neural, abs=0.01)
 
 
 def test_stage02_interchangeable_symbols_get_the_same_embedding():
@@ -253,6 +262,16 @@ def test_stage08_exact_gaussian_velocity_transports_noise_to_data():
     x = S8.integrate(v, rng.standard_normal((20_000, 2)), n_steps=200)
     assert np.allclose(x.mean(0), [1.0, -2.0], atol=0.03)
     assert np.allclose(x.std(0), [0.5, 0.5], atol=0.02)
+
+
+def test_stage08_midpoint_reaches_gaussian_spread_in_fewer_steps():
+    rng = np.random.default_rng(2)
+    v = S8.gaussian_velocity([1.0, -2.0], 0.5)
+    x0 = rng.standard_normal((20_000, 2))
+    euler = S8.integrate(v, x0, n_steps=5)
+    midpoint = S8.integrate_midpoint(v, x0, n_steps=2)
+    assert np.allclose(euler.std(0), [0.37, 0.37], atol=0.02)
+    assert np.allclose(midpoint.std(0), [0.5, 0.5], atol=0.02)
 
 
 def test_stage08_flow_matching_gradient_matches_finite_differences():
@@ -467,9 +486,13 @@ def test_stage11_patching_the_induction_head_transfers_the_clean_prediction():
     corrupt = clean.copy()
     corrupt[:, 1:9] = np.stack([rng.permutation(8) for _ in range(16)])   # first half differs
     _, cc = M.forward(p, cfg, clean[:, :-1], keep=True)
-    patched = S11.second_half_loss(p, cfg, clean, 8, patch=None)
-    corrupt_loss = S11.second_half_loss(p, cfg, np.concatenate([corrupt[:, :9], clean[:, 9:]], 1), 8)
-    assert patched < 0.01 and corrupt_loss > 1.0
+    corrupted_input = np.concatenate([corrupt[:, :9], clean[:, 9:]], 1)
+    clean_loss = S11.second_half_loss(p, cfg, clean, 8)
+    corrupt_loss = S11.second_half_loss(p, cfg, corrupted_input, 8)
+    patch = {(1, 0): cc["blocks"][1]["o"][:, 0]}
+    patched_loss = S11.second_half_loss(p, cfg, corrupted_input, 8, patch=patch)
+    assert clean_loss < 0.01 and corrupt_loss > 1.0
+    assert patched_loss == pytest.approx(clean_loss, abs=1e-12)
 
 
 # ----------------------------------------------------------------------------- Stage 12

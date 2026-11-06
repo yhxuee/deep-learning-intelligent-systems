@@ -119,7 +119,7 @@ def clean(lines, val_fraction=0.1):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--steps", type=int, default=3000)
+    ap.add_argument("--steps", type=int, default=4000)
     ap.add_argument("--no-save", action="store_true")
     args = ap.parse_args()
     lines = load_lines()

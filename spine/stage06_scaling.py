@@ -63,6 +63,7 @@ def main():
     ap.add_argument("--steps", type=int, default=2000)
     ap.add_argument("--widths", default="8,12,16,24,32")
     ap.add_argument("--predict", type=int, default=48)
+    ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
     tr, va, vocab = load_corpus()
     V = len(vocab)
@@ -70,7 +71,7 @@ def main():
     rows = []
     for d in widths:
         t = time.time()
-        N, L = train_size(d, tr, va, V, args.steps)
+        N, L = train_size(d, tr, va, V, args.steps, seed=args.seed)
         rows.append((d, N, L))
         print(f"d={d:3d}  N={N:7d}  held-out NLL {L:.4f}  ({time.time() - t:.0f}s)", flush=True)
     fit = fit_power_law([r[1] for r in rows], [r[2] for r in rows])
@@ -78,9 +79,9 @@ def main():
     N6 = M.n_params(M.init_params(cfg6), cfg6, embedding=False)
     pred = float(predict(fit, N6))
     CKPT_DIR.mkdir(exist_ok=True)
-    (CKPT_DIR / "stage06_prediction.json").write_text(json.dumps({"fit": fit, "d": args.predict, "N": int(N6), "predicted": pred}, indent=1))
+    (CKPT_DIR / "stage06_prediction.json").write_text(json.dumps({"fit": fit, "d": args.predict, "N": int(N6), "predicted": pred, "seed": args.seed}, indent=1))
     print(f"fit: E={fit['E']:.3f}  A={fit['A']:.2f}  alpha={fit['alpha']:.3f};  pre-registered prediction for d={args.predict} (N={N6}): {pred:.4f}")
-    _, L6 = train_size(args.predict, tr, va, V, args.steps)
+    _, L6 = train_size(args.predict, tr, va, V, args.steps, seed=args.seed)
     print(f"observed: {L6:.4f}   error {L6 - pred:+.4f} nats")
     tokens = args.steps * 16 * 64
     print(f"token budget per run: {tokens:,}")

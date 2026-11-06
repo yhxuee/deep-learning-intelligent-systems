@@ -21,7 +21,7 @@ sidebar: { label: 治理与证据标准, order: 3 }
 
 - **推导（derivation）**——说明假设；给出或引用证明或推导。
 - **实验证据（experimentally supported）**——引用研究设计、数据、评估方式与限制。
-- **工程观察（engineering observation）**——记录环境与量测。
+- **工程观察（engineering observation）**——记录环境与度量。
 - **开放假说（open hypothesis）**——明确标记未经验证；适合作为研究题目。
 
 AI 导师的提示词会要求 AI 工具以相同类别标记它的输出。

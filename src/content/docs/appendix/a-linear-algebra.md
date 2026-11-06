@@ -6,6 +6,25 @@ sidebar: { label: "A · Linear algebra", order: 1 }
 
 Every model in this book is built from matrix products, and most of its theory is spectral: step-size limits are eigenvalues (Unit 03), memory decay is a spectral radius (Unit 05), low-rank structure is a singular value decomposition (Units 02 and 04). This appendix collects the facts the units use, with proofs where a proof is short and instructive. Numbers in the examples are checked by `labs/test_appendices.py`.
 
+### The beginner's picture: a matrix is an action
+
+Do not begin by seeing a matrix as a rectangle of numbers to manipulate. See it as a function that moves vectors. For
+
+$$
+A=\begin{pmatrix}2&0\\0&\tfrac12\end{pmatrix},
+\qquad x=\begin{pmatrix}1\\2\end{pmatrix},
+\qquad Ax=\begin{pmatrix}2\\1\end{pmatrix},
+$$
+
+$A$ doubles the first coordinate and halves the second. Linear algebra asks a few recurring questions about this action:
+
+- **What information survives?** Rank counts independent output directions; the null space contains inputs erased by the map.
+- **Which directions behave simply?** Eigenvectors keep their direction; singular vectors identify maximally stretched directions.
+- **How sensitive is inversion?** The condition number says how strongly input or rounding errors can be amplified.
+- **What happens after repetition?** Powers $A^t$ describe deep products and recurrent memory.
+
+Keep this picture beside the symbols. A theorem is useful here because it answers one of these questions exactly.
+
 | Section | Used in |
 |---|---|
 | A.1 Inner products and norms | 02 (similarity, JL lemma), 03 (steepest descent), 04 (attention scores) |
@@ -18,7 +37,7 @@ Every model in this book is built from matrix products, and most of its theory i
 
 ## A.1 Vectors, inner products and norms
 
-Vectors are columns, $x\in\mathbb{R}^n$. The **inner product** is $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$ and the **Euclidean norm** $\lVert x\rVert = \sqrt{x^{\top}x}$. Other norms recur: $\lVert x\rVert_1 = \sum_i|x_i|$ and $\lVert x\rVert_\infty = \max_i|x_i|$.
+Vectors are columns, $x\in\mathbb{R}^n$. A vector may represent a point, a direction, a feature list, or a hidden state; the local context supplies the interpretation. The **inner product** is $\langle x, y\rangle = x^{\top}y = \sum_ix_iy_i$ and the **Euclidean norm** $\lVert x\rVert = \sqrt{x^{\top}x}$. Other norms recur: $\lVert x\rVert_1 = \sum_i|x_i|$ and $\lVert x\rVert_\infty = \max_i|x_i|$.
 
 **Theorem A.1 (Cauchy–Schwarz).** $|x^{\top}y|\le\lVert x\rVert\,\lVert y\rVert$, with equality if and only if $x$ and $y$ are parallel.
 

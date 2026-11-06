@@ -6,6 +6,17 @@ sidebar: { label: "E · Statistics", order: 5 }
 
 Units 01, 10 and 12 turn finite samples into claims: a held-out loss with an interval, a comparison of two models, a registered ablation with a decision rule. This appendix gathers the statistical tools behind them in one place, with the assumptions each one needs. Numbers in the examples are checked by `labs/test_appendices.py`.
 
+### The beginner's map: four different questions
+
+Statistical vocabulary becomes confusing when four questions are compressed into “is it significant?” Keep them separate:
+
+1. **Estimation:** what quantity are we trying to learn, and what is its best estimate?
+2. **Precision:** how much would that estimate vary across valid repetitions?
+3. **Decision:** which outcomes trigger a pre-specified action or conclusion?
+4. **Generalization:** which population, runs, datasets, or future conditions does the sampling design represent?
+
+A confidence interval addresses precision under a procedure; it does not certify the metric, the experimental unit, or the target population. A hypothesis test controls a long-run error rate under a null model; it does not report the probability that the hypothesis is true. Before choosing a formula, write the estimand, experimental unit, sampling assumptions, and minimum effect that matters.
+
 | Section | Used in |
 |---|---|
 | E.1 Estimators | 01 (empirical risk), 06 (fitted exponents) |
@@ -114,7 +125,7 @@ $$
 $$
 *Proof.* For $s > 0$, by Jensen, $e^{s\mathbb{E}\max X_k}\le\mathbb{E}e^{s\max X_k}\le\sum_k\mathbb{E}e^{sX_k}\le Ke^{s^2\sigma^2/2}$. Take logarithms and choose $s = \sqrt{2\ln K}/\sigma$. $\blacksquare$
 
-**Example E.4.** For $K = 100$ independent standard normals the bound is $\sqrt{2\ln100} = 3.03$; the exact expected maximum is $2.51$. If 100 model variants with *identical* true performance are each scored with standard error 0.01, the best one is expected to look about 0.025 better than it is. This is the **winner's curse**, the quantitative reason for fresh data after selection (Unit 01, §1.3.6) and for reporting the tuning budget (Unit 12, §12.8.1).
+**Example E.4.** For $K = 100$ independent standard normals the bound is $\sqrt{2\ln100} = 3.03$; the exact expected maximum is $2.51$. If 100 model variants with *identical* true performance are each scored with standard error 0.01, the best one is expected to look about 0.025 better than it is. This is the **winner's curse**, the quantitative reason for fresh data after selection (Unit 01, §1.3.6) and for reporting the tuning budget (Unit 12, §12.8.2).
 
 ## E.9 Conjugate Bayesian updating
 

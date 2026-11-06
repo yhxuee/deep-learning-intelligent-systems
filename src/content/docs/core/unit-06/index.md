@@ -7,11 +7,11 @@ unit:
   part: 2
   question: When is additional model capacity worth its data, memory, energy, and latency costs?
   anchor: Exact FLOP and memory accounting for the spine Transformer — verified by an instrumented counter — and a scaling-law fit over five model sizes with a pre-registered prediction for a sixth.
-  spine: "Stage 06 — verify that measured training FLOPs equal 6N + 12LTd per token exactly; train five spine-model widths on a fixed token budget, fit L(N) = E + A·N^(−α), write the prediction for a sixth width to disk, then train it and compare."
+  spine: "Stage 06 — verify that the instrumented matrix-product count equals 6N_mm + 12LTd per token under the declared convention; train five spine-model widths on a fixed token budget, fit L(N) = E + A·N^(−α), write the prediction for a sixth width to disk, then train it and compare."
   checkpoint: Derive the 6N rule and the training-memory budget of a Transformer without AI; explain with arithmetic intensity why batch-1 decoding runs far below peak FLOP/s; derive the compute-optimal split of a fixed budget between parameters and data.
   status: draft
   atlas: [method-scaling-law-fit, arch-transformer-block, mech-kv-cache, opt-adamw]
-  answer: "Training costs about 6 FLOPs per parameter per token, runtime is bounded by arithmetic intensity relative to the hardware's compute-to-bandwidth ratio, and held-out loss falls as a predictable power law in parameters and data that fixes the compute-optimal split between them."
+  answer: "For dense Transformer weight matrices, training costs roughly 6 FLOPs per active parameter per token. Actual time also depends on bytes moved, parallelism and utilization. Within a measured regime, an empirical scaling-law fit can estimate how to divide a fixed training budget between parameters and data, but that optimum is conditional—not a universal law."
   leaves: "Compute-optimal models need trillions of tokens — far more than anyone can label — so the learning signal itself must be manufactured from raw data."
   builds_on:
     - { unit: 1, uses: "held-out loss as the yardstick" }
@@ -22,35 +22,66 @@ unit:
 
 ## 6.1 The problem
 
-Units 03–05 built the machinery: a model that learns by gradient descent, combines positions by attention, and remembers through a cache or a state. Each unit made design choices and noted their cost in passing. This unit makes cost the subject, because two practical questions cannot be answered without it.
+Units 03–05 built the machinery: a model that learns by gradient descent, combines positions by attention, and remembers through a cache or a state. Each design consumed computation and memory, but we mostly asked *what the mechanism does*. We now ask whether it fits, how long it takes, and what a fixed budget should buy.
 
-**Question 1: what should a fixed budget buy?** You can afford $10^{21}$ floating-point operations of training — a few days on a small cluster. You could train a 1-billion-parameter model on 170 billion tokens, or a 10-billion-parameter model on 17 billion tokens: both cost the same. Which gives the lower held-out loss? Is either right? Before 2022 the field's answer, based on the scaling laws of [Kaplan et al. (2020)](/references/#kaplan-2020), favoured larger models trained on comparatively few tokens; [Hoffmann et al. (2022)](/references/#hoffmann-2022) re-measured and concluded that parameters and data should grow in roughly equal proportion — and trained a 70-billion-parameter model that outperformed a 280-billion-parameter one trained with the same compute.
+Imagine that an engineer gives you one accelerator for a week. “Train the best model you can” is not yet a plan. You must decide at least four things:
 
-**Question 2: why is the model slower than the arithmetic says?** A 7-billion-parameter model needs about $1.4\times10^{10}$ floating-point operations to produce one token. An A100 GPU can do $3.1\times10^{14}$ per second, which suggests 22 000 tokens per second. Running it to generate text for one user produces about 100. The arithmetic is not wrong; it is the wrong limit.
+1. How many parameters can fit together with gradients, optimizer state and activations?
+2. How many tokens can the machine process before the deadline?
+3. Should the budget buy a larger model, more data, or repeated experiments?
+4. After training, must the model answer one user quickly or serve many users efficiently?
 
-Both questions have exact answers once costs are counted correctly: arithmetic (FLOPs), memory (bytes stored), memory *traffic* (bytes moved per second), and the empirical law that relates loss to model size and data. This unit derives each from first principles, checks the arithmetic against an instrumented implementation of the [spine model](/spine/), and fits a scaling law to it.
+These questions use different currencies. **FLOPs** count arithmetic work; **bytes** count stored or moved data; **latency** is the time for one request; **throughput** is completed work per second; energy is measured in joules. None can be replaced by another without assumptions about hardware and workload.
+
+**Question 1: what should a fixed budget buy?** Suppose the training allowance is $10^{21}$ FLOPs. Under the rough cost $C\approx6ND$, a 1-billion-parameter model trained on about 167 billion tokens and a 10-billion-parameter model trained on about 16.7 billion tokens cost the same. Which gives lower held-out loss? Arithmetic alone cannot decide: it supplies the budget constraint, while measurements supply the loss curve. [Kaplan et al. (2020)](/references/#kaplan-2020) and [Hoffmann et al. (2022)](/references/#hoffmann-2022) estimated different compute-efficient allocations. Hoffmann et al. then trained a 70-billion-parameter model that outperformed a 280-billion-parameter model trained with similar compute. That is evidence for a particular recipe and regime, not a timeless ratio every project should copy.
+
+**Question 2: why is the model slower than the arithmetic says?** A dense 7-billion-parameter model needs roughly $1.4\times10^{10}$ FLOPs for one forward pass per generated token. Dividing an A100's theoretical $3.12\times10^{14}$ BF16 FLOP/s by that count suggests about 22,000 tokens/s. Batch-1 generation is nowhere near that rate. Each step must stream billions of weights from memory, launch kernels and read the growing KV cache. The arithmetic count is useful; treating peak FLOP/s as the only bottleneck is the mistake.
+
+This distinction organizes the unit:
+
+- matrix shapes give **exact counts under a declared FLOP convention**;
+- the roofline gives a **hardware lower bound**, not a stopwatch prediction;
+- a scaling law is an **empirical fit with uncertainty and a range of validity**, not a theorem about intelligence.
+
+We derive all three from first principles, check the arithmetic against an instrumented [spine model](/spine/), and deliberately keep a failed scaling-law prediction as evidence of where extrapolation breaks.
+
+:::note[Two units that will appear repeatedly]
+**Negative log-likelihood (NLL)** measures how much probability the model assigned to the observed next token: $-\ln p$. Because the logarithm is natural, its unit is a **nat**. A smaller NLL is better. One nat equals $1/\ln2\approx1.443$ bits; the unit does not mean “natural language token.” Unit 01 derives this loss. This unit asks how much computation is required to reduce it.
+
+**FLOP** means one floating-point operation. We count a multiplication and an addition as two FLOPs, even when hardware executes them as one fused instruction. **FLOP/s** is a rate. The final “s” changes a quantity of work into a quantity per second.
+:::
 
 :::note[Predict before reading on]
-Training the spine model of Stage 07 (width 64, 3 layers, 128-character context, 16 sequences per step) — how many floating-point operations does one training step take? Within a factor of two is a good guess; the exact number, verified by a counter, is in Worked Example 6.1.
+The spine configuration later used in Stage 07 has width 64, 3 layers, a 128-character context and 16 sequences per step. Before calculating, estimate:
+
+1. how many tokens are processed in one step;
+2. whether one step costs closer to $10^6$, $10^9$ or $10^{12}$ FLOPs;
+3. whether doubling context length doubles or quadruples the whole step cost.
+
+Write the reasoning, not just the guesses. Worked Example 6.1 checks the exact matrix-product count and shows why the third answer depends on which term dominates.
 :::
 
 ## What this unit builds
 
-1. **Counting from first principles** (§6.2). FLOPs of a matrix product; the forward and backward pass of a linear layer; why training costs about 6 FLOPs per parameter per token; memory for parameters, gradients, optimizer state and activations; time as the larger of compute time and memory time.
-2. **Exact accounting for a Transformer** (§6.3). Every matrix product of the spine model counted; attention's extra cost; activation memory and recomputation; arithmetic intensity and the roofline; why decoding is memory-bound and batching helps.
-3. **Scaling laws** (§6.5). Power laws in parameters, data and compute; the irreducible loss; the closed-form compute-optimal allocation; why the optimum is flat and fits disagree.
-4. **What it leaves open** (§6.7). Compute-optimal training of large models needs trillions of tokens — far more than could ever be labelled. That is the question of [Unit 07](/core/unit-07/).
+1. **Count one dot product, then one layer** (§6.2). The factor of 2 in a matrix product and the factor of 3 from forward plus backward produce the $6ND$ rule. We state every assumption hidden inside that shortcut.
+2. **Count what does not fit in $6ND$** (§6.3). Attention mixes activations with activations, activations must survive until backward, and the KV cache adds traffic during decoding. We count the spine Transformer matrix by matrix.
+3. **Turn work into a time bound** (§6.2–§6.3). Arithmetic intensity compares useful operations with bytes moved. It explains why a large matrix multiplication can be compute-bound while batch-1 decoding of the same weights is memory-bound.
+4. **Allocate a fixed training budget** (§6.5). A fitted loss surface in parameters and tokens gives a closed-form optimum. We derive it, inspect its uncertainty and show that the bottom is often flat.
+5. **Test the claims rather than admire the formulas** (§6.7–§6.9). Counterexamples separate FLOPs from time, loss from capability and interpolation from extrapolation. A preregistered spine prediction is allowed to fail.
+6. **Expose the next bottleneck.** Compute-efficient large models consume enormous quantities of data. Learning from raw, unlabelled data is the problem of [Unit 07](/core/unit-07/).
 
 ## Prerequisites
 
 - **From Unit 03:** backpropagation costs a constant multiple of the forward pass (§3.3.4); Adam keeps two extra numbers per parameter (§3.3.8).
 - **From Unit 04:** the Transformer block (§4.3.9), the cost of attention (§4.5.6) and the KV cache (§4.3.10).
 - **From Unit 05:** the memory of a recurrent state versus a cache (§5.3.13).
-- **Mathematics:** logarithms and power laws; one constrained minimization with a substitution (§6.5.3).
+- **Mathematics:** multiplication of matrix dimensions; logarithms and power laws; one constrained minimization solved by substitution (§6.5.3). Every step is shown.
 
 ## How to read this unit
 
-The main text is complete without an AI tutor. Exact numbers are recomputed by `labs/test_worked_examples_u06_u08.py`; the FLOP identity is checked exactly by `spine/test_model.py`; trained-model results come from `spine/stage06_scaling.py` and are quoted to two decimals. Hardware numbers are those of an NVIDIA A100 80 GB SXM ([NVIDIA](/references/#nvidia-a100)): 312 TFLOP/s dense BF16, 2.039 TB/s memory bandwidth, 400 W.
+The main text is complete without an AI tutor. On a first pass, read §6.2, Worked Examples 6.1 and 6.5, then §6.5.1–§6.5.3; the remaining sections deepen or stress-test that path. Keep a small “budget ledger” with four columns—FLOPs, stored bytes, moved bytes and seconds—and never add numbers from different columns.
+
+Exact example values are recomputed by `labs/test_worked_examples_u06_u08.py`; the matrix-product identity is checked by `spine/test_model.py`; trained-model results come from `spine/stage06_scaling.py` and are quoted to two decimals. Hardware examples use the published theoretical specifications of an NVIDIA A100 80 GB SXM ([NVIDIA](/references/#nvidia-a100)): 312 TFLOP/s dense BF16, 2.039 TB/s memory bandwidth and 400 W. They are ceilings or nominal ratings, not promises of application performance.
 
 | Section | Content | Approx. reading time |
 |---|---|---|
