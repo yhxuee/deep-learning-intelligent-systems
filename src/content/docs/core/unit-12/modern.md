@@ -134,4 +134,4 @@ Autonomous-research evaluations often score the final paper or benchmark outcome
 7. **replication yield:** what fraction of credited findings survive independent tests;
 8. **cost and risk:** compute, human review time, and severity of escaped errors.
 
-The open question is no longer whether AI can propose ideas, write code, execute some experiments, and produce polished reports—it can **[E]**. The hard question is how much verified knowledge the complete human–AI system produces per unit of cost and risk **[H]**. Counting papers rewards generation; counting findings that survive suitably independent checks rewards science.
+AI research systems have demonstrated proposal generation, code writing, experiment execution and polished report production ([Lu et al. 2024](/references/#lu-2024); [Yamada et al. 2025](/references/#yamada-2025)) **[E]**. The open question is how much verified knowledge the complete human–AI system produces per unit of cost and risk **[H]**. Counting papers rewards generation; counting findings that survive suitably independent checks rewards science.

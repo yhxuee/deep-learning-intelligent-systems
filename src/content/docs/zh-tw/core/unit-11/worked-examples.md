@@ -7,8 +7,8 @@ sidebar: { label: "11.4 詳解例題", order: 4 }
 精確計算由 `spine/test_spine.py` 與 `labs/test_worked_examples_u09_u12.py` 檢查。固定電路輸出來自 `spine/stage11_induction.py`。手工模型使用
 
 $$
-K=8，\qquad c=60，\qquad\lambda=10，
-\qquad d=36，\qquad d_h=18。
+K=8,\qquad c=60,\qquad\lambda=10,
+\qquad d=36,\qquad d_h=18.
 $$
 
 每個例題都分開三種陳述：
@@ -30,23 +30,23 @@ $$
 所有非目標分數都是零。若有 $n$ 個可見鍵，目標權重為
 
 $$
-A_*(n)=\frac{e^{s_*}}{e^{s_*}+n-1}。
+A_*(n)=\frac{e^{s_*}}{e^{s_*}+n-1}.
 $$
 
 對 $n=16$，
 
 $$
-A_*(16)=0.999989，
+A_*(16)=0.999989,
 \qquad
-1-A_*(16)\approx1.1\times10^{-5}。
+1-A_*(16)\approx1.1\times10^{-5}.
 $$
 
 若 $c=20$，同一個頭就沒有那麼尖銳：
 
 $$
-s_*=20/\sqrt{18}=4.714，
+s_*=20/\sqrt{18}=4.714,
 \qquad
-A_*(16)\approx0.881。
+A_*(16)\approx0.881.
 $$
 
 **合理性檢查。** 即使每個干擾鍵分數都是零，可見干擾鍵越多，目標權重仍會下降。當 $n=1\,000$ 且 $c=60$，缺失質量約為 $7.2\times10^{-4}$——依然很小，卻遠大於 $n=16$ 時。
@@ -76,7 +76,7 @@ $$
 損失為
 
 $$
--\log p_*=0.00044\ldots\ \text{nats}。
+-\log p_*=0.00044\ldots\ \text{nats}.
 $$
 
 這與重複段中可預測的第 2–8 個詞元之實測平均損失 0.0004 相符。
@@ -128,7 +128,7 @@ $$
 恢復比例為
 
 $$
-R=\frac{8.77-0.0004}{8.77-0.0004}\approx1。
+R=\frac{8.77-0.0004}{8.77-0.0004}\approx1.
 $$
 
 測試實作很重要：必須執行**受損輸入**，同時傳入
@@ -150,13 +150,13 @@ patch = {(1, 0): clean_cache["blocks"][1]["o"][:, 0]}
 訓練一個兩層、兩頭、學習位置、$d=48$、無 MLP、無正規化的純注意力模型。訓練序列含兩份八詞元片段，中間隔著隨機長度雜訊：
 
 $$
-[\mathrm{BOS},\mathrm{雜訊},s,\mathrm{雜訊},s,\mathrm{雜訊}]。
+[\mathrm{BOS},\mathrm{雜訊},s,\mathrm{雜訊},s,\mathrm{雜訊}].
 $$
 
 詞彙有 24 個普通詞元，所以均勻損失是
 
 $$
-\log24=3.178\ \text{nats}。
+\log24=3.178\ \text{nats}.
 $$
 
 ### 行為
@@ -182,11 +182,11 @@ $$
 這是兩條捷徑的反例：
 
 $$
-\text{沒有熟悉注意力模式}\not\Rightarrow\text{沒有行為}，
+\text{沒有熟悉注意力模式}\not\Rightarrow\text{沒有行為},
 $$
 
 $$
-\text{最大的微弱分數}\not\Rightarrow\text{機制}。
+\text{最大的微弱分數}\not\Rightarrow\text{機制}.
 $$
 
 ## 詳解例題 11.6——沒有複製行為可定位時
@@ -217,19 +217,19 @@ $$
 線性探針從 200 個隱藏狀態預測二元性質：
 
 $$
-\operatorname{acc}_{\mathrm{真實}}=0.92。
+\operatorname{acc}_{\mathrm{真實}}=0.92.
 $$
 
 同一探針類別在依輸入類型隨機重指派的標籤上訓練，保留記憶輸入類型的機會：
 
 $$
-\operatorname{acc}_{\mathrm{控制}}=0.81。
+\operatorname{acc}_{\mathrm{控制}}=0.81.
 $$
 
 選擇性為
 
 $$
-0.92-0.81=0.11，
+0.92-0.81=0.11,
 $$
 
 即 11 個百分點（[Hewitt & Liang 2019](/zh-tw/references/#hewitt-2019)）。
@@ -256,7 +256,7 @@ $$
 KL 量測平均分布位移：
 
 $$
-D_{\mathrm{KL}}(\pi\|\pi_{\mathrm{ref}})。
+D_{\mathrm{KL}}(\pi\|\pi_{\mathrm{ref}}).
 $$
 
 它不識別哪些 logits 改變、改變是否依提示而異，也不說改變後的分布是否解決預定任務。

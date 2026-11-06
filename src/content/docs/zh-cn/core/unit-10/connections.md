@@ -15,7 +15,7 @@ $$
 \longrightarrow
 \text{不确定性}
 \longrightarrow
-\text{有边界的结论}。
+\text{有边界的结论}.
 $$
 
 看懂这些联系，有助于我们辨认一项机器学习结果是否跳过了其中某个箭头。

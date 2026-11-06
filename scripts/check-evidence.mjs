@@ -8,7 +8,9 @@ import { join } from 'node:path';
 
 const roots = process.argv.length > 2 ? process.argv.slice(2) : ['src/content/docs/core', 'src/content/docs/zh-tw/core', 'src/content/docs/appendix', 'src/content/docs/zh-tw/appendix'];
 const SOURCE = /\]\([^)]*references\/#|Worked Example|詳解例題|例題|[Ss]pine|主幹|Stage \d|階段 \d|\blab\b|實驗室|figures\/|Experiment \d|實驗 \d|§\d/;
-const LEGEND = /^(Labels|標記|標籤)[:：]|Each claim is labelled|Each item states a failure|every claim carries an evidence label|每個主張都|每一項都陳述一個失敗|upgrade them to|升級為/;
+// A legend mentions all four labels but makes no evidence claim of its own.
+// Match it by content rather than by one exact introductory phrase.
+const LEGEND = /(?:label|標記|標籤|標示).*?\*\*\[D\]\*\*.*?\*\*\[E\]\*\*.*?\*\*\[O\]\*\*.*?\*\*\[H\]\*\*/is;
 let bad = 0, labels = 0;
 for (const root of roots) {
   (function walk(d) {

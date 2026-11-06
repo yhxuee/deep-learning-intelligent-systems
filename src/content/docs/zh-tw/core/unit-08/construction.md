@@ -93,7 +93,13 @@ $$
 p_X(x)\,d x\approx p_Z(f(x))\,d z.
 $$
 
-在局部，逆映射把體積改變為 $d z=\left|\det J_f(x)\right|d x$。代入便得到**變數變換公式**
+在局部，逆映射把體積改變為
+
+$$
+d z=\left|\det J_f(x)\right|d x.
+$$
+
+代入便得到**變數變換公式**
 
 $$
 \boxed{
@@ -236,7 +242,14 @@ $$
 \right].
 $$
 
-平方誤差迴歸告訴我們，母體最佳解是 $\varepsilon_\theta^\star(x,t)=\mathbb E[\varepsilon\mid X_t=x]$。但生成時不會有人告訴模型真正的 $\varepsilon$，這個量為何有用？固定乾淨資料時，破壞分布是高斯分布，所以
+平方誤差迴歸告訴我們，母體最佳解是
+
+$$
+\varepsilon_\theta^\star(x,t)
+=\mathbb E[\varepsilon\mid X_t=x].
+$$
+
+但生成時不會有人告訴模型真正的 $\varepsilon$，這個量為何有用？固定乾淨資料時，破壞分布是高斯分布，所以
 
 $$
 \nabla_x\ln p_t(x\mid X_{\mathrm{data}})

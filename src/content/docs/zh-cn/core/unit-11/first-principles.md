@@ -29,13 +29,13 @@ sidebar: { label: "11.2 第一原理", order: 2 }
 所以，“可解码”表示
 
 $$
-\text{受测解码器类别中的某个解码器能恢复标签}，
+\text{受测解码器类别中的某个解码器能恢复标签},
 $$
 
 而不是
 
 $$
-\text{模型本身使用这个解码器或特征}。
+\text{模型本身使用这个解码器或特征}.
 $$
 
 ### 层次三——机制
@@ -57,7 +57,7 @@ $$
 \centernot\Rightarrow
 \text{唯一表示}
 \centernot\Rightarrow
-\text{唯一机制}。
+\text{唯一机制}.
 $$
 
 机制应预测行为，但观察行为无法唯一反转这项映射。这种多对一关系，是可解释性的核心识别问题。
@@ -99,7 +99,7 @@ $$
 $$
 a_j=\frac{\partial s(x)}{\partial h_j}
 \quad\text{或}\quad
-a_j=h_j\frac{\partial s(x)}{\partial h_j}。
+a_j=h_j\frac{\partial s(x)}{\partial h_j}.
 $$
 
 积分梯度沿着从基线到输入的路径累积梯度（[Sundararajan et al. 2017](/zh-cn/references/#sundararajan-2017)）。这些方法速度快，可以排列候选输入或组件。
@@ -134,7 +134,7 @@ $$
 对一个注意力头，
 
 $$
-o_i=\sum_j A_{ij}v_j。
+o_i=\sum_j A_{ij}v_j.
 $$
 
 权重 $A_{ij}$ 说明值向量 $v_j$ 以多大程度混入位置 $i$ 的更新，却**不会**告诉我们：
@@ -176,7 +176,7 @@ $$
 效应大小应在输入内配对：
 
 $$
-\Delta_i=L_i(\text{干预})-L_i(\text{干净})。
+\Delta_i=L_i(\text{干预})-L_i(\text{干净}).
 $$
 
 应回报 $\Delta_i$ 的分布或区间，而不只是单一戏剧性例子。

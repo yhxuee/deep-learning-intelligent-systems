@@ -15,7 +15,7 @@ $$
 \longrightarrow
 \text{不確定性}
 \longrightarrow
-\text{有邊界的結論}。
+\text{有邊界的結論}.
 $$
 
 看懂這些連結，有助於我們辨認一項機器學習結果是否跳過了其中某個箭頭。

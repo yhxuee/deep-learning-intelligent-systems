@@ -93,7 +93,13 @@ $$
 p_X(x)\,d x\approx p_Z(f(x))\,d z.
 $$
 
-在局部，逆映射把体积改变为 $d z=\left|\det J_f(x)\right|d x$。代入便得到**变量替换公式**
+在局部，逆映射把体积改变为
+
+$$
+d z=\left|\det J_f(x)\right|d x.
+$$
+
+代入便得到**变量替换公式**
 
 $$
 \boxed{
@@ -236,7 +242,14 @@ $$
 \right].
 $$
 
-平方误差回归告诉我们，总体最优解是 $\varepsilon_\theta^\star(x,t)=\mathbb E[\varepsilon\mid X_t=x]$。但生成时不会有人告诉模型真正的 $\varepsilon$，这个量为何有用？固定干净数据时，破坏分布是高斯分布，所以
+平方误差回归告诉我们，总体最优解是
+
+$$
+\varepsilon_\theta^\star(x,t)
+=\mathbb E[\varepsilon\mid X_t=x].
+$$
+
+但生成时不会有人告诉模型真正的 $\varepsilon$，这个量为何有用？固定干净数据时，破坏分布是高斯分布，所以
 
 $$
 \nabla_x\ln p_t(x\mid X_{\mathrm{data}})

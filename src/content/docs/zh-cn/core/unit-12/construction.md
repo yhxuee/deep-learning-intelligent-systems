@@ -187,7 +187,7 @@ $$
 假设深度 $A$ 与背景长度 $B$ 可能交互，$2\times2$ 因子模型是
 
 $$
-Y_s=\beta_0+\beta_AA+\beta_BB+\beta_{AB}AB+u_s+\varepsilon_s.
+Y_{s}=\beta_0+\beta_AA+\beta_BB+\beta_{AB}AB+u_s+\varepsilon_s.
 $$
 
 $\beta_{AB}$ 问长背景的效应是否随深度改变。一次一因子的比较无法估计它。

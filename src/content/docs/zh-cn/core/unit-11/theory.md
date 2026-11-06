@@ -68,7 +68,8 @@ $$
 若它恢复了大部分总效应，表示在这个受损方式与干预下，干净激活足以恢复所度量的结果。只要 $\operatorname{TE}\neq0$，可以用描述性的恢复分数
 
 $$
-R_c=\frac{\operatorname{PE}_c}{\operatorname{TE}}.
+R_c=\frac{\operatorname{PE}_c}{\operatorname{TE}},
+\qquad \operatorname{TE}\neq0.
 $$
 
 - $R_c\approx1$：对所选配对与指标，几乎完全恢复；

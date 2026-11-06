@@ -22,8 +22,8 @@ sidebar: { label: "10.10 習題", order: 10 }
 **10.2 ★ [不使用 AI] Brier 分解。** 把信心視為首選標籤答對的機率。對習題 10.1 計算
 
 $$
-\text{Brier}、\quad\text{校準誤差}、\quad
-\text{鑑別度}、\quad\text{不確定性}。
+\text{Brier},\quad\text{校準誤差},\quad
+\text{鑑別度},\quad\text{不確定性}.
 $$
 
 以數值驗證 Brier = 校準 − 鑑別度 + 不確定性。
@@ -63,7 +63,7 @@ $$
 $$
 \operatorname{Var}(d_i)
 =\operatorname{Var}(z_i^A)+\operatorname{Var}(z_i^B)
--2\operatorname{Cov}(z_i^A,z_i^B)。
+-2\operatorname{Cov}(z_i^A,z_i^B).
 $$
 
 分別描述一個正共變異數、零共變異數與負共變異數的情境。哪種情況下配對會縮窄比較？
@@ -72,13 +72,13 @@ $$
 
 $$
 \mathbb E[(r(C)-Y)^2]
-=\pi(1-\pi)-\mathbb E[(r(C)-\pi)^2]。
+=\pi(1-\pi)-\mathbb E[(r(C)-\pi)^2].
 $$
 
 **10.10 ★★ 權重無界還不夠。** 在共變量偏移下推導
 
 $$
-R_q(f)=\mathbb E_p\!\left[\frac{q(X)}{p(X)}\ell(f(X),Y)\right]。
+R_q(f)=\mathbb E_p\!\left[\frac{q(X)}{p(X)}\ell(f(X),Y)\right].
 $$
 
 接著完成兩件事：
@@ -99,7 +99,7 @@ $$
 **10.14 ★★★ 有限樣本 ECE 偏誤。** 一個區間含有 $n$ 個獨立結果 $Y_i\sim\mathrm{Bernoulli}(p)$，其中固定的 $p\in(0,1)$ 也是預測值。證明
 
 $$
-\mathbb E\left|\bar Y-p\right|=\Theta(n^{-1/2})。
+\mathbb E\left|\bar Y-p\right|=\Theta(n^{-1/2}).
 $$
 
 利用常態近似推導首項常數 $\sqrt{2p(1-p)/(\pi n)}$。當 $p=0$ 或 $p=1$ 時會怎樣？解釋為何不同樣本數算出的原始 ECE 不能直接比較。

@@ -58,7 +58,7 @@ unit:
 因此，證據階梯不是
 
 $$
-\text{注意力圖片}\Rightarrow\text{機制已證明}。
+\text{注意力圖片}\Rightarrow\text{機制已證明}.
 $$
 
 它更接近
@@ -70,7 +70,7 @@ $$
 \longrightarrow
 \text{受控介入}
 \longrightarrow
-\text{有邊界的因果主張}。
+\text{有邊界的因果主張}.
 $$
 
 每個箭頭都需要測試。
@@ -80,7 +80,7 @@ $$
 **歸納模式（induction pattern）**具有下列形式：
 
 $$
-[A][B]\;\ldots\;[A]\longrightarrow[B]。
+[A][B]\;\ldots\;[A]\longrightarrow[B].
 $$
 
 看過一次「A 後面接 B」之後，模型再次看到 A，便預測 B。一種受到廣泛研究的 Transformer 機制，會把兩個注意力頭串起來：

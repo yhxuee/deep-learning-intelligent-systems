@@ -129,7 +129,7 @@ $$
 
 - **11.4：**恢復是從受損朝乾淨量測，所以分子為 $L_b-L_p$。
 - **11.10：**歸納頭的 key 讀取前一詞元區塊，不是原始詞元區塊。
-- **11.12：**沿著 $\text{頭 0.0}\rightarrow\text{前一詞元欄位}\rightarrow\text{頭 1.0 key}\rightarrow\text{logit}$ 追蹤。
+- **11.12：**沿著 $\text{頭 0。0}\rightarrow\text{前一詞元欄位}\rightarrow\text{頭 1。0 key}\rightarrow\text{logit}$ 追蹤。
 - **11.17：**冗餘可嘗試 $Y=\max(h_1,h_2)$，交互作用可嘗試 $Y=h_1h_2$。
 - **11.18：**若 $h'=Rh$、$W'=WR^{-1}$，則 $W'h'=Wh$。
 - **11.21：**令 $Y=A+B$，再用閘門使所有一般輸入上的 $B=0$。

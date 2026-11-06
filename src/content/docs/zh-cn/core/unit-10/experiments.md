@@ -39,13 +39,13 @@ python -m pytest test_spine.py -k stage10 -v
 
 $$
 \widehat{\operatorname{coverage}}
-=\frac{\#\{\text{包含真实平均值的区间}\}}{\#\{\text{模拟研究}\}}。
+=\frac{\#\{\text{包含真实平均值的区间}\}}{\#\{\text{模拟研究}\}}.
 $$
 
 因为此估计本身也是二项比例，应附上 Monte Carlo 标准误
 
 $$
-\sqrt{\hat c(1-\hat c)/M}，
+\sqrt{\hat c(1-\hat c)/M},
 $$
 
 其中 $M$ 是模拟研究次数。
@@ -64,7 +64,7 @@ $$
 
 $$
 \frac{\text{字符自助法区间宽度}}
-{\text{故事自助法区间宽度}}。
+{\text{故事自助法区间宽度}}.
 $$
 
 它会接近 1、远小于 1，还是大于 1？请用故事内依赖性解释。

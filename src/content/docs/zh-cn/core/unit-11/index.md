@@ -58,7 +58,7 @@ unit:
 因此，证据阶梯不是
 
 $$
-\text{注意力图片}\Rightarrow\text{机制已证明}。
+\text{注意力图片}\Rightarrow\text{机制已证明}.
 $$
 
 它更接近
@@ -70,7 +70,7 @@ $$
 \longrightarrow
 \text{受控干预}
 \longrightarrow
-\text{有边界的因果主张}。
+\text{有边界的因果主张}.
 $$
 
 每个箭头都需要测试。
@@ -80,7 +80,7 @@ $$
 **归纳模式（induction pattern）**具有下列形式：
 
 $$
-[A][B]\;\ldots\;[A]\longrightarrow[B]。
+[A][B]\;\ldots\;[A]\longrightarrow[B].
 $$
 
 看过一次“A 后面接 B”之后，模型再次看到 A，便预测 B。一种受到广泛研究的 Transformer 机制，会把两个注意力头串起来：

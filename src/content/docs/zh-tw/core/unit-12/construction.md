@@ -187,7 +187,7 @@ $$
 假設深度 $A$ 與脈絡長度 $B$ 可能交互作用，$2\times2$ 因子模型是
 
 $$
-Y_s=\beta_0+\beta_AA+\beta_BB+\beta_{AB}AB+u_s+\varepsilon_s.
+Y_{s}=\beta_0+\beta_AA+\beta_BB+\beta_{AB}AB+u_s+\varepsilon_s.
 $$
 
 $\beta_{AB}$ 問長脈絡的效應是否隨深度改變。一次一因子的比較無法估計它。

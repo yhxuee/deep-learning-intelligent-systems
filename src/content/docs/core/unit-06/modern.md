@@ -42,7 +42,7 @@ Serving has two recurrent wastes: unused cache space and repeated weight reads.
 
 **Speculative decoding.** A small draft model proposes several tokens. The large target model scores the proposed block in one parallel pass; an acceptance-and-correction rule then returns exactly the target model's distribution ([Leviathan et al. 2023](/references/#leviathan-2023)) **[D]**. Unit 08 derives that rule.
 
-Why might this be faster? During memory-bound decoding, checking several positions can require a similar **target-weight** read to checking one. But total traffic is not identical: the draft model, KV caches, verification tensors and rejected proposals all cost something. Speed-up therefore depends on draft acceptance, block length, verification kernels, batching and cache overhead **[E]**. A poor draft can make speculation slower. “Exact” describes the corrected output distribution, not arbitrary greedy acceptance of draft tokens.
+Why might this be faster? During memory-bound decoding, checking several positions can require a similar **target-weight** read to checking one. But total traffic is not identical: the draft model, KV caches, verification tensors and rejected proposals all cost something. Measured speed-up therefore depends on draft acceptance, block length, verification kernels, batching and cache overhead ([Leviathan et al. 2023](/references/#leviathan-2023)) **[E]**. A poor draft can make speculation slower. “Exact” describes the corrected output distribution, not arbitrary greedy acceptance of draft tokens.
 
 ## 6.8.4 More total parameters without proportional active FLOPs
 

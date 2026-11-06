@@ -33,7 +33,7 @@ $$
 
 所以指数就是负斜率。图上呈直线，只能支持已画出范围内的幂律。
 
-纯粹的 $AN^{-\alpha}$ 会趋近零；但在诚实评估下，下一词元 NLL 不可能低于数据生成分布的条件熵（单元 01，推断 1.1）。因此 [Hoffmann et al. (2022)](/zh-cn/references/#hoffmann-2022) 同时拟合参数与数据，并加入明确的渐近值：
+纯粹的 $AN^{-\alpha}$ 会趋近零；但在诚实评估下，下一词元 NLL 不可能低于数据生成分布的条件熵（单元 01，推断 1.1；Corollary 1.1）。因此 [Hoffmann et al. (2022)](/zh-cn/references/#hoffmann-2022) 同时拟合参数与数据，并加入明确的渐近值：
 
 $$
 L(N, D) = E + \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}} .

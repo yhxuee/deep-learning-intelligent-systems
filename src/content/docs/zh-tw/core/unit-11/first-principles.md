@@ -29,13 +29,13 @@ sidebar: { label: "11.2 第一原理", order: 2 }
 所以，「可解碼」表示
 
 $$
-\text{受測解碼器類別中的某個解碼器能恢復標籤}，
+\text{受測解碼器類別中的某個解碼器能恢復標籤},
 $$
 
 而不是
 
 $$
-\text{模型本身使用這個解碼器或特徵}。
+\text{模型本身使用這個解碼器或特徵}.
 $$
 
 ### 層次三——機制
@@ -57,7 +57,7 @@ $$
 \centernot\Rightarrow
 \text{唯一表示}
 \centernot\Rightarrow
-\text{唯一機制}。
+\text{唯一機制}.
 $$
 
 機制應預測行為，但觀察行為無法唯一反轉這項映射。這種多對一關係，是可解釋性的核心識別問題。
@@ -99,7 +99,7 @@ $$
 $$
 a_j=\frac{\partial s(x)}{\partial h_j}
 \quad\text{或}\quad
-a_j=h_j\frac{\partial s(x)}{\partial h_j}。
+a_j=h_j\frac{\partial s(x)}{\partial h_j}.
 $$
 
 積分梯度沿著從基線到輸入的路徑累積梯度（[Sundararajan et al. 2017](/zh-tw/references/#sundararajan-2017)）。這些方法速度快，可以排列候選輸入或元件。
@@ -134,7 +134,7 @@ $$
 對一個注意力頭，
 
 $$
-o_i=\sum_j A_{ij}v_j。
+o_i=\sum_j A_{ij}v_j.
 $$
 
 權重 $A_{ij}$ 說明值向量 $v_j$ 以多大程度混入位置 $i$ 的更新，卻**不會**告訴我們：
@@ -176,7 +176,7 @@ $$
 效應大小應在輸入內配對：
 
 $$
-\Delta_i=L_i(\text{介入})-L_i(\text{乾淨})。
+\Delta_i=L_i(\text{介入})-L_i(\text{乾淨}).
 $$
 
 應回報 $\Delta_i$ 的分布或區間，而不只是單一戲劇性例子。

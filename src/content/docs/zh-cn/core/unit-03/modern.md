@@ -8,7 +8,14 @@ sidebar: { label: "3.8 最新进展", order: 8 }
 
 ## 3.8.1 初始化：前向与反向都保持方差
 
-例题 3.9 在独立、零平均近似下推得前向关系 $\operatorname{Var}(z_i)\approx n_{\text{in}}\sigma_w^2\mathbb E[x_j^2]$。类线性活化因此取 $\sigma_w^2=1/n_{\text{in}}$；ReLU 只保留约一半二阶动差，所以取 $2/n_{\text{in}}$。
+例题 3.9 在独立、零平均近似下推得前向关系
+
+$$
+\operatorname{Var}(z_i)
+\approx n_{\text{in}}\sigma_w^2\,\mathbb E[x_j^2].
+$$
+
+类线性活化因此取 $\sigma_w^2=1/n_{\text{in}}$；ReLU 只保留约一半二阶动差，所以取 $2/n_{\text{in}}$。
 
 **反向**计算具有相同结构，但要对 $n_{\text{out}}$ 个下游单元加总，并计入活化函数导数：
 
@@ -24,7 +31,13 @@ $$
 
 **归一化层**沿选定轴标准化，再应用学到的缩放与平移。批量归一化训练时使用批量统计量、推断时使用移动统计量（[Ioffe & Szegedy 2015](/zh-cn/references/#ioffe-2015)）；层归一化使用每个样本内的特征，训练与推断行为一致（[Ba et al. 2016](/zh-cn/references/#ba-2016)）。两者不能任意互换。它们能改善许多深层架构的可优化性 **[E]**，但机制尚未完全确定。“更平滑”也不自动等于“Hessian 条件数较小”；广泛的机制解释应视为 **[H]**。
 
-**残差连接（residual connection）** $x\mapsto x+F(x)$ 的雅可比矩阵为 $I+\partial F/\partial x$。单位矩阵项提供直接的反向贡献，不必把每份信号都送进残差分支的权重矩阵，因此能改善许多深层架构的梯度传递（[He et al. 2016](/zh-cn/references/#he-2016)）。但它不保证梯度永不消失：$I+\partial F/\partial x$ 仍可能有很小或为零的奇异值，多个因子相乘也仍会收缩。雅可比式为 **[D]**；指定设计的可训练性为 **[E]**。
+**残差连接（residual connection）** $x\mapsto x+F(x)$ 的雅可比矩阵为
+
+$$
+I+\frac{\partial F}{\partial x}.
+$$
+
+单位矩阵项提供直接的反向贡献，不必把每份信号都送进残差分支的权重矩阵，因此能改善许多深层架构的梯度传递（[He et al. 2016](/zh-cn/references/#he-2016)）。但它不保证梯度永不消失：$I+\partial F/\partial x$ 仍可能有很小或为零的奇异值，多个因子相乘也仍会收缩。雅可比式为 **[D]**；指定设计的可训练性为 **[E]**。
 
 ## 3.8.3 学习率调度
 

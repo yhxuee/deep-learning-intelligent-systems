@@ -19,7 +19,7 @@ These are not all failures of the mathematics. Often the theorem is correct and 
 
 **How it breaks.** Deployment commonly changes the source: a model trained on 2020 text is used in 2027, or a classifier trained in one hospital is used in another. As a concrete counterexample, fit the spine bigram on complete stories and then evaluate it on a list containing only arithmetic sentences such as “Now Tom has 7 apples.” Such sentences occur inside the stories, but never constitute the entire text. Their local patterns and frequencies form a different evaluation distribution. The held-out story loss is still a valid estimate for new stories from the original generator; it is not a reliable estimate for this arithmetic-only stream.
 
-**Practical consequence.** A held-out number must always be reported together with the population it is intended to represent. Detecting and measuring distribution shift is the core of [Unit 10](/core/unit-10/) **[E]**.
+**Practical consequence.** A held-out number must always be reported together with the population it is intended to represent. [Unit 10, Experiment 10.7](/core/unit-10/experiments/) demonstrates how a multi-site shortcut can remain hidden by an aggregate score **[E]**.
 
 ## 1.7.2 Leakage makes held-out numbers optimistic
 

@@ -20,7 +20,7 @@ sidebar: { label: "10.5 一般理论", order: 5 }
 二元 Brier 损失是
 
 $$
-S(q,Y)=(q-Y)^2。
+S(q,Y)=(q-Y)^2.
 $$
 
 在 $Y\sim\mathrm{Bernoulli}(p)$ 下，其期望值为
@@ -29,7 +29,7 @@ $$
 \begin{aligned}
 \mathbb E_p[(q-Y)^2]
 &=p(q-1)^2+(1-p)q^2\\
-&=(q-p)^2+p(1-p)。
+&=(q-p)^2+p(1-p).
 \end{aligned}
 $$
 
@@ -42,7 +42,7 @@ $$
 $$
 \mathbb E_{Y\sim p}[-\log q(Y)]
 -\mathbb E_{Y\sim p}[-\log p(Y)]
-=D_{\mathrm{KL}}(p\|q)\ge0。
+=D_{\mathrm{KL}}(p\|q)\ge0.
 $$
 
 所以适当评分回答的是精确问题：**完整预测分布有多好？** 它本身不会告诉我们，应用某个阈值之后的决策成本是否可以接受。
@@ -52,21 +52,21 @@ $$
 令 $C$ 表示模型回报的概率，并定义
 
 $$
-r(C)=\mathbb E[Y\mid C]，
+r(C)=\mathbb E[Y\mid C],
 \qquad
-\pi=\mathbb E[Y]。
+\pi=\mathbb E[Y].
 $$
 
 $r(C)$ 是收到相同预测值之案例的真实事件频率。加上再减去 $r(C)$：
 
 $$
-C-Y=(C-r(C))+(r(C)-Y)。
+C-Y=(C-r(C))+(r(C)-Y).
 $$
 
 平方后取期望，交叉项消失，因为
 
 $$
-\mathbb E[r(C)-Y\mid C]=0。
+\mathbb E[r(C)-Y\mid C]=0.
 $$
 
 因此
@@ -74,7 +74,7 @@ $$
 $$
 \mathbb E[(C-Y)^2]
 =\mathbb E[(C-r(C))^2]
-+\mathbb E[(r(C)-Y)^2]。
++\mathbb E[(r(C)-Y)^2].
 $$
 
 对二元 $Y$，再以基础率 $\pi$ 分解第二项，可得
@@ -88,7 +88,7 @@ $$
 \underbrace{\mathbb E[(r(C)-\pi)^2]}_{\text{分辨力}}
 +
 \underbrace{\pi(1-\pi)}_{\text{不确定性}}
-}。
+}.
 $$
 
 符号很重要：
@@ -111,7 +111,7 @@ $$
 假设 $X_1,\ldots,X_n$ 来自未知的总体分布 $F$，我们关心的统计量是
 
 $$
-\hat\theta=T(X_1,\ldots,X_n)。
+\hat\theta=T(X_1,\ldots,X_n).
 $$
 
 如果知道 $F$，我们可以反复从它抽出新数据集，直接观察 $\hat\theta$ 的抽样分布。但 $F$ 未知，因此自助法以经验分布
@@ -129,7 +129,7 @@ F\ \text{未知}
 \quad\longrightarrow\quad
 \hat F_n\ \text{可观察}
 \quad\longrightarrow\quad
-\text{模拟 }\hat\theta^*。
+\text{模拟 }\hat\theta^*.
 $$
 
 对许多独立同分布数据的平滑统计量——例如平均、在适当条件下的回归系数，以及配对平均差——条件自助法分布
@@ -183,14 +183,14 @@ $$
 5. 令
 
 $$
-k=\left\lceil(n+1)(1-\alpha)\right\rceil。
+k=\left\lceil(n+1)(1-\alpha)\right\rceil.
 $$
 
 若 $k\le n$，令 $\hat q$ 为第 $k$ 小的校准分数；若 $k>n$，则令 $\hat q=+\infty$。
 6. 对新输入返回
 
 $$
-C(x)=\{y:s(x,y)\le\hat q\}。
+C(x)=\{y:s(x,y)\le\hat q\}.
 $$
 
 $n+1$ 修正不可省略。直接使用普通的经验 $(1-\alpha)$ 分位数，可能在有限样本下覆盖不足。
@@ -207,7 +207,7 @@ $n+1$ 修正不可省略。直接使用普通的经验 $(1-\alpha)$ 分位数，
 对上述构建，以及一个新的可交换点 $(X_{n+1},Y_{n+1})$，
 
 $$
-P\{Y_{n+1}\in C(X_{n+1})\}\ge1-\alpha。
+P\{Y_{n+1}\in C(X_{n+1})\}\ge1-\alpha.
 $$
 
 **证明。** 先假设 $n+1$ 个分数彼此相异。可交换性使测试分数的排名在 $\{1,\ldots,n+1\}$ 上均匀分布。因此
@@ -215,7 +215,7 @@ $$
 $$
 P\{\operatorname{rank}(s_{n+1})\le k\}
 =\frac{k}{n+1}
-\ge1-\alpha。
+\ge1-\alpha.
 $$
 
 当 $k\le n$ 时，排名不超过 $k$ 蕴含 $s_{n+1}\le s_{(k)}=\hat q$，所以真实标签包含在集合中。当 $k>n$ 时，集合包含所有标签，覆盖率为一。有同分时，保守的同分规则会保留此不等式；随机打破同分则能得到更精确的有限样本水平。$\blacksquare$
@@ -240,9 +240,9 @@ $$
 两种错误准则回答不同问题：
 
 $$
-\mathrm{FWER}=P(V\ge1)，
+\mathrm{FWER}=P(V\ge1),
 \qquad
-\mathrm{FDR}=\mathbb E\left[\frac{V}{\max(R,1)}\right]。
+\mathrm{FDR}=\mathbb E\left[\frac{V}{\max(R,1)}\right].
 $$
 
 家族错误率（FWER）问的是出现**任何一个**错误发现的概率。错误发现率（FDR）问的是已回报发现中，错误比例的期望值。控制 FDR 不表示每个回报结果的假阳性概率都不超过 $\alpha$，也不表示 $P(V\ge1)\le\alpha$。
@@ -256,7 +256,7 @@ $$
 3. 找到满足下式的最大 $k$：
 
 $$
-p_{(k)}\le\frac{k\alpha}{m}。
+p_{(k)}\le\frac{k\alpha}{m}.
 $$
 
 4. 拒绝对应于 $p_{(1)},\ldots,p_{(k)}$ 的假设。
@@ -266,13 +266,13 @@ $$
 **例子。** 令 $m=5$、$\alpha=0.05$，排序后的 $p$ 值是
 
 $$
-0.003,\ 0.012,\ 0.021,\ 0.080,\ 0.200。
+0.003,\ 0.012,\ 0.021,\ 0.080,\ 0.200.
 $$
 
 BH 阈值是
 
 $$
-0.01,\ 0.02,\ 0.03,\ 0.04,\ 0.05。
+0.01,\ 0.02,\ 0.03,\ 0.04,\ 0.05.
 $$
 
 最大的通过索引是 $k=3$，所以拒绝前三个假设。若使用 Bonferroni 规则把 FWER 控制在 0.05，阈值是 $0.05/5=0.01$，只会拒绝第一个。

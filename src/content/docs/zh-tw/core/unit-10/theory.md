@@ -20,7 +20,7 @@ sidebar: { label: "10.5 一般理論", order: 5 }
 二元 Brier 損失是
 
 $$
-S(q,Y)=(q-Y)^2。
+S(q,Y)=(q-Y)^2.
 $$
 
 在 $Y\sim\mathrm{Bernoulli}(p)$ 下，其期望值為
@@ -29,7 +29,7 @@ $$
 \begin{aligned}
 \mathbb E_p[(q-Y)^2]
 &=p(q-1)^2+(1-p)q^2\\
-&=(q-p)^2+p(1-p)。
+&=(q-p)^2+p(1-p).
 \end{aligned}
 $$
 
@@ -42,7 +42,7 @@ $$
 $$
 \mathbb E_{Y\sim p}[-\log q(Y)]
 -\mathbb E_{Y\sim p}[-\log p(Y)]
-=D_{\mathrm{KL}}(p\|q)\ge0。
+=D_{\mathrm{KL}}(p\|q)\ge0.
 $$
 
 所以適當評分回答的是精確問題：**完整預測分布有多好？** 它本身不會告訴我們，套用某個閾值之後的決策成本是否可以接受。
@@ -52,21 +52,21 @@ $$
 令 $C$ 表示模型回報的機率，並定義
 
 $$
-r(C)=\mathbb E[Y\mid C]，
+r(C)=\mathbb E[Y\mid C],
 \qquad
-\pi=\mathbb E[Y]。
+\pi=\mathbb E[Y].
 $$
 
 $r(C)$ 是收到相同預測值之案例的真實事件頻率。加上再減去 $r(C)$：
 
 $$
-C-Y=(C-r(C))+(r(C)-Y)。
+C-Y=(C-r(C))+(r(C)-Y).
 $$
 
 平方後取期望，交叉項消失，因為
 
 $$
-\mathbb E[r(C)-Y\mid C]=0。
+\mathbb E[r(C)-Y\mid C]=0.
 $$
 
 因此
@@ -74,7 +74,7 @@ $$
 $$
 \mathbb E[(C-Y)^2]
 =\mathbb E[(C-r(C))^2]
-+\mathbb E[(r(C)-Y)^2]。
++\mathbb E[(r(C)-Y)^2].
 $$
 
 對二元 $Y$，再以基準率 $\pi$ 分解第二項，可得
@@ -88,7 +88,7 @@ $$
 \underbrace{\mathbb E[(r(C)-\pi)^2]}_{\text{鑑別度}}
 +
 \underbrace{\pi(1-\pi)}_{\text{不確定性}}
-}。
+}.
 $$
 
 符號很重要：
@@ -111,7 +111,7 @@ $$
 假設 $X_1,\ldots,X_n$ 來自未知的母體分布 $F$，我們關心的統計量是
 
 $$
-\hat\theta=T(X_1,\ldots,X_n)。
+\hat\theta=T(X_1,\ldots,X_n).
 $$
 
 如果知道 $F$，我們可以反覆從它抽出新資料集，直接觀察 $\hat\theta$ 的抽樣分布。但 $F$ 未知，因此拔靴法以經驗分布
@@ -129,7 +129,7 @@ F\ \text{未知}
 \quad\longrightarrow\quad
 \hat F_n\ \text{可觀察}
 \quad\longrightarrow\quad
-\text{模擬 }\hat\theta^*。
+\text{模擬 }\hat\theta^*.
 $$
 
 對許多獨立同分布資料的平滑統計量——例如平均、在適當條件下的迴歸係數，以及配對平均差——條件拔靴法分布
@@ -183,14 +183,14 @@ $$
 5. 令
 
 $$
-k=\left\lceil(n+1)(1-\alpha)\right\rceil。
+k=\left\lceil(n+1)(1-\alpha)\right\rceil.
 $$
 
 若 $k\le n$，令 $\hat q$ 為第 $k$ 小的校準分數；若 $k>n$，則令 $\hat q=+\infty$。
 6. 對新輸入回傳
 
 $$
-C(x)=\{y:s(x,y)\le\hat q\}。
+C(x)=\{y:s(x,y)\le\hat q\}.
 $$
 
 $n+1$ 修正不可省略。直接使用普通的經驗 $(1-\alpha)$ 分位數，可能在有限樣本下覆蓋不足。
@@ -207,7 +207,7 @@ $n+1$ 修正不可省略。直接使用普通的經驗 $(1-\alpha)$ 分位數，
 對上述建構，以及一個新的可交換點 $(X_{n+1},Y_{n+1})$，
 
 $$
-P\{Y_{n+1}\in C(X_{n+1})\}\ge1-\alpha。
+P\{Y_{n+1}\in C(X_{n+1})\}\ge1-\alpha.
 $$
 
 **證明。** 先假設 $n+1$ 個分數彼此相異。可交換性使測試分數的排名在 $\{1,\ldots,n+1\}$ 上均勻分布。因此
@@ -215,7 +215,7 @@ $$
 $$
 P\{\operatorname{rank}(s_{n+1})\le k\}
 =\frac{k}{n+1}
-\ge1-\alpha。
+\ge1-\alpha.
 $$
 
 當 $k\le n$ 時，排名不超過 $k$ 蘊含 $s_{n+1}\le s_{(k)}=\hat q$，所以真實標籤包含在集合中。當 $k>n$ 時，集合包含所有標籤，覆蓋率為一。有同分時，保守的同分規則會保留此不等式；隨機打破同分則能得到更精確的有限樣本水準。$\blacksquare$
@@ -240,9 +240,9 @@ $$
 兩種錯誤準則回答不同問題：
 
 $$
-\mathrm{FWER}=P(V\ge1)，
+\mathrm{FWER}=P(V\ge1),
 \qquad
-\mathrm{FDR}=\mathbb E\left[\frac{V}{\max(R,1)}\right]。
+\mathrm{FDR}=\mathbb E\left[\frac{V}{\max(R,1)}\right].
 $$
 
 家族錯誤率（FWER）問的是出現**任何一個**錯誤發現的機率。錯誤發現率（FDR）問的是已回報發現中，錯誤比例的期望值。控制 FDR 不表示每個回報結果的偽陽性機率都不超過 $\alpha$，也不表示 $P(V\ge1)\le\alpha$。
@@ -256,7 +256,7 @@ $$
 3. 找到滿足下式的最大 $k$：
 
 $$
-p_{(k)}\le\frac{k\alpha}{m}。
+p_{(k)}\le\frac{k\alpha}{m}.
 $$
 
 4. 拒絕對應於 $p_{(1)},\ldots,p_{(k)}$ 的假設。
@@ -266,13 +266,13 @@ $$
 **例子。** 令 $m=5$、$\alpha=0.05$，排序後的 $p$ 值是
 
 $$
-0.003,\ 0.012,\ 0.021,\ 0.080,\ 0.200。
+0.003,\ 0.012,\ 0.021,\ 0.080,\ 0.200.
 $$
 
 BH 閾值是
 
 $$
-0.01,\ 0.02,\ 0.03,\ 0.04,\ 0.05。
+0.01,\ 0.02,\ 0.03,\ 0.04,\ 0.05.
 $$
 
 最大的通過索引是 $k=3$，所以拒絕前三個假設。若使用 Bonferroni 規則把 FWER 控制在 0.05，閾值是 $0.05/5=0.01$，只會拒絕第一個。

@@ -7,8 +7,8 @@ sidebar: { label: "11.4 例题", order: 4 }
 精确计算由 `spine/test_spine.py` 与 `labs/test_worked_examples_u09_u12.py` 检查。固定电路输出来自 `spine/stage11_induction.py`。手工模型使用
 
 $$
-K=8，\qquad c=60，\qquad\lambda=10，
-\qquad d=36，\qquad d_h=18。
+K=8,\qquad c=60,\qquad\lambda=10,
+\qquad d=36,\qquad d_h=18.
 $$
 
 每个例题都分开三种陈述：
@@ -30,23 +30,23 @@ $$
 所有非目标分数都是零。若有 $n$ 个可见键，目标权重为
 
 $$
-A_*(n)=\frac{e^{s_*}}{e^{s_*}+n-1}。
+A_*(n)=\frac{e^{s_*}}{e^{s_*}+n-1}.
 $$
 
 对 $n=16$，
 
 $$
-A_*(16)=0.999989，
+A_*(16)=0.999989,
 \qquad
-1-A_*(16)\approx1.1\times10^{-5}。
+1-A_*(16)\approx1.1\times10^{-5}.
 $$
 
 若 $c=20$，同一个头就没有那么尖锐：
 
 $$
-s_*=20/\sqrt{18}=4.714，
+s_*=20/\sqrt{18}=4.714,
 \qquad
-A_*(16)\approx0.881。
+A_*(16)\approx0.881.
 $$
 
 **合理性检查。** 即使每个干扰键分数都是零，可见干扰键越多，目标权重仍会下降。当 $n=1\,000$ 且 $c=60$，缺失质量约为 $7.2\times10^{-4}$——依然很小，却远大于 $n=16$ 时。
@@ -76,7 +76,7 @@ $$
 损失为
 
 $$
--\log p_*=0.00044\ldots\ \text{nats}。
+-\log p_*=0.00044\ldots\ \text{nats}.
 $$
 
 这与重复段中可预测的第 2–8 个词元之实测平均损失 0.0004 相符。
@@ -128,7 +128,7 @@ $$
 恢复比例为
 
 $$
-R=\frac{8.77-0.0004}{8.77-0.0004}\approx1。
+R=\frac{8.77-0.0004}{8.77-0.0004}\approx1.
 $$
 
 测试实现很重要：必须执行**受损输入**，同时传入
@@ -150,13 +150,13 @@ patch = {(1, 0): clean_cache["blocks"][1]["o"][:, 0]}
 训练一个两层、两头、学习位置、$d=48$、无 MLP、无归一化的纯注意力模型。训练序列含两份八词元片段，中间隔着随机长度噪声：
 
 $$
-[\mathrm{BOS},\mathrm{噪声},s,\mathrm{噪声},s,\mathrm{噪声}]。
+[\mathrm{BOS},\mathrm{噪声},s,\mathrm{噪声},s,\mathrm{噪声}].
 $$
 
 词汇有 24 个普通词元，所以均匀损失是
 
 $$
-\log24=3.178\ \text{nats}。
+\log24=3.178\ \text{nats}.
 $$
 
 ### 行为
@@ -182,11 +182,11 @@ $$
 这是两条捷径的反例：
 
 $$
-\text{没有熟悉注意力模式}\not\Rightarrow\text{没有行为}，
+\text{没有熟悉注意力模式}\not\Rightarrow\text{没有行为},
 $$
 
 $$
-\text{最大的微弱分数}\not\Rightarrow\text{机制}。
+\text{最大的微弱分数}\not\Rightarrow\text{机制}.
 $$
 
 ## 例题 11.6——没有复制行为可定位时
@@ -217,19 +217,19 @@ $$
 线性探针从 200 个隐藏状态预测二元性质：
 
 $$
-\operatorname{acc}_{\mathrm{真实}}=0.92。
+\operatorname{acc}_{\mathrm{真实}}=0.92.
 $$
 
 同一探针类别在依输入类型随机重指派的标签上训练，保留记忆输入类型的机会：
 
 $$
-\operatorname{acc}_{\mathrm{控制}}=0.81。
+\operatorname{acc}_{\mathrm{控制}}=0.81.
 $$
 
 选择性为
 
 $$
-0.92-0.81=0.11，
+0.92-0.81=0.11,
 $$
 
 即 11 个百分点（[Hewitt & Liang 2019](/zh-cn/references/#hewitt-2019)）。
@@ -256,7 +256,7 @@ $$
 KL 度量平均分布位移：
 
 $$
-D_{\mathrm{KL}}(\pi\|\pi_{\mathrm{ref}})。
+D_{\mathrm{KL}}(\pi\|\pi_{\mathrm{ref}}).
 $$
 
 它不识别哪些 logits 改变、改变是否依提示而异，也不说改变后的分布是否解决预定任务。

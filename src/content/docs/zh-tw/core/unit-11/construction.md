@@ -21,12 +21,12 @@ sidebar: { label: "11.3 數學建構", order: 3 }
 在殘差網路中，每個區塊都把更新加到持續流動的向量上。對沒有正規化的純注意力 Transformer，
 
 $$
-r_t^{(0)}=e_{x_t}+p_t，
+r_t^{(0)}=e_{x_t}+p_t,
 $$
 
 $$
 r_t^{(\ell+1)}
-=r_t^{(\ell)}+sum_h o_t^{(\ell,h)}，
+=r_t^{(\ell)}+sum_h o_t^{(\ell,h)},
 $$
 
 其中 $e_{x_t}$ 是詞元嵌入、$p_t$ 是位置嵌入，而 $o_t^{(\ell,h)}$ 是一個頭經輸出投影後的輸出。
@@ -35,20 +35,20 @@ $$
 
 $$
 r_t^{(L)}
-=e_{x_t}+p_t+sum_{\ell=0}^{L-1}\sum_h o_t^{(\ell,h)}。
+=e_{x_t}+p_t+sum_{\ell=0}^{L-1}\sum_h o_t^{(\ell,h)}.
 $$
 
 若線性反嵌入矩陣為 $U\in\mathbb R^{V\times d}$，則
 
 $$
-z_t=Ur_t^{(L)}+b。
+z_t=Ur_t^{(L)}+b.
 $$
 
 由線性可得精確帳本：
 
 $$
 z_t
-=Ue_{x_t}+Up_t+sum_{\ell,h}Uo_t^{(\ell,h)}+b。
+=Ue_{x_t}+Up_t+sum_{\ell,h}Uo_t^{(\ell,h)}+b.
 $$
 
 向量 $Uo_t^{(\ell,h)}$ 是此頭的**直接 logit 貢獻**。其中對詞元 $v$ 的座標，表示此頭在最後讀出時，直接把 logit $z_{t,v}$ 提高或降低多少（[Elhage et al. 2021](/zh-tw/references/#elhage-2021)）。
@@ -66,42 +66,42 @@ $$
 採用列向量慣例。把殘差向量堆疊成 $X\in\mathbb R^{T\times d}$。對寬度為 $d_h$ 的一個頭，
 
 $$
-Q=XW_Q，\qquad K=XW_K，\qquad V=XW_V，
+Q=XW_Q,\qquad K=XW_K,\qquad V=XW_V,
 $$
 
 其中 $W_Q,W_K,W_V\in\mathbb R^{d\times d_h}$。因果注意力矩陣是
 
 $$
 A=\operatorname{softmax}_{\text{row}}
-\left(\frac{QK^\top}{\sqrt{d_h}}+M\right)，
+\left(\frac{QK^\top}{\sqrt{d_h}}+M\right),
 $$
 
 對未來位置 $j>i$，$M_{ij}=-\infty$。殘差更新為
 
 $$
-O=AVW_O，
-\qquad W_O\in\mathbb R^{d_h\times d}。
+O=AVW_O,
+\qquad W_O\in\mathbb R^{d_h\times d}.
 $$
 
 展開一個分數與一個輸出，
 
 $$
 \operatorname{score}_{ij}
-=\frac{x_iW_QW_K^\top x_j^\top}{\sqrt{d_h}}，
+=\frac{x_iW_QW_K^\top x_j^\top}{\sqrt{d_h}},
 $$
 
 $$
-o_i=\sum_{j\le i}A_{ij}\,x_jW_VW_O。
+o_i=\sum_{j\le i}A_{ij}\,x_jW_VW_O.
 $$
 
 這揭露兩個低秩映射：
 
 $$
-W_{QK}=W_QW_K^\top\in\mathbb R^{d\times d}，
+W_{QK}=W_QW_K^\top\in\mathbb R^{d\times d},
 $$
 
 $$
-W_{OV}=W_VW_O\in\mathbb R^{d\times d}。
+W_{OV}=W_VW_O\in\mathbb R^{d\times d}.
 $$
 
 - **QK 電路：**決定哪些查詢—鍵配對得到高分——**在哪裡讀**。
@@ -141,7 +141,7 @@ $$
 k_j^{(1,g)}
 =x_j^{(1)}W_K^{(1,g)}
 =x_j^{(0)}W_K^{(1,g)}
-+o_j^{(0,h)}W_K^{(1,g)}。
++o_j^{(0,h)}W_K^{(1,g)}.
 $$
 
 第二項是從頭 $(0,h)$ 的輸出走到頭 $(1,g)$ 之鍵的路徑，稱為 **K 組合**。
@@ -168,7 +168,7 @@ $$
 令普通詞彙含 $K$ 個詞元，再加入一個序列開始詞元，所以 $V=K+1$。每個序列為
 
 $$
-[\mathrm{BOS},s_0,s_1,\ldots,s_{K-1},s_0,s_1,\ldots,s_{K-1}]，
+[\mathrm{BOS},s_0,s_1,\ldots,s_{K-1},s_0,s_1,\ldots,s_{K-1}],
 $$
 
 其中 $s$ 是 $K$ 個普通詞元的一項排列。
@@ -185,13 +185,13 @@ r_t=
 \underbrace{\text{前一詞元}}_{V}
 \mid
 \underbrace{0}_{1}
-]。
+].
 $$
 
 因此
 
 $$
-d=V+(2K+1)+V+1=2V+2K+2=4K+4。
+d=V+(2K+1)+V+1=2V+2K+2=4K+4.
 $$
 
 有兩個頭時，$d_h=d/2=2K+2$，足以路由全部 $2K+1$ 個位置座標。
@@ -205,19 +205,19 @@ $$
 在查詢位置 $t$，選擇
 
 $$
-q_t=c\,u_t。
+q_t=c\,u_t.
 $$
 
 在鍵位置 $j$，選擇
 
 $$
-k_j=u_{j+1}。
+k_j=u_{j+1}.
 $$
 
 所以
 
 $$
-q_t\cdot k_j=c\,[j=t-1]。
+q_t\cdot k_j=c\,[j=t-1].
 $$
 
 除以 $\sqrt{d_h}$ 並做 softmax 後，$c$ 很大時，注意力幾乎全部放在 $j=t-1$。它的值讀取 $j$ 的目前詞元區塊，輸出則把該向量寫入 $t$ 的前一詞元區塊。
@@ -229,19 +229,19 @@ $$
 在位置 $i$，查詢讀取目前詞元區塊：
 
 $$
-q_i=c\,e_{x_i}。
+q_i=c\,e_{x_i}.
 $$
 
 在候選位置 $j$，鍵讀取前一詞元區塊：
 
 $$
-k_j=e_{x_{j-1}}。
+k_j=e_{x_{j-1}}.
 $$
 
 因此
 
 $$
-q_i\cdot k_j=c\,[x_i=x_{j-1}]。
+q_i\cdot k_j=c\,[x_i=x_{j-1}].
 $$
 
 在 $s_k$ 第二次出現時，較早的同一 $s_k$ 位於 $k+1$。所以被選的 $j$ 是 $k+2$，即該次出現之後一格。位置 $k+2$ 含有正確下一詞元 $s_{k+1}$；序列末端沒有可評分的重複內目標，因此排除。
@@ -257,7 +257,7 @@ $$
 當 $K=8$，
 
 $$
-V=9，\qquad d=36，\qquad d_h=18。
+V=9,\qquad d=36,\qquad d_h=18.
 $$
 
 取 $c=60$，softmax 前的目標注意力分數為
@@ -265,13 +265,13 @@ $$
 $$
 \frac{c}{\sqrt{d_h}}
 =\frac{60}{\sqrt{18}}
-\approx14.14。
+\approx14.14.
 $$
 
 若有 $n$ 個可見鍵，而且非目標分數都是零，目標注意力權重為
 
 $$
-\frac{e^{14.14}}{e^{14.14}+n-1}。
+\frac{e^{14.14}}{e^{14.14}+n-1}.
 $$
 
 在 $n=16$ 時約為 $0.999989$。取 $\lambda=10$，正確詞元機率約為 0.9996，受評分重複位置的損失約為 0.0004 nats。
@@ -303,7 +303,7 @@ $$
 
 $$
 \Delta_i^{\mathrm{abl}}
-=L(f_{c\leftarrow a}(x_i),y_i)-L(f(x_i),y_i)。
+=L(f_{c\leftarrow a}(x_i),y_i)-L(f(x_i),y_i).
 $$
 
 正的平均值表示此替換會傷害受測分布上的表現。必要性措辭應把介入說出來：「在零消融下必要」比「在所有實作中都必要」更站得住腳。
@@ -315,15 +315,15 @@ $$
 分別執行並快取活化 $h_c$：
 
 $$
-h_c^{\mathrm c}=h_c(x_{\mathrm c})，
+h_c^{\mathrm c}=h_c(x_{\mathrm c}),
 \qquad
-h_c^{\mathrm x}=h_c(x_{\mathrm x})。
+h_c^{\mathrm x}=h_c(x_{\mathrm x}).
 $$
 
 接著評估
 
 $$
-f_{c\leftarrow h_c^{\mathrm c}}(x_{\mathrm x})。
+f_{c\leftarrow h_c^{\mathrm c}}(x_{\mathrm x}).
 $$
 
 若乾淨行為恢復，表示在這套修補設置下，改變此活化足以傳遞兩輪執行之間某項具有因果關聯的差異（[Zhang & Nanda 2024](/zh-tw/references/#zhang-nanda-2024)；[Heimersheim & Nanda 2024](/zh-tw/references/#heimersheim-2024)）。它不證明特徵只位於 $c$，也不證明 $h_c$ 的每個座標都相關。
@@ -332,7 +332,7 @@ $$
 
 $$
 R=\frac{L_{\mathrm{受損}}-L_{\mathrm{修補}}}
-{L_{\mathrm{受損}}-L_{\mathrm{乾淨}}}。
+{L_{\mathrm{受損}}-L_{\mathrm{乾淨}}}.
 $$
 
 - $R=0$：沒有恢復；
@@ -367,7 +367,7 @@ $$
 給定凍結活化 $h_i$ 與標籤 $y_i$，線性探針學習
 
 $$
-P_\phi(y\mid h)=\operatorname{softmax}(Wh+b)。
+P_\phi(y\mid h)=\operatorname{softmax}(Wh+b).
 $$
 
 留出探針正確率估計此解碼器類別在抽樣母體上恢復 $y$ 的能力。切分必須防止洩漏：若同一序列類型產生許多位置，應依序列或類型切分，而不是隨機切位置。
@@ -377,7 +377,7 @@ $$
 $$
 \operatorname{selectivity}
 =\operatorname{score}_{\mathrm{真實}}
--\operatorname{score}_{\mathrm{控制}}。
+-\operatorname{score}_{\mathrm{控制}}.
 $$
 
 真實正確率高但選擇性低，表示探針容量或輸入類型記憶可能解釋大部分結果（[Hewitt & Liang 2019](/zh-tw/references/#hewitt-2019)）。
@@ -391,13 +391,13 @@ $$
 對純量分數 $s(z)$，梯度乘輸入指派
 
 $$
-a_j=z_j\frac{\partial s}{\partial z_j}。
+a_j=z_j\frac{\partial s}{\partial z_j}.
 $$
 
 積分梯度選擇基線 $z_0$ 與直線路徑
 
 $$
-\gamma(\alpha)=z_0+\alpha(z-z_0)，
+\gamma(\alpha)=z_0+\alpha(z-z_0),
 $$
 
 再指派
@@ -407,7 +407,7 @@ $$
 =(z_j-z_{0,j})
 \int_0^1
 \frac{\partial s(\gamma(\alpha))}{\partial z_j}
-\,d\alpha。
+\,d\alpha.
 $$
 
 在規則條件下，歸因滿足完備性：

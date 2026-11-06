@@ -128,8 +128,8 @@ $$
 連續信心的精確值很少重複，因此可靠度表把 $[0,1]$ 切成 $B_1,\ldots,B_M$。對分箱 $b$，定義
 
 $$
-n_b=\sum_i\mathbf1\{c_i\in B_b},\quad
-\bar c_b=\frac1{n_b}\sum_{i:c_i\in B_b}c_i,\quad
+n_b=\sum_i\mathbf1\{c_i\in B_b\},\qquad
+\bar c_b=\frac1{n_b}\sum_{i:c_i\in B_b}c_i,\qquad
 \bar a_b=\frac1{n_b}\sum_{i:c_i\in B_b}a_i.
 $$
 
@@ -158,7 +158,13 @@ $$
 
 此慣例範圍為 $[0,2]$；有些作者再除以 $K$，比較時必須寫明。多類別 Brier 分數是嚴格適當評分：期望上，誠實回報真實條件機率使其最小（[Gneiting & Raftery 2007](/zh-tw/references/#gneiting-2007)）。
 
-不要把它與首選標籤二元分數 $\frac1n\sum_i(c_i-a_i)^2$ 混淆；後者只評估「所選類別正確」這個事件。兩個機率向量可有相同首選信心與首選 Brier 分數，多類別分數卻不同。
+不要把它與首選標籤二元分數混淆：
+
+$$
+\frac1n\sum_i(c_i-a_i)^2,
+$$
+
+後者只評估「所選類別正確」這個事件。兩個機率向量可有相同首選信心與首選 Brier 分數，多類別分數卻不同。
 
 ### 溫度縮放
 

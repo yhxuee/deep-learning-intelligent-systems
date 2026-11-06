@@ -131,7 +131,7 @@ $$
 With continuous confidence, exact values rarely repeat. A reliability table partitions $[0,1]$ into bins $B_1,\ldots,B_M$. For bin $b$, define
 
 $$
-n_b=\sum_i\mathbf1{c_i\in B_b},\qquad
+n_b=\sum_i\mathbf1\{c_i\in B_b\},\qquad
 \bar c_b=\frac1{n_b}\sum_{i:c_i\in B_b}c_i,qquad
 \bar a_b=\frac1{n_b}\sum_{i:c_i\in B_b}a_i.
 $$

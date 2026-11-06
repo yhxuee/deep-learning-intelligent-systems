@@ -128,8 +128,8 @@ $$
 连续置信度的精确值很少重复，因此可靠性表把 $[0,1]$ 切成 $B_1,\ldots,B_M$。对分箱 $b$，定义
 
 $$
-n_b=\sum_i\mathbf1\{c_i\in B_b},\quad
-\bar c_b=\frac1{n_b}\sum_{i:c_i\in B_b}c_i,\quad
+n_b=\sum_i\mathbf1\{c_i\in B_b\},\qquad
+\bar c_b=\frac1{n_b}\sum_{i:c_i\in B_b}c_i,\qquad
 \bar a_b=\frac1{n_b}\sum_{i:c_i\in B_b}a_i.
 $$
 
@@ -158,7 +158,13 @@ $$
 
 此惯例范围为 $[0,2]$；有些作者再除以 $K$，比较时必须写明。多类别 Brier 分数是严格适当评分：期望上，诚实回报真实条件概率使其最小（[Gneiting & Raftery 2007](/zh-cn/references/#gneiting-2007)）。
 
-不要把它与首选标签二元分数 $\frac1n\sum_i(c_i-a_i)^2$ 混淆；后者只评估“所选类别正确”这个事件。两个概率向量可有相同首选置信度与首选 Brier 分数，多类别分数却不同。
+不要把它与首选标签二元分数混淆：
+
+$$
+\frac1n\sum_i(c_i-a_i)^2,
+$$
+
+后者只评估“所选类别正确”这个事件。两个概率向量可有相同首选置信度与首选 Brier 分数，多类别分数却不同。
 
 ### 温度缩放
 

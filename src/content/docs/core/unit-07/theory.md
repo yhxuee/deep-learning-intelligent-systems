@@ -151,7 +151,7 @@ Transfer is favoured when four alignments hold:
 
 These distinctions explain why “frozen linear probe,” “full fine-tuning” and “prompting” answer different questions. A fact may be present but not linearly accessible; fine-tuning may create a new feature rather than merely reveal an old one. For language modelling, a task directly expressible as likely text continuation is well aligned with the pretraining interface, but reliability still depends on the prompt distribution and on whether the corpus conditional is the desired answer conditional.
 
-Idealized contrastive theory can prove transfer when positive pairs arise from latent classes aligned with downstream labels. That is a conditional theorem, not a universal account of natural data **[D]/[H]**. Broad transfer is ultimately established by held-out experiments, including distribution-shift tests **[E]**.
+Idealized contrastive theory can prove transfer when positive pairs arise from latent classes aligned with downstream labels. That is a conditional theorem, not a universal account of natural data **[D]/[H]**. Broad transfer is ultimately established by held-out experiments, including distribution-shift tests; CLIP's zero-shot evaluations are one concrete instance ([Radford et al. 2021](/references/#radford-2021)) **[E]**.
 
 ## 7.5.5 ★ Deduplication changes the estimand
 

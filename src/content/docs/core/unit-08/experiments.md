@@ -204,7 +204,7 @@ p(x,y)\propto e^{-\beta U(x,y)},
 \qquad
 U(x,y)=(x^2-1)^2+\frac{y^2}{2},
 \qquad
-\beta=3?
+\beta=3.
 $$
 
 This target is symmetric, so the exact probability of $x>0$ is $1/2$. The barrier near $x=0$ has low density.

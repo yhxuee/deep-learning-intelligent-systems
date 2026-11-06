@@ -39,13 +39,13 @@ python -m pytest test_spine.py -k stage10 -v
 
 $$
 \widehat{\operatorname{coverage}}
-=\frac{\#\{\text{包含真實平均值的區間}\}}{\#\{\text{模擬研究}\}}。
+=\frac{\#\{\text{包含真實平均值的區間}\}}{\#\{\text{模擬研究}\}}.
 $$
 
 因為此估計本身也是二項比例，應附上 Monte Carlo 標準誤
 
 $$
-\sqrt{\hat c(1-\hat c)/M}，
+\sqrt{\hat c(1-\hat c)/M},
 $$
 
 其中 $M$ 是模擬研究次數。
@@ -64,7 +64,7 @@ $$
 
 $$
 \frac{\text{字元拔靴法區間寬度}}
-{\text{故事拔靴法區間寬度}}。
+{\text{故事拔靴法區間寬度}}.
 $$
 
 它會接近 1、遠小於 1，還是大於 1？請用故事內相依性解釋。

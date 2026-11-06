@@ -33,7 +33,7 @@ $$
 
 所以指數就是負斜率。圖上呈直線，只能支持已畫出範圍內的冪律。
 
-純粹的 $AN^{-\alpha}$ 會趨近零；但在誠實評估下，下一詞元 NLL 不可能低於資料生成分布的條件熵（單元 01，推論 1.1）。因此 [Hoffmann et al. (2022)](/zh-tw/references/#hoffmann-2022) 同時擬合參數與資料，並加入明確的漸近值：
+純粹的 $AN^{-\alpha}$ 會趨近零；但在誠實評估下，下一詞元 NLL 不可能低於資料生成分布的條件熵（單元 01，推論 1.1；Corollary 1.1）。因此 [Hoffmann et al. (2022)](/zh-tw/references/#hoffmann-2022) 同時擬合參數與資料，並加入明確的漸近值：
 
 $$
 L(N, D) = E + \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}} .

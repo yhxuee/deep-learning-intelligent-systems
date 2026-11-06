@@ -8,7 +8,14 @@ sidebar: { label: "3.8 近期發展", order: 8 }
 
 ## 3.8.1 初始化：前向與反向都保持變異數
 
-詳解例題 3.9 在獨立、零平均近似下推得前向關係 $\operatorname{Var}(z_i)\approx n_{\text{in}}\sigma_w^2\mathbb E[x_j^2]$。類線性活化因此取 $\sigma_w^2=1/n_{\text{in}}$；ReLU 只保留約一半二階動差，所以取 $2/n_{\text{in}}$。
+詳解例題 3.9 在獨立、零平均近似下推得前向關係
+
+$$
+\operatorname{Var}(z_i)
+\approx n_{\text{in}}\sigma_w^2\,\mathbb E[x_j^2].
+$$
+
+類線性活化因此取 $\sigma_w^2=1/n_{\text{in}}$；ReLU 只保留約一半二階動差，所以取 $2/n_{\text{in}}$。
 
 **反向**計算具有相同結構，但要對 $n_{\text{out}}$ 個下游單元加總，並計入活化函數導數：
 
@@ -24,7 +31,13 @@ $$
 
 **正規化層**沿選定軸標準化，再套用學到的縮放與平移。批次正規化訓練時使用批次統計量、推論時使用移動統計量（[Ioffe & Szegedy 2015](/zh-tw/references/#ioffe-2015)）；層正規化使用每個樣本內的特徵，訓練與推論行為一致（[Ba et al. 2016](/zh-tw/references/#ba-2016)）。兩者不能任意互換。它們能改善許多深層架構的可最佳化性 **[E]**，但機制尚未完全確定。「更平滑」也不自動等於「Hessian 條件數較小」；廣泛的機制解釋應視為 **[H]**。
 
-**殘差連接（residual connection）** $x\mapsto x+F(x)$ 的雅可比矩陣為 $I+\partial F/\partial x$。單位矩陣項提供直接的反向貢獻，不必把每份訊號都送進殘差分支的權重矩陣，因此能改善許多深層架構的梯度傳遞（[He et al. 2016](/zh-tw/references/#he-2016)）。但它不保證梯度永不消失：$I+\partial F/\partial x$ 仍可能有很小或為零的奇異值，多個因子相乘也仍會收縮。雅可比式為 **[D]**；指定設計的可訓練性為 **[E]**。
+**殘差連接（residual connection）** $x\mapsto x+F(x)$ 的雅可比矩陣為
+
+$$
+I+\frac{\partial F}{\partial x}.
+$$
+
+單位矩陣項提供直接的反向貢獻，不必把每份訊號都送進殘差分支的權重矩陣，因此能改善許多深層架構的梯度傳遞（[He et al. 2016](/zh-tw/references/#he-2016)）。但它不保證梯度永不消失：$I+\partial F/\partial x$ 仍可能有很小或為零的奇異值，多個因子相乘也仍會收縮。雅可比式為 **[D]**；指定設計的可訓練性為 **[E]**。
 
 ## 3.8.3 學習率排程
 

@@ -33,7 +33,7 @@ At high accuracy, item-level auditing becomes more important, not less. A ceilin
 
 ### Publication creates contamination risk, not proof of contamination
 
-Once items, solutions or close paraphrases are public, they can enter web corpora, instruction data or human feedback. Unit 07 showed how exact and approximate overlap can be searched **[E]**. But “the benchmark is public” does not prove that a particular checkpoint trained on it. Provenance records, corpus searches, canary strings and time-stamped data cutoffs provide evidence; none is perfect on its own.
+Once items, solutions or close paraphrases are public, they can enter web corpora, instruction data or human feedback. Spine Stage 07 demonstrates exact and approximate overlap searches on planted contamination **[E]**. But “the benchmark is public” does not prove that a particular checkpoint trained on it. Provenance records, corpus searches, canary strings and time-stamped data cutoffs provide evidence; none is perfect on its own.
 
 A subtle counterexample is **indirect familiarity**. A model may never see the exact item but may see its answer, a worked solution, or many templates generated from the same source. Exact string deduplication then reports no match while the evaluation is still easier because of exposure.
 

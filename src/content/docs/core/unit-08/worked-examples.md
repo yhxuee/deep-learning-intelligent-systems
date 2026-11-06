@@ -11,7 +11,7 @@ These examples follow one routine: state what the procedure claims to sample, ca
 **Question.** How can a single draw $U\sim\operatorname{Uniform}[0,1)$ sample from
 
 $$
-p=(0.50,0.30,0.15,0.05)?
+p=(0.50,0.30,0.15,0.05).
 $$
 
 **Step 1: build the cumulative distribution.** Add probabilities from left to right:

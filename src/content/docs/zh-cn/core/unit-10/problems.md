@@ -22,8 +22,8 @@ sidebar: { label: "10.10 习题", order: 10 }
 **10.2 ★ [不使用 AI] Brier 分解。** 把置信度视为首选标签答对的概率。对习题 10.1 计算
 
 $$
-\text{Brier}、\quad\text{校准误差}、\quad
-\text{分辨力}、\quad\text{不确定性}。
+\text{Brier},\quad\text{校准误差},\quad
+\text{分辨力},\quad\text{不确定性}.
 $$
 
 以数值验证 Brier = 校准 − 分辨力 + 不确定性。
@@ -63,7 +63,7 @@ $$
 $$
 \operatorname{Var}(d_i)
 =\operatorname{Var}(z_i^A)+\operatorname{Var}(z_i^B)
--2\operatorname{Cov}(z_i^A,z_i^B)。
+-2\operatorname{Cov}(z_i^A,z_i^B).
 $$
 
 分别描述一个正协方差、零协方差与负协方差的情境。哪种情况下配对会缩窄比较？
@@ -72,13 +72,13 @@ $$
 
 $$
 \mathbb E[(r(C)-Y)^2]
-=\pi(1-\pi)-\mathbb E[(r(C)-\pi)^2]。
+=\pi(1-\pi)-\mathbb E[(r(C)-\pi)^2].
 $$
 
 **10.10 ★★ 权重无界还不够。** 在协变量偏移下推导
 
 $$
-R_q(f)=\mathbb E_p\!\left[\frac{q(X)}{p(X)}\ell(f(X),Y)\right]。
+R_q(f)=\mathbb E_p\!\left[\frac{q(X)}{p(X)}\ell(f(X),Y)\right].
 $$
 
 接着完成两件事：
@@ -99,7 +99,7 @@ $$
 **10.14 ★★★ 有限样本 ECE 偏差。** 一个区间含有 $n$ 个独立结果 $Y_i\sim\mathrm{Bernoulli}(p)$，其中固定的 $p\in(0,1)$ 也是预测值。证明
 
 $$
-\mathbb E\left|\bar Y-p\right|=\Theta(n^{-1/2})。
+\mathbb E\left|\bar Y-p\right|=\Theta(n^{-1/2}).
 $$
 
 利用正态近似推导首项常数 $\sqrt{2p(1-p)/(\pi n)}$。当 $p=0$ 或 $p=1$ 时会怎样？解释为何不同样本量算出的原始 ECE 不能直接比较。
