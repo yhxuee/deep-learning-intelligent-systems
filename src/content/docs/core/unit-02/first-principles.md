@@ -4,139 +4,140 @@ description: Features and linear read-outs, XOR, one-hot codes as count tables, 
 sidebar: { label: "2.2 First principles", order: 2 }
 ---
 
+The core mission of deep learning is representation learning. Objects in the physical and symbolic world—characters, spoken syllables, pixel arrays—possess no native linear algebraic structure. The words "cat" and "dog" are discrete symbols; they cannot be added, scaled, or differentiated. The first step of machine learning is to map these discrete entities into a continuous geometric vector space where distances, angles, and algebraic transformations carry operational predictive meaning.
+
 ## 2.2.1 A representation is a choice of coordinates
 
-A model never receives “a character” or “an image” in the abstract; it receives numbers. Formally, a **representation** is a map
+A machine never receives abstract concepts in the wild; it operates exclusively on arrays of real numbers. Formally, a **representation** is a mapping:
 
 $$
 \phi:x\longmapsto\phi(x)\in\mathbb R^d
 $$
 
-that turns an input $x$ into a vector of $d$ numbers. Here $x$ might be a character, image or sound; $\phi(x)$ is what the next computation sees; and $d$ is the representation's dimension. The map may be designed by a person, as in the XOR feature below, or learned from data, as in an embedding table.
+that transforms an arbitrary raw input $x$ into a $d$-dimensional feature vector in Euclidean space $\mathbb R^d$. Here $x$ may represent a discrete text token, a visual patch, or an audio waveform; $\phi(x)$ constitutes the actual numerical coordinate vector read by subsequent computation; and $d$ denotes the representation dimension. This mapping may be handcrafted via domain engineering or learned end-to-end entirely from data via differentiable parameters.
 
-To see what the representation contributes, hold the downstream rule fixed. We will begin with the simplest useful rule: a **linear read-out**. For binary classification it computes
+To isolate what a representation uniquely contributes, we hold the downstream decision rule fixed. We begin with the simplest and most transparent decision mechanism: a **linear read-out**. For binary classification, a linear read-out computes an inner product followed by a scalar bias shift:
 
 $$
 s(x)=w^{\top}\phi(x)+b
 $$
 
-and predicts class 1 when the score crosses a threshold. With several classes, it computes one score per class and either chooses the largest or applies softmax to obtain probabilities. Such a read-out can draw only flat decision boundaries—lines in two dimensions, planes in three, and hyperplanes in higher dimensions.
+and predicts class 1 whenever the score crosses zero ($s(x) > 0$). In multi-class classification, the readout assigns an independent weight vector to each class, producing a vector of logits that can be mapped to probabilities via the Softmax operator. Geometrically, a linear read-out is constrained to draw flat hyperplanes—straight lines in $\mathbb R^2$, planes in $\mathbb R^3$, and affine hyperplanes in $\mathbb R^d$.
 
-So the precise beginner's slogan is:
+This yields the foundational axiom of deep learning:
 
-> Learning with a linear read-out is easy when the target is linear in the chosen representation.
+> Under a linear read-out, learning is mathematically straightforward whenever the predictive target is linearly separable in the chosen representation space.
 
-This is a claim about the **pair** consisting of a representation and a read-out. A one-hot vector followed by an unrestricted table behaves differently from the same vector followed by a multilayer network; we will keep the read-out explicit rather than credit every effect to the representation alone.
+This insight explicitly focuses on the **coupled pair** of representation and read-out. An isolated one-hot encoding paired with an unrestricted linear table behaves identically to a memorized lookup table; but when the same input is mapped into an expressive continuous latent space, a simple linear hyperplane achieves robust generalization. The essence of deep learning is not to invent increasingly tortuous decision surfaces, but to discover coordinates $\phi$ in which complex real-world relationships become linearly untangled.
 
 ## 2.2.2 XOR: impossible, then easy
 
-Take four inputs with two binary coordinates and the label "exactly one coordinate is 1":
+To see concretely how coordinates govern learnability, consider the classical Exclusive-OR (XOR) problem. Take four inputs with two binary features, where the target label is 1 if and only if exactly one coordinate equals 1:
 
-| $x_1$ | $x_2$ | label |
+| $x_1$ | $x_2$ | Target Label $y$ |
 |---|---|---|
 | 0 | 0 | 0 |
 | 0 | 1 | 1 |
 | 1 | 0 | 1 |
 | 1 | 1 | 0 |
 
-With $\phi(x)=(x_1,x_2)$, suppose a linear classifier predicts 1 when $w_1x_1+w_2x_2+b>0$. Reading the four rows in order gives four requirements:
+Using raw coordinates $\phi(x)=(x_1,x_2)$, suppose a linear classifier predicts 1 when $w_1x_1+w_2x_2+b>0$ and 0 otherwise. Reading the four truth table rows establishes four simultaneous linear inequalities:
 
 $$
 b\le0,\qquad w_2+b>0,\qquad w_1+b>0,\qquad w_1+w_2+b\le0.
 $$
 
-Add the two strict middle inequalities: $w_1+w_2+2b>0$. Therefore $w_1+w_2+b>-b\ge0$, which contradicts the last requirement. The contradiction is the proof: **no line separates XOR**. [Minsky & Papert (1969)](/references/#minsky-1969) made this limitation of a single-layer perceptron famous.
+Summing the two strict middle inequalities yields $w_1+w_2+2b>0$, which rearranges to $w_1+w_2+b > -b$. Because the first condition requires $b \le 0 \implies -b \ge 0$, we obtain $w_1+w_2+b > 0$. This directly contradicts the fourth requirement $w_1+w_2+b \le 0$!
 
-Now use $\phi(x)=(x_1,x_2,x_1x_2)$. The weights $w=(1,1,-2)$ and $b=-0.5$ give scores $-0.5,0.5,0.5,-0.5$ for the four rows, so the same kind of linear read-out separates them perfectly (Worked Example 2.1). The new coordinate records whether both inputs are 1. It supplies exactly the interaction that the original two coordinates could not express linearly.
+This algebraic contradiction proves that **no line in $\mathbb R^2$ can separate XOR**. [Minsky & Papert (1969)](/references/#minsky-1969) proved this fundamental limitation of single-layer perceptrons, triggering the first historical AI winter.
 
-Two lessons generalize:
+Now lift the feature representation into three dimensions by adding a nonlinear interaction coordinate: $\phi(x)=(x_1, x_2, x_1x_2)$. Assign weights $w=(1, 1, -2)$ with bias $b=-0.5$. Evaluating the linear readout across the four points gives:
+- For $(0,0)$: $s = 1(0) + 1(0) - 2(0) - 0.5 = -0.5 \le 0$ (class 0)
+- For $(0,1)$: $s = 1(0) + 1(1) - 2(0) - 0.5 = +0.5 > 0$ (class 1)
+- For $(1,0)$: $s = 1(1) + 1(0) - 2(0) - 0.5 = +0.5 > 0$ (class 1)
+- For $(1,1)$: $s = 1(1) + 1(1) - 2(1) - 0.5 = -0.5 \le 0$ (class 0)
 
-1. **A good representation makes the target simple — ideally linear — in its coordinates.**
-2. **Representations can combine raw coordinates.** The product $x_1x_2$ is a *nonlinear feature*. A hidden layer computes many nonlinear features and learns which are useful; the final layer may then remain linear (§2.5.1).
+The exact same linear hyperplane now separates XOR without error (Worked Example 2.1)! The new coordinate $x_1x_2$ tracks whether both inputs are simultaneously active, geometrically lifting $(1,1)$ along the third axis so that a flat plane can slice cleanly between classes.
 
-Do not overread the example. We chose $x_1x_2$ because we already knew the rule. Deep learning replaces that hand choice with an optimization problem: search for internal features that reduce predictive loss. Whether that search succeeds is a separate question, taken up in Unit 03.
+Two generalized lessons follow:
+1. **A good representation makes the target simple—ideally linear—in its coordinates.**
+2. **Hidden layers in deep networks automate this feature lifting.** In this toy example, we handcrafted the interaction $x_1x_2$. Deep learning replaces manual feature engineering with optimization: gradient descent searches a parameterized space of nonlinear compositions to discover features that linearize downstream prediction (§2.5.1).
 
 ## 2.2.3 One-hot codes: the representation that shares nothing
 
-Suppose the vocabulary contains $V$ characters. The most literal encoding gives each character its own coordinate. Character $a$ becomes the **one-hot** vector $u_a\in\mathbb R^V$: position $a$ is 1 and every other position is 0. For a three-symbol vocabulary,
+Suppose our vocabulary contains $V$ discrete tokens. The most primitive encoding assigns a private orthogonal basis dimension to each symbol. Token $a$ becomes a **one-hot** vector $u_a\in\mathbb R^V$, with a 1 at index $a$ and 0 everywhere else. For a tiny alphabet of three symbols:
 
 $$
 u_1=(1,0,0),\qquad u_2=(0,1,0),\qquad u_3=(0,0,1).
 $$
 
-Every pair of distinct one-hot vectors is orthogonal and lies at distance $\sqrt2$. The code itself provides no notion that `3` resembles `4` more than `T`. Now let $W\in\mathbb R^{V\times V}$ be an unrestricted linear read-out. For input $a$,
+In Euclidean geometry, any two distinct one-hot vectors are completely orthogonal ($u_a^\top u_b = 0$) with Euclidean distance $\|u_a - u_b\|_2 = \sqrt{2}$. This geometry enforces an extreme inductive assumption: **every symbol is equally and totally unrelated to every other symbol**. The encoding cannot represent that "3" and "4" are digits, or that "cat" and "dog" are domestic animals.
+
+Now pair this representation with an unconstrained linear readout matrix $W\in\mathbb R^{V\times V}$. Given input token $a$, the output logit vector is:
 
 $$
 z=W^{\top}u_a=W[a],
 $$
 
-where $W[a]$ denotes row $a$. Multiplication by a one-hot vector is therefore just a **row lookup**. Softmax turns that row into $q(\cdot\mid a)$, so a one-hot input plus an unrestricted linear read-out is exactly a table with one independently adjustable row per input. Maximum-likelihood training recovers the count-based bigram from Unit 01. The executable spine later verifies the equivalence by fitting the table with gradients rather than counts.
+where $W[a]$ denotes column $a$ of $W^\top$ (the $a$-th row of $W$). Multiplying by a one-hot vector is **computationally identical to table lookup**. When followed by a Softmax layer and trained under maximum likelihood, this reproduces the count-based bigram table of Unit 01. Updating parameters for token $a$ produces zero gradient signal for token $b$.
 
-The careful conclusion is not that one-hot vectors can never be used in a model that shares parameters. It is that **one-hot plus an unrestricted linear read-out introduces no sharing across symbols**. Sharing must come from an additional constraint, a different parameterization, or a learned lower-dimensional representation.
+The fundamental conclusion is that **one-hot encodings preclude all statistical sharing across symbols.** In a one-hot representation, every symbol resides in an isolated orthogonal compartment.
 
-## 2.2.4 Embeddings: learned coordinates that can be shared
+## 2.2.4 Embeddings: learned shared coordinates
 
-Replace the length-$V$ one-hot code by a shorter vector $e_a\in\mathbb R^d$, with $d\ll V$. Store all of them as the rows of an **embedding table** $E\in\mathbb R^{V\times d}$, so looking up symbol $a$ returns $E[a]=e_a$. These entries are trainable parameters, not predetermined semantic attributes.
+The solution to one-hot isolation is to compress the sparse $V$-dimensional space into a compact, continuous vector $e_a\in\mathbb R^d$, where the embedding dimension is dramatically smaller than the vocabulary size ($d\ll V$). Storing these vectors as rows in an **embedding table** $E\in\mathbb R^{V\times d}$, retrieving symbol $a$ extracts $E[a]=e_a$. These $d$ coordinates are continuous, differentiable parameters learned through gradient descent.
 
-What can this buy us? Suppose one shared, reasonably smooth prediction function consumes every embedding. If $e_{\texttt3}$ and $e_{\texttt4}$ are close and the function's weights are not extreme, their predictions will also be close. An update that improves how the shared function handles one region of embedding space can then help several symbols in that region. This is **statistical sharing**.
+How do low-dimensional embeddings enable generalization?
+Suppose token embeddings feed into a smooth parameterized predictor $f(e)$. If training places $e_{\texttt3}$ and $e_{\texttt4}$ in close Euclidean proximity, and $f$ possesses bounded Lipschitz curvature, their model predictions will naturally align. Crucially: **a gradient update that improves $f$ on sentences containing "3" simultaneously improves predictions on sentences containing "4"!** This phenomenon is **statistical sharing**.
 
-The direction of explanation matters. Similar behaviour can give two symbols similar training signals and may lead the optimizer to place them nearby; merely declaring an embedding dimension does not guarantee that useful geometry will emerge. The learned geometry also depends on the task, data, objective, model and optimization path. Nothing labels a coordinate “is a digit.”
+This represents the foundational insight of modern neural language modeling formulated by [Bengio et al. (2003)](/references/#bengio-2003): "associate with each word in the vocabulary a distributed word feature vector... and learn simultaneously the word feature vectors and the parameters of that probability function." The word "distributed" denotes that concepts are represented across $d$ shared continuous coordinates rather than a single isolated index.
 
-This is the idea [Bengio et al. (2003)](/references/#bengio-2003) used to build the first neural language model: "associate with each word a distributed feature vector … learn simultaneously the feature vectors and the parameters of the probability function". The point of the word *distributed* is that each character is described by $d$ shared coordinates rather than one private one.
-
-There is also a parameter bottleneck. A full bigram stores $V^2$ logits, although adding a constant to every logit in one row changes no probability, leaving $V(V-1)$ effective degrees of freedom. The factorized score
+Furthermore, low-dimensional embeddings introduce a parameter bottleneck. A full bigram table stores $V^2$ independent logits (effective degrees of freedom $V(V-1)$). In contrast, factorized bilinear scoring:
 
 $$
 z_{ab}=e_a^{\top}Me_b+c_b
 $$
 
-uses $Vd+d^2+V$ trainable numbers (§2.3.3). With $V=50$ and $d=16$, that is 1 106 stored numbers instead of 2 500 logits in the full table (2 450 effective degrees of freedom). On the spine corpus its held-out loss is within 0.03 nats of the full table (Worked Example 2.4). The smaller model is not automatically better; its low-dimensional bottleneck is an inductive bias that helps only when the omitted distinctions are less useful than the sharing it creates.
+requires only $Vd+d^2+V$ trainable parameters (§2.3.3). When $V=50$ and $d=16$, parameter count drops from 2,500 to 1,106. On the textbook spine corpus, this factorized model matches the held-out loss of the full count table to within 0.03 nats (Worked Example 2.4). The dimensional bottleneck functions as an inductive bias, preventing the network from memorizing idiosyncratic noise.
 
 ## 2.2.5 The distributional hypothesis
 
-Why should “occurs in similar contexts” suggest “use a similar representation”? Zellig Harris argued that differences in meaning correlate with differences in linguistic distribution ([Harris 1954](/references/#harris-1954)); J. R. Firth later summarized the idea through the company a word keeps. For prediction we need a narrower claim, not a complete theory of meaning:
+Why should words appearing in similar contexts share similar geometric representations?
+Linguist Zellig Harris argued that semantic differences correlate with differences in distributional environments ([Harris 1954](/references/#harris-1954)); J. R. Firth famously summarized: "You shall know a word by the company it keeps." For machine learning, we rely on a practical predictive formulation:
 
-> If two symbols are interchangeable in every context relevant to the task, an optimal predictor treats them identically. Pooling their evidence can then reduce estimation noise without sacrificing task-relevant information.
+> If two symbols are mutually interchangeable across all task-relevant contexts, the optimal predictor must treat them identically. Pooling evidence across interchangeable symbols reduces statistical estimation variance without sacrificing task-relevant information.
 
-The qualification is essential. Words can occur in similar contexts yet differ in a way another task needs; antonyms are a familiar warning. An embedding records similarity *for the training objective*, not an all-purpose semantic truth.
+Importantly, geometric proximity reflects **similarity relative to the training objective**, rather than universal metaphysical truth. For example, antonyms like "hot" and "cold" frequently appear in identical syntactic frames ("the soup is too ___ to drink"), causing language model objectives to place them close in cosine similarity.
 
-The spine tests check this directly. They generate text from a Markov chain in which symbols 1 and 2 have identical predecessors and successors, train the factorized bigram, and require the cosine similarity of $e_1$ and $e_2$ to exceed 0.95 and to exceed every other pair's (Experiment 2.3). On real text the interchangeability is partial — `3` and `4` are interchangeable in most contexts, not all — and the geometry reflects degrees of it (Worked Example 2.5).
+## 2.2.6 Tied embeddings: using one table for input and output
 
-## 2.2.6 One table for reading and writing: tied embeddings
+In autoregressive language modeling, every token plays a dual role:
+1. As an **input context token**: informing the model of past history;
+2. As a **target output token**: scored by the model's logits for next-token prediction.
 
-A language model uses characters twice: as **inputs** (what came before) and as **outputs** (what comes next). With separate parameters, the input embedding of `3` and the output vector used to score `3` need not be related. **Weight tying** reuses the same table $E$ on both sides: the score for “next character is $b$” contains an inner product with $e_b$ ([Press & Wolf 2017](/references/#press-2017)). This reduces parameters and imposes the belief that useful input and output geometry should be related.
-
-Tying is a design choice, not a theorem that the two roles must be identical. It also requires compatible dimensions, sometimes supplied by an extra projection. The factorized bigram in spine Stage 02 ties $E$ in $e_a^{\top}Me_b+c_b$; the separate neural n-gram used later in this section does **not** tie its output matrix. Unit 04's Transformer again reads out with $E^{\top}$.
+With separate matrices, the input embedding for "3" shares no parameters with the readout weights that score "3". **Weight tying** ([Press & Wolf 2017](/references/#press-2017)) reuses the identical matrix $E$ for both roles, scoring candidate output $b$ via the dot product with $e_b$. This cuts parameters in half and imposes the structural inductive bias that the geometric manifold of input comprehension should align with that of output generation.
 
 ## 2.2.7 Longer contexts without exponential tables
 
-The pressure for sharing becomes strongest as context grows. A count model over the previous $k$ characters may need one row for each of $V^k$ contexts—6.25 million when $V=50$ and $k=4—and only a small fraction may be observed. A **neural n-gram** instead looks up the $k$ embeddings, **concatenates** them into one vector of length $kd$, and sends that vector through a small network:
+When expanding context length, classical count tables suffer catastrophic combinatorial explosion. An $n$-gram table conditioning on $k$ prior tokens requires $V^k$ rows. For $V=50$ and $k=4$, this demands 6.25 million rows; for $k=10$, it exceeds $9.7 \times 10^{16}$ configurations, outstripping available memory.
+
+A **neural n-gram** bypasses this exponential barrier by retrieving the $d$-dimensional embeddings of the $k$ context tokens, **concatenating** them into a single vector of length $kd$, and processing them through a multilayer perceptron:
 
 $$
 h = \tanh\big(W_1[e_{x_{t-k}};\ \dots;\ e_{x_{t-1}}] + b_1\big),\qquad z = W_2h + b_2 .
 $$
 
-Read the equation from inside out. The bracketed expression joins the $k$ vectors; $W_1$ mixes their coordinates; $\tanh$ supplies a nonlinear hidden representation $h$; and $W_2h+b_2$ produces one logit per possible next character. Holding $d$, hidden width $H$ and vocabulary size $V$ fixed, its parameter count grows *linearly* rather than exponentially with $k$.
+Reading from inside out: the brackets concatenate $k$ vectors into $\mathbb R^{kd}$; projection $W_1$ mixes coordinates across temporal positions; $\tanh$ injects nonlinearity to form representation $h$; and $W_2$ produces logits across vocabulary $V$.
+For fixed $d$, hidden width $H$, and vocabulary $V$, parameter count scales **linearly with context length** ($O(kdH)$) rather than exponentially ($O(V^k)$)!
 
-Contexts such as `ad 3 ` and `ad 4 ` can now enter the shared network at nearby points. A smooth learned function can transfer evidence between them instead of requiring two unrelated rows. That is the mechanism behind the neural 4-gram's advantage over the count 4-gram when training data are scarce (§2.1, Worked Example 2.6); it is a useful bias, not a guarantee for every dataset.
+Contexts such as `ad 3 ` and `ad 4 ` map to adjacent locations in $\mathbb R^{kd}$. The continuous smoothness of the neural network transfers statistical strength between similar histories, allowing neural models to generalize across contexts (Worked Example 2.6).
 
-Concatenation is still a crude way to combine positions: it fixes the window size and treats position 1 and position 4 with entirely separate weights. How information from different positions *should* be combined is the question of Unit 04, and the answer — attention — keeps the embedding table of this unit as its first layer.
+## 2.2.8 Summary of representation paradigms
 
-## 2.2.8 What we have so far
-
-| Representation | What it shares | Parameters for $k$ characters of context | Spine result |
+| Representation Architecture | Sharing Mechanism | Parameters for $k$-token Context | Spine Benchmark Performance |
 |---|---|---|---|
-| one-hot + unrestricted table | nothing across contexts | up to $V^{k+1}$ logits | bigram 2.12 nats (Unit 01) |
-| embedding + factorized bigram | similar characters | $Vd + d^2 + V$ | 2.15 nats with $d = 16$ (1 106 parameters) |
-| embedding + neural n-gram | similar characters *and* similar contexts | $Vd + kdH + H + HV + V$ | test NLL 0.94 vs 1.07 for counts at 5 000 characters, $k = 4$ |
+| One-hot + Unconstrained Table | Zero sharing across tokens and contexts | Up to $V^{k+1}$ logits | Bigram NLL 2.12 nats (Unit 01) |
+| Continuous Embeddings + Factorized Bigram | Manifold sharing across similar tokens | $Vd + d^2 + V$ | NLL 2.15 nats at $d = 16$ (1,106 parameters) |
+| Continuous Embeddings + Neural $n$-gram | Shared representations across tokens & contexts | $Vd + kdH + H + HV + V$ | NLL 0.94 vs Count-table 1.07 ($k=4$, 5k tokens) |
 
-The common thread is now more precise: **a representation, together with the function that consumes it, determines which cases can share evidence and which distinctions remain available.** One-hot plus a free table shares nothing across contexts. A low-dimensional embedding plus a shared function can learn graded similarity. Unit 04's attention and Unit 05's recurrence add assumptions about *positions* as well.
-
-Before continuing, check that you can answer four questions in plain language:
-
-1. Why can more XOR data not rescue a linear classifier on $(x_1,x_2)$?
-2. Why is $W^{\top}u_a$ a lookup rather than a genuine mixture of rows?
-3. What assumption allows nearby embeddings to share statistical strength?
-4. What useful information might a low-dimensional embedding discard?
-
-If one answer is unclear, return to that subsection before beginning the matrix derivations in §2.3.
+The unifying thread of this unit is established: **the geometry of the representation space and the functional class operating upon it collectively dictate which statistical evidence is shared, and which distinctions are preserved.**
