@@ -4,27 +4,27 @@ description: Learning as estimating a distribution — the coin, the log-loss, t
 sidebar: { label: "1.2 First principles", order: 2 }
 ---
 
-We begin with the smallest setting in which learning is possible, then enlarge it one step at a time until it becomes a language model.
+We build the idea of learning from the smallest example that contains it, then enlarge it one step at a time until it becomes a language model.
 
 ## 1.2.1 The smallest learner: a coin
 
 A coin lands heads with some unknown probability $p$. You see ten tosses, seven of them heads. You must now state a probability $q$ for "heads" on the *next* toss — a toss you have not seen.
 
-A natural first estimate is $q = 0.7$, the observed frequency. Before justifying it, notice what has happened: you used **past cases** (ten tosses) to make a **prediction about a future case** (the eleventh). This is learning in its most stripped-down form, and it needs three ingredients:
+The obvious answer is $q = 0.7$, the observed frequency. Before justifying it, notice what has happened. You used **past cases** (ten tosses) to make a **prediction about a future case** (the eleventh). That is all learning is, in its most stripped-down form. Three ingredients were needed:
 
 1. A **model**: here a single number $q$, the predicted probability of heads.
 2. A way to **score** a prediction once the outcome is known.
-3. A reason to believe the **past tells us something about the future**.
+3. A reason to believe the **past is informative about the future**.
 
 The rest of this section supplies the second and third ingredients.
 
 ## 1.2.2 Why the past can inform the future
 
-Suppose the eleventh toss used a *different* coin, chosen by an adversary after seeing your prediction. No prediction would then be defensible: whatever you say, the adversary could choose a coin that makes you wrong. Learning from experience therefore needs an assumption that connects the cases you have seen with the case you have not.
+Suppose the eleventh toss were made with a *different* coin, chosen by an adversary after seeing your prediction. Then no prediction could be justified: whatever you say, the adversary picks a coin that makes you wrong. Learning from experience needs an assumption that connects the cases you have seen to the case you have not.
 
-The standard assumption is that all tosses — past and future — are **independent and identically distributed (i.i.d.)**. *Identically distributed* means that every toss comes from the same distribution. *Independent* means that, beyond what a toss reveals about that shared distribution, its outcome tells you nothing extra about another toss. Under this assumption, the **law of large numbers** says that the frequency of heads in $n$ tosses converges to $p$ as $n$ grows. The past is informative because it is a sample from the same source as the future.
+The standard assumption is that all tosses — past and future — are **independent and identically distributed (i.i.d.)**: each is drawn from the same distribution, and knowing one tells you nothing extra about another beyond what it tells you about the distribution. Under this assumption, the **law of large numbers** says that the frequency of heads in $n$ tosses converges to $p$ as $n$ grows. The past is informative because it is a sample from the same source as the future.
 
-Everything in this unit rests on this assumption, and much of [Unit 10](/core/unit-10/) examines what happens when it fails. Keep the point in view: **a model generalizes only relative to an assumption about how its training data are related to future data.** In the real dataset of §1.1, image content connects the training labels to future labels. After the labels are shuffled, that connection disappears, so there is no pattern to carry from training photographs to new ones.
+Everything in this unit rests on this assumption, and a good part of [Unit 10](/core/unit-10/) is about what happens when it fails. Keep it in view: **generalization is never a property of a model alone. It is a property of a model *together with* an assumption about how the training data and the future data are related.** The random-label experiment of §1.1 is a case where the assumption gives the model nothing: labels in the training set and labels in the future are related by the image content only in the real dataset, not in the shuffled one.
 
 ## 1.2.3 Scoring a probabilistic prediction: the log-loss
 
@@ -38,15 +38,15 @@ $$
 \ell(q; x) = -\ln q(x),
 $$
 
-where $q(x)$ is the probability your prediction assigned to the outcome $x$ that actually occurred. Because the formula uses the natural logarithm $\ln$, the loss is measured in **nats** (short for *natural units of information*). Predicting $q(\text{tails}) = 0.3$ and seeing tails costs $-\ln 0.3 = 1.204$ nats; predicting $q(\text{tails}) = 0.001$ and seeing tails costs $6.91$ nats; predicting $q(\text{tails}) = 0$ costs $+\infty$ — a forecaster who rules out something that then happens is infinitely wrong.
+where $q(x)$ is the probability your prediction assigned to the outcome $x$ that actually occurred. Predicting $q(\text{tails}) = 0.3$ and seeing tails costs $-\ln 0.3 = 1.204$ nats; predicting $q(\text{tails}) = 0.001$ and seeing tails costs $6.91$ nats; predicting $q(\text{tails}) = 0$ costs $+\infty$ — a forecaster who rules out something that then happens is infinitely wrong.
 
 Three properties make the log-loss the right default:
 
-- **It rewards honesty.** If the true probability of heads is $p$, the *expected* log-loss of predicting $q$ is $-p\ln q - (1-p)\ln(1-q)$. Setting the derivative with respect to $q$ to zero gives $q = p$: you minimize your expected loss by stating your actual belief. A score with this property is called **proper** ([Gneiting & Raftery 2007](/references/#gneiting-2007)); accuracy is not (it is indifferent between 51% and 99%).
+- **It rewards honesty.** If the true probability of heads is $p$, the *expected* log-loss of predicting $q$ is $-p\ln q - (1-p)\ln(1-q)$. Setting the derivative with respect to $q$ to zero gives $q = p$: you minimize your expected loss by reporting your actual belief. A score with this property is called **proper** ([Gneiting & Raftery 2007](/references/#gneiting-2007)); accuracy is not (it is indifferent between 51% and 99%).
 - **It adds up over independent events.** The probability of a sequence of independent outcomes is a product, so its log-loss is the *sum* of the individual log-losses. Averages over many predictions are therefore meaningful.
 - **It measures information.** In base 2, $-\log_2 q(x)$ is the number of bits an optimal code built from $q$ uses to transmit $x$ (§1.6.1). A model with lower log-loss is literally a better compressor of the data.
 
-The scale is easy to read: assigning the outcome probability $0.5$ costs $-\ln 0.5 = 0.693$ nats, while assigning it probability $0.1$ costs $2.303$ nats. Lower is better. Divide a value in nats by $\ln 2 \approx 0.693$ to convert it to bits.
+We measure log-loss in **nats** (natural logarithm). Divide by $\ln 2 \approx 0.693$ to convert to bits.
 
 ## 1.2.4 The first baseline: predicting uniformly
 
@@ -56,7 +56,7 @@ $$
 -\ln\frac{1}{V} = \ln V \text{ nats}.
 $$
 
-This is the **uniform baseline**. For a coin, $\ln 2 = 0.693$. For the 50 distinct characters of the spine corpus, $\ln 50 = 3.912$ nats per character. **A model must beat $\ln V$ on unseen data before we can claim that it has learned something useful for this prediction task.** The baseline also serves as a check on code: a freshly initialized language model, whose predictions are close to uniform, should produce a loss close to $\ln V$ — Units 03 and 04 use exactly this check.
+This is the **uniform baseline**. For a coin, $\ln 2 = 0.693$. For the 50 distinct characters of the spine corpus, $\ln 50 = 3.912$ nats per character. **Every model must beat $\ln V$ on data it has not seen; a model that does not has learned nothing usable.** The baseline also serves as a check on code: a freshly initialized language model, whose predictions are close to uniform, should report a loss close to $\ln V$ — Units 03 and 04 use exactly this check.
 
 ## 1.2.5 Learning by counting: maximum likelihood
 
@@ -66,7 +66,7 @@ $$
 \frac{7}{q} - \frac{3}{1-q} = 0 \quad\Longrightarrow\quad q = \frac{7}{10}.
 $$
 
-The observed frequency is the **maximum-likelihood estimate (MLE)**. Maximizing the probability of the data is the same as *minimizing the total log-loss on the training data*, because log-loss is the negative log-probability. Thus “fit by maximum likelihood” and “minimize the training log-loss” are two ways of giving the same instruction — the basis of likelihood training throughout this book.
+The observed frequency is the **maximum-likelihood estimate (MLE)**. Maximizing the probability of the data is the same as *minimizing the total log-loss on the training data*, because the log-loss is minus the log-probability. So "fit the model by maximum likelihood" and "minimize the training log-loss" are the same instruction — the instruction every model in this book is trained with.
 
 The same reasoning extends from two outcomes to $V$: if outcome $v$ occurred $c_v$ times out of $n$, the MLE is $q(v) = c_v/n$ (derived in §1.3.3). Learning a distribution over characters, *ignoring context*, is counting how often each character occurs. This is the **unigram** model. On the spine corpus its held-out loss is 3.06 nats per character — already 0.85 nats better than the uniform baseline, because some characters (space, `e`, `a`) are far more common than others (`Z`, `9`).
 
@@ -78,29 +78,48 @@ $$
 q(b \mid a) = \frac{c(a \to b)}{c(a)},
 $$
 
-where $c(a\to b)$ counts occurrences of the pair "$a$ then $b$" in the training text and $c(a) = \sum_b c(a\to b)$. The whole model is a $V\times V$ table of counts, normalized row by row. It is our **anchor exemplar**: simple enough to compute by hand, yet substantial enough to serve as the first stage of the spine model.
+where $c(a\to b)$ counts occurrences of the pair "$a$ then $b$" in the training text and $c(a) = \sum_b c(a\to b)$. The whole model is a $V\times V$ table of counts, normalized row by row. It is our **anchor exemplar**: simple enough to compute by hand, real enough to be the first stage of the spine model.
 
-On the spine corpus, the bigram reaches a held-out loss of **2.124 nats per character**, a full 1.79 nats below the uniform baseline and 0.94 below the unigram. The progression $\ln V \to$ unigram $\to$ bigram introduces a pattern repeated throughout the book: evaluate each model against its predecessor on held-out data.
+On the spine corpus, the bigram reaches a held-out loss of **2.124 nats per character**, a full 1.79 nats below the uniform baseline and 0.94 below the unigram. The sequence $\ln V \to$ unigram $\to$ bigram is the first instance of a pattern the whole book follows: each model is measured against the previous one on held-out data.
 
 ## 1.2.7 The zero-count problem and smoothing
 
-Now fit the bigram on only the first 2 000 characters of the corpus. Of the $50^2 = 2\,500$ possible pairs, only 269 occur. A held-out text inevitably contains some pairs that never appeared in training — on the spine corpus, 5.4% of held-out pairs are unseen. The maximum-likelihood table assigns them probability zero, and a single zero makes the held-out log-loss **infinite**.
+Now fit the bigram on only the first 2 000 characters of the corpus. Of the $50^2 = 2\,500$ possible pairs, only 269 occur. A held-out text inevitably contains some pairs that never appeared in training — on the spine corpus, 5.4% of held-out pairs are completely unseen in the training set. The maximum-likelihood table assigns them probability zero ($q = 0$), and because log-loss evaluates $-\ln q$, a single zero makes the held-out loss **infinite**.
 
-The fix is to pretend we saw every pair a small number $\alpha$ of extra times — **add-$\alpha$ smoothing**:
+This exposes a fundamental pathology of empirical frequencies: **an unobserved event is not an impossible event.** In finite samples, zero counts reflect sampling sparsity rather than physical impossibility.
+
+The fix is to avoid assigning zero probability to any possible transition. The classic approach is to pretend that prior to observing data, every pair had already been observed a small number $\alpha$ of times — **add-$\alpha$ smoothing**:
 
 $$
 q_\alpha(b\mid a) = \frac{c(a\to b) + \alpha}{c(a) + \alpha V}.
 $$
 
-With $\alpha = 1$ this is Laplace's "rule of succession" from 1814; §1.3.4 shows it is the Bayesian answer under a particular prior. Smoothing **trades fit for robustness**: as $\alpha \to 0$ we recover the maximum-likelihood table (best on the training data, fragile on new data); as $\alpha\to\infty$ every row becomes uniform and the loss becomes exactly $\ln V$. Somewhere in between is the best held-out performance. Worked Example 1.5 finds it: on 2 000 training characters the held-out loss is 2.523 at $\alpha = 0.001$, 2.371 at $\alpha = 0.1$ and 2.607 at $\alpha = 1$.
+### Laplace's Rule of Succession: History and Intuition
 
-This U-shape is the simplest instance of the central tension of learning: **a model flexible enough to fit the training data exactly is also flexible enough to fit accidental patterns in those data.** Choosing $\alpha$ is choosing how much to trust the data versus a prior belief.
+When $\alpha = 1$ and there are only two possible outcomes ($V = 2$, such as coin tosses), this formula reduces to Pierre-Simon Laplace's celebrated **rule of succession**, formulated in his 1814 treatise *Essai philosophique sur les probabilités*.
+
+Laplace addressed the classical philosophical puzzle known as the "sunrise problem": If the sun has risen every day for recorded history ($n$ successes, $0$ failures), what is the probability that it will rise tomorrow?
+- Maximum likelihood estimation yields $n/n = 1.0$, dogmatically asserting that non-rising is physically impossible ($p = 0$). But as David Hume observed, finite historical observations provide no logical guarantee of future necessity. If the unexpected happens, an overconfident model suffers infinite log-loss.
+- Laplace adopted a Bayesian stance: prior to any observation, assume total ignorance about the true probability (a uniform prior over $[0, 1]$). After observing $s$ successes in $n$ trials, the posterior predictive probability that the **next** trial succeeds is:
+  $q(X_{n+1}=1 \mid s, n) = \frac{s + 1}{n + 2}$.
+
+The physical intuition is straightforward: adding $1$ to the numerator and $2$ to the denominator introduces **two virtual pseudo-counts** — one prior success and one prior failure. Before seeing any data ($n = 0, s = 0$), the formula yields $(0+1)/(0+2) = 1/2$, reflecting maximal uncertainty. After a single heads ($n = 1, s = 1$), where MLE recklessly claims $p = 1.0$, Laplace cautiously predicts $(1+1)/(1+2) = 2/3$.
+
+Add-$\alpha$ smoothing generalizes Laplace's principle to vocabularies of size $V$: each token receives $\alpha$ pseudo-counts, and the denominator expands by $\alpha V$ to maintain normalization. In §1.3.4 we show this is the exact Bayes-optimal prediction under a symmetric Dirichlet prior.
+
+Smoothing **trades fit for robustness**:
+- As $\alpha \to 0$, the model trusts the data completely, recovering the maximum-likelihood table (optimal on training data, fragile on unseen data);
+- As $\alpha\to\infty$, prior belief dominates completely, every row becomes uniform, and the loss approaches $\ln V$.
+
+Somewhere in between lies the optimal generalization performance. Worked Example 1.5 calculates this empirically: on 2 000 training characters the held-out loss is 2.523 at $\alpha = 0.001$, drops to an optimal 2.371 at $\alpha = 0.1$, and rises back to 2.607 at $\alpha = 1$.
+
+This U-shape is the simplest manifestation of the core tension in learning: **a model flexible enough to fit the training data exactly is also flexible enough to fit its accidental noise.** Choosing $\alpha$ is choosing how much to trust empirical data versus a regularizing prior.
 
 ## 1.2.8 Why you must hold data out
 
 How did we choose $\alpha$? By measuring the loss on text the counts did not see. If we had measured on the training text instead, the answer would always be $\alpha = 0$: the unsmoothed table is, by construction, the best possible bigram *on its own training data* (§1.3.3). The training loss is a biased, optimistic estimate of performance on new data — the model has been chosen to make it small.
 
-This gives the three data splits used throughout the rest of the book:
+This gives the three-way discipline used in the rest of the book:
 
 | Split | Used for | Never used for |
 |---|---|---|

@@ -4,9 +4,7 @@ description: Attention as Nadaraya–Watson kernel regression; softmax as entrop
 sidebar: { label: "4.5 General theory", order: 5 }
 ---
 
-This section gives three lenses on the same operation. The statistical lens treats attention as data-dependent averaging; the symmetry lens asks which transformations a layer should respect; the graph lens treats positions as nodes exchanging messages. None is the single “true meaning” of attention, but each makes different assumptions and limitations visible.
-
-## 4.5.1 Attention through the lens of kernel regression
+## 4.5.1 Attention is kernel regression
 
 A classical problem in statistics: given examples $(k_1,v_1),\dots,(k_n,v_n)$ of an unknown function $v = f(k)$, estimate $f$ at a new point $q$. The **Nadaraya–Watson estimator** ([Nadaraya 1964](/references/#nadaraya-1964); [Watson 1964](/references/#watson-1964)) averages the observed values, weighting each by how close its input is to $q$ through a kernel $\mathcal K$:
 
@@ -26,9 +24,7 @@ $$
 \hat f(q) = \sum_j\mathrm{softmax}_j\Bigl(\frac{q^{\top}k_j}{h^2}\Bigr)v_j ,
 $$
 
-which is dot-product attention with temperature $h^2$—the same location in the formula occupied by $\sqrt{d_k}$. The equivalence to a Gaussian smoother requires equal key norms; without that condition, the extra factor $\exp(-\lVert k_j\rVert^2/2h^2)$ changes the weights. More generally, $\exp(q^\top k/\tau)$ itself can be viewed as a kernel.
-
-This gives a useful, qualified interpretation: **a softmax attention head performs kernel-like smoothing in learned feature spaces**. $W_Q$ and $W_K$ define the comparison space, while $W_V$ defines what is averaged. The view developed by [Tsai et al. (2019)](/references/#tsai-2019) connects attention to nonparametric regression. It is an analogy for the head's weighted averaging, not a claim that an entire multi-layer Transformer is merely a classical kernel estimator.
+which is dot-product attention with temperature $h^2$ — the role played by $\sqrt{d_k}$. **Attention is a kernel smoother whose inputs and outputs are learned features**: $W_Q$ and $W_K$ learn the space in which closeness is measured, $W_V$ learns what is averaged. This view, developed in [Tsai et al. (2019)](/references/#tsai-2019), explains why attention interpolates smoothly between stored examples, and connects it to a long literature on nonparametric regression.
 
 ## 4.5.2 Temperature, entropy and the soft maximum
 
@@ -44,8 +40,8 @@ where $\Delta$ is the set of probability vectors.
 
 Attention weights therefore balance two goals: put weight on high-scoring keys, and spread weight out. The temperature sets the exchange rate. Two consequences:
 
-- **Soft maximum.** The optimal value is $\tau\log\sum_je^{s_j/\tau}$ (log-sum-exp), which satisfies $\max_js_j\le\tau\log\sum_je^{s_j/\tau}\le\max_js_j+\tau\log T$. As $\tau\to0$, the value approaches the hard maximum. If the maximum is unique, its weight tends to 1; tied maxima share the limiting mass.
-- **Entropy as a diagnostic.** With $N$ visible keys, attention entropy ranges from 0 in the limiting one-key case to $\log N$ for a uniform row. Over 64 keys ($\log64=4.16$), random scores with standard deviations 1, 4, and 16 give mean entropies of about 3.69, 1.31, and 0.26. This measures sharpness, not quality: low entropy may be correct for lookup and harmful when it is premature or unintended. Monitor it together with loss, gradients, and task behavior (§4.7.4).
+- **Soft maximum.** The optimal value is $\tau\log\sum_je^{s_j/\tau}$ (log-sum-exp), which satisfies $\max_js_j\le\tau\log\sum_je^{s_j/\tau}\le\max_js_j + \tau\log T$. As $\tau\to0$ it becomes the hard maximum and the weights become one-hot (§4.2.6).
+- **Entropy as a diagnostic.** Attention entropy ranges from 0 (one key) to $\log T$ (uniform). Over 64 keys ($\log 64 = 4.16$), random scores with standard deviation 1, 4 and 16 give mean entropies of about 3.69, 1.31 and 0.26: the saturation of §4.2.8, measured. Collapsing entropy during training is a symptom worth monitoring (§4.7.4).
 
 ## 4.5.3 Symmetry: convolution and attention as one idea
 
@@ -57,16 +53,16 @@ A map $F$ is **equivariant** to a transformation $g$ if transforming the input a
 
 **Theorem 4.3 (permutation-equivariant linear maps on sets).** A linear map $L:\mathbb{R}^T\to\mathbb{R}^T$ commutes with every permutation matrix if and only if $L = aI + b\,\mathbf{1}\mathbf{1}^{\top}$ for scalars $a, b$.
 
-*Proof sketch.* From $LP=PL$ and $P^{-1}=P^\top$, we get $PLP^\top=L$. Thus $L_{ij}$ is unchanged when the same permutation is applied to both indices. Ordered index pairs have only two orbits under all permutations: $i=j$ and $i\ne j$. Therefore every diagonal entry has one value, say $a+b$, and every off-diagonal entry has one value, say $b$, giving $L=aI+b\mathbf1\mathbf1^\top$. The converse is a direct check. $\blacksquare$ (The multi-channel version underlies Deep Sets, [Zaheer et al. 2017](/references/#zaheer-2017).)
+*Proof sketch.* Commuting with the transposition of $i$ and $j$ forces $L_{ii} = L_{jj}$ and makes all off-diagonal entries in rows and columns $i, j$ equal; ranging over all transpositions makes all diagonal entries equal ($a + b$) and all off-diagonal entries equal ($b$). The converse is a direct check. $\blacksquare$ (The multi-channel version underlies the Deep Sets architecture, [Zaheer et al. 2017](/references/#zaheer-2017).)
 
 Put the two theorems side by side:
 
 | symmetry | most general **linear** equivariant mixing | what it can do |
 |---|---|---|
-| shifts (cyclic sequences or grids) | circular convolution | use the same offset-dependent rule everywhere; locality requires restricting the kernel's support |
-| all permutations (scalar set elements) | $a\cdot\text{self}+b\cdot\text{sum of all}$ | distinguish “me” from one shared global aggregate |
+| shifts (sequences, images) | convolution | detect the same local pattern everywhere |
+| all permutations (sets) | $a\cdot\text{self} + b\cdot\text{mean of all}$ | only "me" versus "everyone on average" |
 
-In the scalar case, a *linear* permutation-equivariant layer is restricted to self-information plus one global sum. With multiple feature channels, the coefficients become matrices, but the positional structure is still “self plus shared aggregate.” Attention escapes this linear restriction because its weights are **nonlinear functions of the input**, while the layer remains permutation-equivariant (Proposition 4.2). Positional information removes that full permutation symmetry; which order bias replaces it depends on the chosen positional scheme. In this sense convolution and attention answer a common design question: what useful mixing rule respects the symmetry we want to build in?
+A *linear* permutation-equivariant layer can do almost nothing: each element sees only itself and the global mean. Attention escapes this limit by being **nonlinear in the input** — its weights depend on content — while remaining permutation-equivariant (Proposition 4.2). Adding positional information then breaks the symmetry exactly as much as the task requires. In this sense **convolution and attention are two answers to one question**: what is the most useful mixing that respects a given symmetry?
 
 ## 4.5.4 Message passing on graphs
 
@@ -76,25 +72,28 @@ $$
 h_i' = \phi\Bigl(h_i,\ \bigoplus_{j\in\mathcal N(i)}\psi(h_i, h_j)\Bigr),
 $$
 
-with an aggregation $\bigoplus$ (sum, mean, max) that is invariant to the order of neighbours. Many graph convolutions use structure-determined mixing coefficients such as normalized adjacency, together with learned feature maps. **Graph attention** instead computes feature-dependent scores and normalizes them over each neighbourhood ([Veličković et al. 2018](/references/#velickovic-2018)).
+with an aggregation $\bigoplus$ (sum, mean, max) that is invariant to the order of neighbours. Graph convolutions use fixed, structure-determined weights (such as normalized adjacency); **graph attention** computes softmax weights over each neighbourhood from the node features ([Veličković et al. 2018](/references/#velickovic-2018)).
 
-**Proposition 4.4.** Self-attention is neighbourhood-normalized message passing on the **complete directed graph**. Let $\mathcal N(i)=\{1,\dots,T\}$ and define
-
-$$
-e_{ij}=\frac{q_i^\top k_j}{\sqrt{d_k}},\qquad
-\alpha_{ij}=\frac{e^{e_{ij}}}{\sum_{r\in\mathcal N(i)}e^{e_{ir}}},\qquad
-m_{ij}=\alpha_{ij}v_j.
-$$
-
-Then $y_i=\sum_{j\in\mathcal N(i)}m_{ij}$. The coefficient $\alpha_{ij}$ is not a function of the pair $(i,j)$ alone: its denominator depends on the whole neighbourhood. With a causal mask, the directed edge $j\to i$ exists only when $j\le i$, so a node receives messages from itself and its predecessors. $\blacksquare$ (Direct substitution.)
+**Proposition 4.4.** Self-attention is message passing on the **complete graph**: take $\mathcal N(i) = \{1,\dots,T\}$, messages $\psi(h_i,h_j) = \mathrm{softmax}_j(q_i^{\top}k_j/\sqrt{d_k})\,W_V^{\top}h_j$, sum aggregation, and $\phi$ returning the aggregate. A causal mask is message passing on the graph in which each node's neighbours are its predecessors. $\blacksquare$ (Direct substitution.)
 
 Choosing an architecture is therefore partly choosing a **graph**: a grid with fixed position-dependent messages (convolution), a given molecular or social graph (graph networks), or the complete graph with learned content-dependent messages (attention). Sparsity is an inductive bias; Problem 4.15 asks when it helps.
 
 ## 4.5.5 What attention can and cannot represent
 
-- **Universality.** In the fixed-length setting studied by [Yun et al. (2020)](/references/#yun-2020), Transformers with positional encodings can approximate arbitrary continuous sequence-to-sequence functions on a compact domain. This is an existence theorem: it gives no practical size bound, no guarantee that gradient descent finds the construction, and no claim about unbounded-length generalization. **[D]**
-- **Rank collapse in a restricted pure-attention setting.** Under the assumptions studied by [Dong et al. (2021)](/references/#dong-2021), stacks without skip connections or MLPs approach token-uniform, rank-one outputs doubly exponentially with depth. This motivates the complete block, but does not imply that every modified attention-only architecture collapses in the same way. **[D]**
-- **Concrete circuits.** Small attention-only models can learn mechanisms for copying and induction (“after A came B; A appears again, so predict B”). These claims are supported by weight/activation analysis and causal interventions in the studied models, with stronger causal evidence in small models than in larger ones ([Elhage et al. 2021](/references/#elhage-2021); [Olsson et al. 2022](/references/#olsson-2022)). Unit 11 applies related tests to the spine model. **[E]**
+### 1. Universal approximation
+Equipped with positional encodings, Transformers can approximate any continuous sequence-to-sequence function on a compact domain to arbitrary precision ([Yun et al. 2020](/references/#yun-2020)). Like all universal approximation theorems, it establishes representational capability in principle, while remaining silent on parameter efficiency, sample complexity, and optimization tractability. **[D]**
+
+### 2. Rank collapse without MLP and residual connections
+Why must every Transformer block strictly incorporate residual connections and MLP feed-forward sublayers?
+[Dong et al. (2021)](/references/#dong-2021) proved that without residual connections and non-linear MLPs, a pure stack of self-attention layers $X^{(l+1)} = P^{(l)} X^{(l)} W_V^{(l)}$ (where $P^{(l)} = \mathrm{softmax}(Q K^\top / \sqrt{d})$ is a row-stochastic matrix with row sums equal to 1) suffers from **doubly exponential rank collapse** with depth $l$!
+
+**Geometric contraction mechanism:**
+Each attention layer computes convex averages across token vectors (a Markov transition step). By the Perron–Frobenius theorem and contraction mapping principles, multiplication by row-stochastic matrices exponentially contracts pairwise token distances $\|x_i^{(l)} - x_j^{(l)}\| \to 0$.
+Consequently, all tokens in the sequence irreversibly converge toward an identical vector, collapsing the representation matrix into a degenerate rank-1 subspace.
+**The salvation of residual connections:** The residual skip connection $X^{(l+1)} = X^{(l)} + \mathrm{Attn}(X^{(l)})$ provides an identity shortcut $I$, breaking the contraction mapping and preserving full-rank expressivity across hundreds of layers. The block designs of §4.3.7–§4.3.8 are not cosmetic heuristics, but indispensable mathematical guardrails. **[D]**
+
+### 3. Concrete algorithmic circuits
+Small attention-only models can implement discrete algorithms — such as token copying and induction ("if pattern A $\to$ B appeared earlier, predict B upon encountering A again") — whose mechanisms can be cleanly decompiled from weight matrices $W_Q^\top W_K$ and $W_O W_V$ ([Elhage et al. 2021](/references/#elhage-2021); [Olsson et al. 2022](/references/#olsson-2022)). Unit 11 will dissect these induction heads directly within our spine model. **[E]**
 
 ## 4.5.6 Complexity
 
@@ -105,7 +104,7 @@ For a sequence of length $T$, width $d$, $H$ heads and $L$ layers:
 | projections + MLP | $\approx24Td^2$ FLOPs | weights, linear in $T$ |
 | scores + mixing | $\approx4T^2d$ FLOPs | attention, quadratic in $T$ |
 | attention weights, if stored | $HT^2$ numbers | quadratic in $T$ |
-| KV cache (decoding, ordinary MHA) | $2Td$ numbers | linear in $T$ |
-| one decoding step at length $t$ | $\approx2\cdot12d^2 + 4td$ FLOPs | projections/MLP for short $t$; attention over cached positions for long $t$ |
+| KV cache (decoding) | $2Td$ numbers | linear in $T$ |
+| one decoding step at length $t$ | $\approx2\cdot12d^2 + 4td$ FLOPs | weights for short $t$, cache for long $t$ |
 
-Under this matrix-multiplication-only accounting, the quadratic prefill terms cross the linear projection/MLP terms at $T=6d$ (Worked Example 4.8). This is not a universal wall-clock crossover: kernels, precision, batch size, and hardware all matter. In particular, **memory traffic** can dominate when an implementation materializes $T\times T$ score or weight matrices in slower memory and reads them back. IO-aware exact-attention kernels target that traffic without changing the quadratic arithmetic count (§4.8.1); Unit 06 develops the broader model through arithmetic intensity and the roofline.
+The quadratic terms dominate beyond $T = 6d$ (Worked Example 4.8). On real hardware, time often depends less on FLOPs than on **memory traffic**: materializing the $T\times T$ weight matrices in slow memory and reading them back costs more than the arithmetic. This observation, not a reduction in FLOPs, is what IO-aware kernels exploit (§4.8.1); Unit 06 develops the general model (arithmetic intensity and the roofline).
