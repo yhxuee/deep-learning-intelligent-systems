@@ -15,7 +15,7 @@ L(\theta + \delta) = L(\theta) + \nabla L(\theta)^{\top}\delta + \tfrac12\,\delt
 \qquad H_{ij} = \frac{\partial^2L}{\partial\theta_i\,\partial\theta_j}.
 $$
 
-The **Hessian** $H$ is symmetric, so by the spectral theorem it has real eigenvalues $\lambda_1,\dots,\lambda_n$ and an orthonormal basis of eigenvectors $q_1,\dots,q_n$: $H = Q\Lambda Q^{\top}$. In the direction $q_i$ the loss curves like the parabola $\tfrac12\lambda_i t^2$. Positive eigenvalues are bowl-shaped directions, negative ones are hill-shaped (a saddle if both occur), and the *spread* of the eigenvalues — not their size alone — will turn out to control the speed of gradient descent.
+The **Hessian** $H$ is symmetric, so by the spectral theorem it has real eigenvalues $\lambda_1,\dots,\lambda_n$ and an orthonormal basis of eigenvectors $q_1,\dots,q_n$: $H = Q\Lambda Q^{\top}$. In the direction $q_i$ the loss curves like the parabola $\tfrac12\lambda_i t^2$. Positive eigenvalues are bowl-shaped directions, negative ones are hill-shaped (a saddle if both occur, and in high dimensions stationary points are almost always high-index saddles rather than local minima; [Dauphin et al. 2014](/references/#dauphin-2014)), and the *spread* of the eigenvalues — not their size alone — will turn out to control the speed of gradient descent.
 
 ## 3.5.2 Smoothness and the descent lemma
 

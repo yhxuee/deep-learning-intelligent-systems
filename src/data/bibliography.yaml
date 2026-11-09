@@ -28,6 +28,7 @@ bengio-2003: { authors: "Bengio, Y., Ducharme, R., Vincent, P., and Jauvin, C.",
 mikolov-2013: { authors: "Mikolov, T., Chen, K., Corrado, G., and Dean, J.", year: 2013, title: "Efficient Estimation of Word Representations in Vector Space", venue: "arXiv:1301.3781", url: "https://arxiv.org/abs/1301.3781" }
 press-2017: { authors: "Press, O., and Wolf, L.", year: 2017, title: "Using the Output Embedding to Improve Language Models", venue: "EACL", url: "https://arxiv.org/abs/1608.05859" }
 lecun-1998: { authors: "LeCun, Y., Bottou, L., Bengio, Y., and Haffner, P.", year: 1998, title: "Gradient-based learning applied to document recognition", venue: "Proceedings of the IEEE 86(11), 2278–2324", url: "https://doi.org/10.1109/5.726791" }
+dauphin-2014: { authors: "Dauphin, Y. N., Pascanu, R., Gulcehre, C., Cho, K., Ganguli, S., and Bengio, Y.", year: 2014, title: "Identifying and attacking the saddle point problem in high-dimensional non-convex optimization", venue: "NeurIPS", url: "https://arxiv.org/abs/1406.2572" }
 
 # --- Attention, transformers, sequence memory ---------------------------------
 bahdanau-2015: { authors: "Bahdanau, D., Cho, K., and Bengio, Y.", year: 2015, title: "Neural Machine Translation by Jointly Learning to Align and Translate", venue: "ICLR", url: "https://arxiv.org/abs/1409.0473" }
