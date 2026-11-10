@@ -100,6 +100,8 @@ Softmax is not uniquely forced by the goals; other maps can produce sparse or di
 
 For the score, a matrix-multiplication-friendly choice is the **dot product**, $s_{ij}=x_i^{\top}x_j$. For equal vector norms it is larger when the vectors point in more similar directions, and all pairwise scores can be computed at once as $XX^{\top}$. Most importantly for lookup, it contains products between features of two positions—the interaction missing from an affine map of the whole input.
 
+**Deep conceptual roots: The modern rebirth of Nadaraya–Watson kernel regression.** As early as 1964, statisticians E. A. Nadaraya and G. S. Watson introduced a foundational non-parametric smoothing estimator: given observed pairs $(x_1, y_1), \dots, (x_T, y_T)$, predict the value at a new query $x$ via kernel-weighted averaging: $\hat y(x) = \sum_j \frac{K(x, x_j)}{\sum_m K(x, x_m)} y_j$. Compare this classical formula with modern attention: $x$ is the **query**, $x_j$ is the **key**, $y_j$ is the **value**, and the normalized kernel weights are precisely **attention weights**! The revolutionary departure of modern deep learning is that while classical kernel regression operates in fixed raw input space with rigid handcrafted kernels (such as isotropic Gaussians), Transformer self-attention projects inputs into learned latent representations, allowing the network to discover how to dynamically route and aggregate contextual information.
+
 ## 4.2.7 Three roles: queries, keys and values
 
 Why not use the same raw vector $x$ both to compute scores $x_i^{\top}x_j$ and to supply values $v_j=x_j$? The explicit encoding of §4.2.1 exposes three restrictions:
