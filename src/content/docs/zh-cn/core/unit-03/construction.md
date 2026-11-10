@@ -136,6 +136,8 @@ $$
 \bar W = X^{\top}\bar Y,\qquad \bar X = \bar Y\,W^{\top}.
 $$
 
+**以标量索引严格展开：** 设批量矩阵乘法为 $Y_{ik} = \sum_j X_{ij} W_{jk}$。对权重元素 $W_{jk}$ 求梯度：$\bar W_{jk} = \frac{\partial L}{\partial W_{jk}} = \sum_{i,m} \frac{\partial L}{\partial Y_{im}} \frac{\partial Y_{im}}{\partial W_{jk}}$。由于 $\frac{\partial Y_{im}}{\partial W_{jk}} = X_{ij}\delta_{km}$，求和式塌缩为 $\sum_i \bar Y_{ik} X_{ij} = \sum_i X_{ij} \bar Y_{ik} = (X^\top \bar Y)_{jk}$。这严格证明了为什么前向乘法 $XW$ 在反向传播时必然会将 $X$ 转置后与上游梯度 $\bar Y$ 相乘！
+
 **形状规则：** 一个张量的伴随值与该张量形状相同。$\bar W$ 必须是 $n\times m$；$X^\top$（$n\times B$）与 $\bar Y$（$B\times m$）唯一能得到这个形状的乘积就是 $X^\top\bar Y$。在算任何数值之前先检查形状，就能抓到大部分的转置错误。
 
 **(b) 逐元素非线性。** $y_i = \varphi(x_i)$ 的雅可比矩阵是对角的，所以 $\bar x = \bar y\odot\varphi'(x)$。常用导数：$\tanh' = 1-\tanh^2$；logistic 函数 $\sigma' = \sigma(1-\sigma)$；$\mathrm{ReLU}'(x) = \mathbb 1[x>0]$（在 $0$ 处依惯例取值；§3.7.1）。
@@ -236,13 +238,21 @@ $$
 
 只有在 $|g_1|\gg\epsilon$ 时，才近似 $-\eta\operatorname{sign}(g_1)$（例题 3.7）。之后若梯度方向持续一致，$|\hat m|$ 可以接近 $\sqrt{\hat v}$；符号改变或变动很大时，这个比值会缩小。这是一种实用的逐坐标归一化启发法，不是反曲率的精确估计，也不是普遍的收敛保证。
 
-**AdamW：解耦的权重衰减。** 在损失加入 $\tfrac\lambda2\|\theta\|^2$，会在梯度加入 $\lambda\theta$。Adam 接着把这一项混入两个动差估计，并对它做自适应缩放，所以所得更新不等同于普通 SGD 权重衰减所产生的简单乘法收缩。AdamW 改为在自适应梯度变换之外施加收缩（[Loshchilov & Hutter 2019](/zh-cn/references/#loshchilov-2019)）：
+**AdamW：解耦的权重衰减。** 在损失加入 $\tfrac\lambda2\|\theta\|^2$，会在梯度加入 $\lambda\theta$。Adam 接着把这一项混入两个动差估计，并对它做自适应缩放，所以所得更新不等同于普通 SGD 权重衰减所产生的简单乘法收缩。
+
+**为什么传统 Adam 搭配 $L_2$ 正则化会严重失真？**
+在 SGD 中，对损失加上 $L_2$ 惩罚项 $\frac{\lambda}{2}\|\theta\|^2$ 与直接将权重缩放 $(1 - \eta\lambda)$ 是完全等价的：$\theta \leftarrow \theta - \eta(\nabla L + \lambda\theta) = (1 - \eta\lambda)\theta - \eta\nabla L$。
+然而在标准 Adam 中，若将 $\lambda\theta$ 混入梯度 $g$，梯度的平方项 $g^2$ 也会包含惩罚项，导致二阶动差 $\hat v$ 被人为放大。更致命的是，更新步中包含分母 $\sqrt{\hat v} + \epsilon$：
+- 对于**历史梯度很大或频繁更新的参数**（例如常见词元的嵌入向量或主要注意力矩阵），$\sqrt{\hat v}$ 极大，其权重衰减效应 $\frac{\lambda\theta}{\sqrt{\hat v}}$ 被严重除以大数而**被无故抑制**；
+- 对于**历史梯度很小的罕见特征参数**，$\sqrt{\hat v}$ 极小，其权重衰减效应反而被异常放大！
+
+这与正则化“对大权重施加一致惩罚”的初衷彻底背道而驰！[Loshchilov & Hutter (2019)](/zh-cn/references/#loshchilov-2019) 提出 AdamW，改为在自适应梯度变换之外施加收缩：
 
 $$
 \theta_k = \theta_{k-1} - \eta\Bigl(\frac{\hat m_k}{\sqrt{\hat v_k}+\epsilon} + \lambda\,\theta_{k-1}\Bigr).
 $$
 
-等价地说，显示的公式会先把旧参数乘上 $1-\eta\lambda$，再应用自适应更新。AdamW 是 Transformer 常用的优化器，也是主干项目相关阶段采用的选择；流行的工程惯例不等于它对每种模型都最优。[AdamW Atlas 节点](/zh-cn/atlas/nodes/opt-adamw/)列出了它的不变量与常见实现错误。
+等价地说，显示的公式会先把旧参数乘上 $1-\eta\lambda$，再应用自适应更新。不论参数的梯度历史有多大或多小，每个参数每一步都严格乘上统一的收缩因子 $(1 - \eta\lambda)$，彻底恢复了健康的权重衰减！这项修正也是现代大语言模型（如 GPT、LLaMA、Mistral）普遍标配 AdamW 的根本原因。[AdamW Atlas 节点](/zh-cn/atlas/nodes/opt-adamw/)列出了它的不变量与常见实现错误。
 
 ## 3.3.9 构建引擎
 

@@ -136,6 +136,8 @@ $$
 \bar W = X^{\top}\bar Y,\qquad \bar X = \bar Y\,W^{\top}.
 $$
 
+**Expanding rigorously with scalar indices:** consider batch matrix multiplication $Y_{ik} = \sum_j X_{ij} W_{jk}$. Differentiating with respect to weight element $W_{jk}$: $\bar W_{jk} = \frac{\partial L}{\partial W_{jk}} = \sum_{i,m} \frac{\partial L}{\partial Y_{im}} \frac{\partial Y_{im}}{\partial W_{jk}}$. Since $\frac{\partial Y_{im}}{\partial W_{jk}} = X_{ij}\delta_{km}$, the sum collapses to $\sum_i \bar Y_{ik} X_{ij} = \sum_i X_{ij} \bar Y_{ik} = (X^\top \bar Y)_{jk}$. This rigorously proves why forward multiplication $XW$ inevitably requires transposing $X$ and multiplying by upstream gradient $\bar Y$ during backpropagation!
+
 **Shape rule:** the adjoint of a tensor has that tensor's shape. $\bar W$ must be $n\times m$; the only product of $X^\top$ ($n\times B$) and $\bar Y$ ($B\times m$) with that shape is $X^\top\bar Y$. Checking shapes catches most transposition errors before any numerics.
 
 **(b) Elementwise nonlinearity.** $y_i = \varphi(x_i)$ has a diagonal Jacobian, so $\bar x = \bar y\odot\varphi'(x)$. Useful derivatives: $\tanh' = 1-\tanh^2$; $\sigma' = \sigma(1-\sigma)$ for the logistic $\sigma$; $\mathrm{ReLU}'(x) = \mathbb 1[x>0]$ (with a convention at $0$; §3.7.1).
@@ -236,13 +238,21 @@ $$
 
 which is approximately $-\eta\operatorname{sign}(g_1)$ only when $|g_1|\gg\epsilon$ (Worked Example 3.7). Across later steps, a consistent gradient can make $|\hat m|$ comparable to $\sqrt{\hat v}$, while sign changes or variability reduce that ratio. This is a useful per-coordinate normalization heuristic, not an exact estimate of inverse curvature and not a universal convergence guarantee.
 
-**AdamW: decoupled weight decay.** Adding $\tfrac\lambda2\|\theta\|^2$ to the loss adds $\lambda\theta$ to the gradient. Adam then mixes that term into both moment estimates and adaptively scales it, so the resulting update is not the simple multiplicative shrinkage produced by weight decay in ordinary SGD. AdamW instead applies shrinkage outside the adaptive gradient transform ([Loshchilov & Hutter 2019](/references/#loshchilov-2019)):
+**AdamW: decoupled weight decay.** Adding $\tfrac\lambda2\|\theta\|^2$ to the loss adds $\lambda\theta$ to the gradient. Adam then mixes that term into both moment estimates and adaptively scales it, so the resulting update is not the simple multiplicative shrinkage produced by weight decay in ordinary SGD.
+
+**Why does standard Adam with $L_2$ regularization fail?**
+In SGD, adding an $L_2$ penalty $\frac{\lambda}{2}\|\theta\|^2$ to the loss is strictly equivalent to exponential weight decay by $(1 - \eta\lambda)$: $\theta \leftarrow \theta - \eta(\nabla L + \lambda\theta) = (1 - \eta\lambda)\theta - \eta\nabla L$.
+However, in standard Adam, mixing $\lambda\theta$ directly into gradient $g$ poisons both moment estimators. Because the update divides by $\sqrt{\hat v} + \epsilon$:
+- Parameters with **frequent or large gradients** (such as frequent token embeddings or dense attention weights) have huge $\sqrt{\hat v}$, so their effective weight decay $\frac{\lambda\theta}{\sqrt{\hat v}}$ is heavily suppressed;
+- Parameters with **infrequent or small gradients** have tiny $\sqrt{\hat v}$, so their weights are disproportionately over-decayed!
+
+This is the exact opposite of healthy regularization. [Loshchilov & Hutter (2019)](/references/#loshchilov-2019) proposed AdamW to decouple weight decay completely from the adaptive gradient transformation:
 
 $$
 \theta_k = \theta_{k-1} - \eta\Bigl(\frac{\hat m_k}{\sqrt{\hat v_k}+\epsilon} + \lambda\,\theta_{k-1}\Bigr).
 $$
 
-Equivalently, the displayed formula multiplies the previous parameter by $1-\eta\lambda$ and then applies the adaptive update. AdamW is a common Transformer optimizer and is the choice used by the relevant spine stages; that popularity is an engineering convention, not a theorem that it is best for every model. The [AdamW Atlas node](/atlas/nodes/opt-adamw/) lists its invariants and common implementation bugs.
+Equivalently, the displayed formula multiplies the previous parameter by $1-\eta\lambda$ and then applies the adaptive update. Every parameter shrinks by $(1 - \eta\lambda)$ regardless of its gradient history, restoring sound regularization across all layers. This theoretical fix is why AdamW is universally standard in modern LLMs (e.g., GPT, LLaMA, Mistral). The [AdamW Atlas node](/atlas/nodes/opt-adamw/) lists its invariants and common implementation bugs.
 
 ## 3.3.9 Building the engine
 
