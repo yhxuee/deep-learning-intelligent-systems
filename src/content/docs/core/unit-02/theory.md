@@ -104,7 +104,7 @@ $$
 F(g\cdot x) = g\cdot F(x).
 $$
 
-**The sparsity miracle of equivariant linear maps:**
+**The structural constraint of equivariant linear maps:**
 Constraining a linear layer $F(x) = Wx$ to satisfy group equivariance shrinks the parameter space dramatically:
 - **Cyclic shift equivariance:** For a 1D sequence of length $T$, shift equivariance forces $W$ to be a **circulant matrix**, reducing $T^2$ parameters to just $T$ convolution filter weights — the mathematical origin of **convolutional neural networks** (Unit 04, Theorem 4.2)!
 - **Permutation equivariance:** For an unordered set of $T$ elements, permutation equivariance forces the linear map to take the form $X \mapsto XA + \mathbf{1}\mathbf{1}^{\top}XB$ ([Zaheer et al. 2017](/references/#zaheer-2017); Unit 04, Theorem 4.3). Each position can see only itself and the global average.
